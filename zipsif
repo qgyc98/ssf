@@ -1,0 +1,13 @@
+#!/bin/bash
+
+FNAME=$(date +%y_%m_%d)
+
+GLOBIGNORE="*"
+
+FILETYPES='*.cpp *.h Makefile.in Makefile mergelib'
+
+echo Creating backup file prg$FNAME.zip with following files $FILETYPES
+
+zip -R prg$FNAME $FILETYPES -x 691/\* EXAM/\* GEFEL/PERMON/\* GEFEL/PETSC/\* GEFEL/CHOLMOD/\* ARCHIVES/\* EXAMPLES/\* WORK/\*
+
+echo Backup file prg$FNAME.zip was created
