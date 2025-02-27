@@ -1,0 +1,25 @@
+Installation
+============
+
+1. Extract package with 'tar xzvf cmlfile-xxxx.tgz'
+
+2. Type 'make lib'
+
+3. Edit (if necessary) lines
+
+	INSTDIR_INCLUDE = /usr/include
+	INSTDIR_LIB = /usr/lib
+
+   in 'makefile'
+   
+4. Become root and type 'make install'
+
+5. Optional: 'make test' and run test routine with './test train.cml'
+
+
+
+Uninstallation
+==============
+
+1. Become root and type 'make uninstall'
+

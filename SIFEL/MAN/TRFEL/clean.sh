@@ -1,0 +1,9 @@
+rm -f *.aux
+rm -f *.dvi
+rm -f *.log
+rm -f *.idx
+rm -f *.ind
+rm -f *.ilg
+rm -f *.toc
+rm -f *.tex~
+rm -f clean.sh~

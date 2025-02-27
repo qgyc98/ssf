@@ -1,0 +1,156 @@
+####################################################################
+#
+#  Makefile for hybrid parallel mechanical code HPMEFEL
+#
+####################################################################
+
+
+
+# the following variable indicates the makefile as the parallel part of code
+PARSIFEL = yes
+
+
+
+################################################################### 
+#  Include default part of Makefile - 
+#  compiler definitions, flags, libraries ...
+#
+include ../../Makefile.in
+
+
+
+################################################################### 
+#  List of include directories
+#
+INCLUDES         = ../../GEFEL/:../../GEFEL/PARSER/:../../GEFEL/OPTIM:../../GEFEL/RANDY:../../GEFEL/CMLFILE:../../PARGEF/:../../HPARAL/SRC:../../MEFEL/SRC/:../../TRFEL/SRC/:$(MPI_HOME)/include
+
+
+
+################################################################### 
+#  List of libraries
+#
+LOC_LIBS        =   -lmef -lgef -lpargef
+
+
+
+####################################################################
+# List of source files
+#
+SRCS = hplssolver.cpp hpmefel.cpp hpmefelinit.cpp hpmtsolver.cpp hpsolver.cpp hpsolverm.cpp
+
+
+
+####################################################################
+# List of object files
+
+OBJS     = $(SRCS:%.cpp=$(OUTPUTPATH)%.o)
+MOBJS    = $(OUTPUTPATH)hpmefel.o
+HPMEFEL  = $(OUTPUTPATH)hpmefel
+LIBHPMEF = $(OUTPUTPATH)libhpmef.a
+
+
+####################################################################
+#  List of lib files
+#
+
+# list of dependent libraries
+LIBDEPS = $(SIFEL_ROOT)$(BIN_ROOT)GEFEL/$(OUTPUTDIR)libgef.a  $(SIFEL_ROOT)$(BIN_ROOT)MEFEL/SRC/$(OUTPUTDIR)libmef.a  $(SIFEL_ROOT)$(BIN_ROOT)PARGEF/$(OUTPUTDIR)libpargef.a
+
+# list of paths for dependent libraries
+DIR_LIBS=-L$(SIFEL_ROOT)$(BIN_ROOT)MEFEL/SRC/$(OUTPUTDIR) -L$(SIFEL_ROOT)$(BIN_ROOT)PARGEF/$(OUTPUTDIR) -L$(SIFEL_ROOT)$(BIN_ROOT)GEFEL/$(OUTPUTDIR)
+
+# list of mpi libraries
+#MPI_LIB = -L$(MPI_HOME)/lib -lpmpich++ -lpmpich
+
+#list of all necessary libraries
+LIBS	 = $(DIR_LIBS) $(LOC_LIBS) $(SYS_LIBS) #${PETSC_C_SH_LIB_PATH} ${PETSC_LIB}
+
+
+
+###########################################################################################
+#  Following targets will be made regardless of whether there are files with the same names
+#
+.PHONY : mefel pargef
+
+
+
+#########################################################################
+#  Targets
+#
+all:  $(HPMEFEL)
+
+$(HPMEFEL): $(LIBDEPS) $(MOBJS) $(OBJS)
+	@($(RM) $@)
+	@(echo "##### Creating HPMEFEL library . . .")
+	@(echo $(AR) $(ARFLAGS) $(OUTPUTPATH)libhpmef.a $(SRCS:%.cpp=$(OUTPUTDIR)%.o))
+	$(AR) $(ARFLAGS) $(OUTPUTPATH)libhpmef.a $(OBJS)
+	@(echo "##### HPMEFEL library was successfully created")
+	@(echo "##### Creating hpmefel executable . . .")
+	$(PCC) -o $@ $(MOBJS) $(EXECFLAGS) -L$(OUTPUTPATH) -lhpmef $(LIBS)
+	@(echo "##### hpmefel was successfully created")
+
+$(MOBJS): | $(OUTPUTPATH)
+$(OBJS):  | $(OUTPUTPATH)
+
+$(OUTPUTPATH):
+	@(mkdir -p $(OUTPUTPATH))
+
+$(LIBDEPS) : mefel pargef;
+
+clean:    
+	@($(RM)  $(HPMEFEL) $(LIBHPMEF) $(OBJS) *~ core)
+	@(echo " hpmefel was successfully cleaned")
+
+cleanall: $(LIBDEPS)
+	@($(RM) -r -f $(addprefix $(SIFEL_ROOT)$(BIN_ROOT)$(MODULE_PATH),$(REMOVEDIR)))
+	@(echo " hpmefel was successfully cleaned")
+
+cleandepall: $(LIBDEPS)
+	@($(RM) -r -f $(SIFEL_ROOT)$(BIN_ROOT)$(MODULE_PATH))
+	@(echo " hpmefel was successfully cleaned")
+
+cleandeb:    clean
+cleanopt:    clean
+cleanoptdeb: clean
+
+cleandep:       cleanall
+cleandepdeb:    cleanall
+cleandepopt:    cleanall
+cleandepoptdeb: cleanall
+
+################################################################
+# Module targets
+#
+
+mefel:
+	+@(cd ../../MEFEL/SRC; $(MAKE) $(MAKECMDGOALS))
+
+pargef: |mefel;
+	+@(cd ../../PARGEF; $(MAKE) $(MAKECMDGOALS))
+
+
+####################################################################
+#  Suffix rules
+#
+$(OUTPUTPATH)%.o : %.cpp
+	@export CPATH=$(INCLUDES); \
+	echo $(PCC) $(CFLAGS) -c $(<D)/$(<F); \
+	$(PCC) $(CFLAGS) $(COMPATFLAGS) $(DEFS) -c $(<D)/$(<F) -o $(@D)/$(@F)
+
+
+################################################################
+# Dependencies
+
+depend: $(LIBDEPS)
+	$(DEPEND) -DMAKEDEPEND $(SRCS)
+#	$(DEPEND) -DMAKEDEPEND $(DEFS) $(INCLUDES) $(SRCS)
+
+dependclean: $(LIBDEPS)
+	(t="/tmp/t_$$" ; sed 1,/"DO\ NOT\ DELETE"/p Makefile -n > t ; mv t Makefile)
+
+
+
+
+
+####################################################################
+# DO NOT DELETE

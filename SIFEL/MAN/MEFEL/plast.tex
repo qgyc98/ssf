@@ -1,0 +1,643 @@
+\chapter{Plasticity}
+
+stress tensor
+\begin{eqnarray}
+\left(\begin{array}{ccc}
+\sigma_{xx} & \sigma_{xy} & \sigma_{xz}
+\\
+\sigma_{yx} & \sigma_{yy} & \sigma_{yz}
+\\
+\sigma_{zx} & \sigma_{zy} & \sigma_{zz}
+\end{array}\right)
+\end{eqnarray}
+
+stress vector
+\begin{eqnarray}
+\mbf{\sigma} = \left(\begin{array}{c}
+\sigma_x
+\\
+\sigma_y
+\\
+\sigma_z
+\\
+\tau_{yz}
+\\
+\tau_{zx}
+\\
+\tau_{xy}
+\end{array}\right) = \left(\begin{array}{c}
+\sigma_{xx}
+\\
+\sigma_{yy}
+\\
+\sigma_{zz}
+\\
+\sigma_{yz}
+\\
+\sigma_{zx}
+\\
+\sigma_{xy}
+\end{array}\right)
+\end{eqnarray}
+
+
+first invariant of the stress tensor
+\begin{eqnarray}
+I_1 = \sigma_{ii} = \sigma_{xx} + \sigma_{yy} + \sigma_{zz} = \sigma_x + \sigma_y + \sigma_z
+\end{eqnarray}
+
+mean stress\index{mean stress}
+\begin{eqnarray}
+\sigma_m = \frac{1}{3} I_1 = \frac{1}{3}(\sigma_{xx} + \sigma_{yy} + \sigma_{zz}) = \frac{1}{3}(\sigma_x + \sigma_y + \sigma_z)
+\end{eqnarray}
+
+first derivatives of the first invariant of stress tensor (in vector notation)
+\begin{eqnarray}
+\ppd{I_1}{\sigma_x} &=& 1
+\\
+\ppd{I_1}{\sigma_y} &=& 1
+\\
+\ppd{I_1}{\sigma_z} &=& 1
+\\
+\ppd{I_1}{\tau_{yz}} &=& 0
+\\
+\ppd{I_1}{\tau_{zx}} &=& 0
+\\
+\ppd{I_1}{\tau_{xy}} &=& 0
+\\
+\end{eqnarray}
+
+second derivates are identically equal to zero
+
+matrix form of second derivates of $I_1^2$ (in vector notation)
+\begin{eqnarray}
+\npd{2}{I_1^2}{\mbf{\sigma}} = \left(\begin{array}{rrrrrr}
+2 & 2 & 2 & 0 & 0 & 0
+\\[2mm]
+2 & 2 & 2 & 0 & 0 & 0
+\\[2mm]
+2 & 2 & 2 & 0 & 0 & 0
+\\[2mm]
+0 & 0 & 0 & 0 & 0 & 0
+\\[2mm]
+0 & 0 & 0 & 0 & 0 & 0
+\\[2mm]
+0 & 0 & 0 & 0 & 0 & 0
+\end{array}\right)
+\end{eqnarray}
+
+third invariant of the stress tensor
+\begin{eqnarray}
+I_{3s} &=& \left|\begin{array}{ccc}
+\sigma_{xx} & \sigma_{xy} & \sigma_{xz}
+\\
+\sigma_{yx} & \sigma_{yy} & \sigma_{yz}
+\\
+\sigma_{zx} & \sigma_{zy} & \sigma_{zz}
+\end{array}\right| = 
+\\ \nonumber
+&=& \sigma_{xx} \sigma_{yy} \sigma_{zz} +  \sigma_{xy} \sigma_{yz} \sigma_{zx} + \sigma_{xz} \sigma_{yx} \sigma_{zy} -  \sigma_{xz}^2 \sigma_{yy} - \sigma_{yz}^2 \sigma_{xx} - \sigma_{zz} \sigma_{xy}^2
+\end{eqnarray}
+
+
+\begin{eqnarray}
+\ppd{I_{3s}}{\sigma_{xx}} &=& \sigma_{yy}\sigma_{zz} - \sigma_{yz}\sigma_{zy}
+\\
+\ppd{I_{3s}}{\sigma_{xy}} &=& \sigma_{yz}\sigma_{zx} - \sigma_{yx}\sigma_{zz}
+\\
+\ppd{I_{3s}}{\sigma_{xz}} &=& \sigma_{yx}\sigma_{zy} - \sigma_{yy}\sigma_{zx}
+\\
+\ppd{I_{3s}}{\sigma_{yx}} &=& \sigma_{xz}\sigma_{zy} - \sigma_{xy}\sigma_{zz}
+\\
+\ppd{I_{3s}}{\sigma_{yy}} &=& \sigma_{xx}\sigma_{zz} - \sigma_{xz}\sigma_{zx}
+\\
+\ppd{I_{3s}}{\sigma_{yz}} &=& \sigma_{xy}\sigma_{zx} - \sigma_{xx}\sigma_{zy}
+\\
+\ppd{I_{3s}}{\sigma_{zx}} &=& \sigma_{xy}\sigma_{yz} - \sigma_{xz}\sigma_{yy}
+\\
+\ppd{I_{3s}}{\sigma_{zy}} &=& \sigma_{xz}\sigma_{yx} - \sigma_{xx}\sigma_{yz}
+\\
+\ppd{I_{3s}}{\sigma_{zz}} &=& \sigma_{xx}\sigma_{yy} - \sigma_{xy}\sigma_{yx}
+\end{eqnarray}
+
+stress deviator\index{stress deviator} (tensor notation)
+\begin{eqnarray}
+s_{ij} = \sigma_{ij} - \sigma_m \delta_{ij}
+\end{eqnarray}
+stress deviator\index{stress deviator} (vector notation)
+\begin{eqnarray}
+\mbf{s} = \left(\begin{array}{c}
+\frac{2}{3}\sigma_{x} - \frac{1}{3}\sigma_{y} - \frac{1}{3}\sigma_{z}
+\\[2mm]
+\frac{2}{3}\sigma_{y} - \frac{1}{3}\sigma_{x} - \frac{1}{3}\sigma_{z}
+\\[2mm]
+\frac{2}{3}\sigma_{z} - \frac{1}{3}\sigma_{x} - \frac{1}{3}\sigma_{y}
+\\[2mm]
+\tau_{yz}
+\\
+\tau_{zx}
+\\
+\tau_{xy}
+\end{array}\right)
+\end{eqnarray}
+
+first invariant of the stress deviator
+\begin{eqnarray}
+J_1 = 0
+\end{eqnarray}
+
+second invariant of the stress deviator
+\begin{eqnarray}
+J_2 = \del{1}{3}(\sigma_x^2 + \sigma_y^2 + \sigma_z^2 - \sigma_y \sigma_z - \sigma_z \sigma_x -
+\sigma_x \sigma_y) + \tau_{yz}^2 + \tau_{zx}^2 + \tau_{xy}^2
+\end{eqnarray}
+
+first derivatives of the second invariant of stress deviator
+\begin{eqnarray}
+\ppd{J_2}{\sigma_x} &=& \del{1}{3} (2 \sigma_x - \sigma_z - \sigma_y) = s_x
+\\
+\ppd{J_2}{\sigma_y} &=& \del{1}{3} (2 \sigma_y - \sigma_z - \sigma_x) = s_y
+\\
+\ppd{J_2}{\sigma_z} &=& \del{1}{3} (2 \sigma_z - \sigma_y - \sigma_x) = s_z
+\\
+\ppd{J_2}{\tau_{yz}} &=& 2 \tau_{yz}
+\\
+\ppd{J_2}{\tau_{zx}} &=& 2 \tau_{zx}
+\\
+\ppd{J_2}{\tau_{xy}} &=& 2 \tau_{xy}
+\end{eqnarray}
+
+second derivatives of the second invariant of stress deviator
+
+\begin{eqnarray}
+\dpd{J_2}{\sigma_x}{\sigma_x} &=& \del{2}{3}
+\\
+\dpd{J_2}{\sigma_x}{\sigma_y} &=& -\del{1}{3}
+\\
+\dpd{J_2}{\sigma_x}{\sigma_z} &=& -\del{1}{3}
+\\
+\dpd{J_2}{\sigma_x}{\tau_{yz}} &=& 0
+\\
+\dpd{J_2}{\sigma_x}{\tau_{zx}} &=& 0
+\\
+\dpd{J_2}{\sigma_x}{\tau_{xy}} &=& 0
+\\
+\dpd{J_2}{\sigma_y}{\sigma_y} &=& \del{2}{3}
+\\
+\dpd{J_2}{\sigma_y}{\sigma_z} &=& -\del{1}{3}
+\\
+\dpd{J_2}{\sigma_y}{\tau_{yz}} &=& 0
+\\
+\dpd{J_2}{\sigma_y}{\tau_{zx}} &=& 0
+\\
+\dpd{J_2}{\sigma_y}{\tau_{xy}} &=& 0
+\\
+\dpd{J_2}{\sigma_z}{\sigma_z} &=& \del{2}{3}
+\\
+\dpd{J_2}{\sigma_z}{\tau_{yz}} &=& 0
+\\
+\dpd{J_2}{\sigma_z}{\tau_{zx}} &=& 0
+\\
+\dpd{J_2}{\sigma_z}{\tau_{xy}} &=& 0
+\\
+\dpd{J_2}{\tau_{yz}}{\tau_{yz}} &=& 2
+\\
+\dpd{J_2}{\tau_{yz}}{\tau_{zx}} &=& 0
+\\
+\dpd{J_2}{\tau_{yz}}{\tau_{xy}} &=& 0
+\\
+\dpd{J_2}{\tau_{zx}}{\tau_{zx}} &=& 2
+\\
+\dpd{J_2}{\tau_{zx}}{\tau_{xy}} &=& 0
+\\
+\dpd{J_2}{\tau_{xy}}{\tau_{xy}} &=& 2
+\end{eqnarray}
+
+matrix form of second derivatives of the second invariant of stress deviator
+\begin{eqnarray}
+\npd{2}{J_2}{\mbf{\sigma}} = \left(\begin{array}{rrrrrr}
+ \frac{2}{3} & -\frac{1}{3} & -\frac{1}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{1}{3} &  \frac{2}{3} & -\frac{1}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{1}{3} & -\frac{1}{3} &  \frac{2}{3} & 0 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 2 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 2 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 0 & 2
+\end{array}\right)
+\end{eqnarray}
+
+\begin{eqnarray}
+\ppd{J_3}{\mbf{\sigma}} = \left(\begin{array}{c}
+s_y s_z - \tau_{yz}^2 + \frac{J_2}{3}
+\\[2mm]
+s_x s_z - \tau_{xz}^2 + \frac{J_2}{3}
+\\[2mm]
+s_x s_y - \tau_{xy}^2 + \frac{J_2}{3}
+\\[2mm]
+2(\tau_{yz}\tau_{xz} - s_z \tau_{xy})
+\\[2mm]
+2(\tau_{xz}\tau_{xy} - s_x \tau_{yz})
+\\[2mm]
+2(\tau_{xy}\tau_{yz} - s_y \tau_{xz})
+\end{array}\right)
+\end{eqnarray}
+
+\begin{eqnarray}
+\npd{2}{J_3}{\mbf{\sigma}} = \frac{2}{3}\left(\begin{array}{cccccc}
+       s_{x} &        s_{z} &        s_{y} &    \tau_{xy} & -2 \tau_{yz} &    \tau_{xz}
+\\
+       s_{z} &        s_{y} &        s_{x} &    \tau_{xy} &    \tau_{yz} & -2 \tau_{xz}
+\\
+       s_{y} &        s_{x} &        s_{z} & -2 \tau_{xy} &    \tau_{yz} &    \tau_{xz}
+\\
+   \tau_{xy} &    \tau_{xy} & -2 \tau_{xy} &     -3 s_{z} &  3 \tau_{xz} &  3 \tau_{yz}
+\\
+-2 \tau_{yz} &    \tau_{yz} &    \tau_{yz} &  3 \tau_{xz} &     -3 s_{x} &  3 \tau_{xy}
+\\
+   \tau_{xz} & -2 \tau_{xz} &    \tau_{xz} &  3 \tau_{yz} &  3 \tau_{xy} &     -3 s_{y}
+\end{array}\right)
+\end{eqnarray}
+
+
+Zienkiewicz and Cormeau in reference \cite{zienkiewicz:viscoplasticity} use the
+yield function in the form
+\begin{eqnarray}
+f (\mbf{\sigma}) = f(\sigma_m, J_2, J_3)
+\end{eqnarray}
+where $\sigma_m$ is the mean\index{mean stress} stress, $J_2$ and $J_3$ are second and third
+invariants of the stress deviator. Their definitions are the following
+\begin{eqnarray}
+\sigma_m &=& \frac{1}{3} \sigma_{ii}
+\\
+s_{ij} &=& \sigma_{ij} - \delta_{ij} \sigma_m
+\\
+J_2 &=& \frac{1}{2} s_{ij} s_{ij}
+\\
+J_3 &=& \frac{1}{3} s_{ij} s_{jk} s_{ki} = \det \mbf{s}
+\end{eqnarray}
+An alternative to the third invariant $J_3$ is the Lode \index{Lode angle} angle
+\begin{eqnarray}
+-\frac{\pi}{6} \leq \theta = \frac{1}{3} \sin^{-1}\left(\frac{-3 \sqrt{3} J_3}{2 J_2^{\frac{3}{2}}}\right) \leq \frac{\pi}{6}
+\end{eqnarray}
+In reference \cite{crisfield2}, the principal stresses can be expressed in the form
+\begin{eqnarray}
+\left(\begin{array}{c}
+\sigma_1
+\\
+\sigma_2
+\\
+\sigma_3
+\end{array}\right) = \frac{2\sqrt{J_2}}{\sqrt{3}}
+\left(\begin{array}{c}
+\sin (\theta + 2\pi/3)
+\\
+\sin \theta
+\\
+\sin (\theta - 2\pi/3)
+\end{array}\right) + \frac{I_1}{2} \left(\begin{array}{c}
+1
+\\
+1
+\\
+1
+\end{array}\right)
+\end{eqnarray}
+
+In reference \cite{crisfield2}, derivative of the Lode angle with respect to the stress vector has the form
+\begin{eqnarray}
+\ppd{\theta}{\mbf{\sigma}} = \frac{-\sqrt{3}}{2 \cos 3\theta} \left(J_2^{-3 \over 2} \ppd{J_3}{\mbf{\sigma}} - \frac{3}{2} J_3 J_2^{-5 \over 2} \ppd{J_2}{\mbf{\sigma}}\right)
+\end{eqnarray}
+
+\section{Tresca model of plasticity}
+\index{model of plasticity!Tresca}
+
+In reference \cite{prochazka}, the yield function has the form
+\begin{eqnarray}
+f = 2\sqrt{J_2} \cos \alpha - \alpha_0\ ,
+\end{eqnarray}
+where $\alpha$ and $\alpha_0$ are Lode angles.
+
+\section{von Mises model of plasticity}
+\index{model of plasticity!von Mises}
+
+In reference \cite{prochazka}, the yield function has the form
+\begin{eqnarray}
+f = \sqrt{3 J_2} - \sigma_0\ ,
+\end{eqnarray}
+
+\section{Mohr-Coulomb model of plasticity}
+\index{model of plasticity!Mohr-Coulomb}
+
+In reference \cite{prochazka}, the yield function has the form
+\begin{eqnarray}
+f = \frac{I_1}{3} \sin \varphi' + \sqrt{I_2}(\cos \alpha - \frac{1}{\sqrt{3}}\sin \alpha \sin \varphi') - c' \cos \varphi 
+\end{eqnarray}
+where $\alpha$ is the Lode angle.
+
+
+\section{Drucker-Prager model of plasticity}
+\index{model of plasticity!Drucker-Prager}
+
+In reference \cite{jirasek:skripta}, the Drucker-Prager model of plasticity
+is based on the yield function in the form
+\begin{eqnarray}
+f(\mbf{\sigma}) = 3 \alpha_{\phi} \sigma_m(\mbf{\sigma}) + \sqrt{J_2(\mbf{\sigma})} - \tau_0 = \alpha_{\phi} I_{1,s} + \sqrt{J_2(\mbf{\sigma})} - \tau_0\ ,
+\end{eqnarray}
+where $\alpha_{\phi}$ is the angle of internal\index{angle of internal friction} friction,
+$\sigma_m(\mbf{\sigma})$ is the mean\index{mean stress} stress,
+$I_{1,s}$ is the first invarinat of stress tensor and
+$J_2(\mbf{\sigma})$ is second invariant of the stress deviator.
+
+In reference \cite{belytschko:nonlin}, the Drucker-Prager model of plasticity
+is based on the yield function in the form
+\begin{eqnarray}
+f = \bar{\sigma} - \alpha I_{1,s} - Y\ ,
+\end{eqnarray}
+where $\bar{\sigma}$ is the efffective\index{efffective stress} stress and
+the coefficients are in the form
+\begin{eqnarray}\label{eqplasticitydruckerprager1}
+\alpha &=& \frac{2 \sin \phi}{3 \pm \sin \phi}\ ,
+\\ \label{eqplasticitydruckerprager2}
+Y &=& \frac{6 c \cos \phi}{3 \pm \sin \phi}\ ,
+\end{eqnarray}
+where $\phi$ is the angle of internal\index{angle of internal friction} friction
+and $c$ is the cohesion.\index{cohesion}
+The efffective stress has the form
+\begin{eqnarray}
+\bar{\sigma} = \sqrt{\frac{3}{2}s_{ij}s_{ij}}\ .
+\end{eqnarray}
+The plus sign in (\ref{eqplasticitydruckerprager1}) and (\ref{eqplasticitydruckerprager2})
+corresponds to the inner apexes and minus signe corresponds to the outer apexes
+of the Mohr-Coulomb yield surface.
+The derivative with respect to the stress vector has the form
+\begin{eqnarray}
+\od{f}{\mbf{\sigma}} = \frac{3}{2\bar{\sigma}} \mbf{s} - \alpha \mbf{I}
+\end{eqnarray}
+
+In reference \cite{crisfield2}, the Drucker-Prager model of plasticity
+is based on the yield function in the form
+\begin{eqnarray}
+f = D I_1 + \sqrt{J_2} - \sigma_0\ ,
+\end{eqnarray}
+where
+\begin{eqnarray}
+D &=& \frac{2 \sin \phi}{\sqrt{3}(3 \pm \sin \phi)}\ ,
+\\
+\sigma_0 &=& \frac{6 c \cos \phi}{\sqrt{3}(3 \pm \sin \phi)}\ .
+\end{eqnarray}
+
+
+In reference \cite{prochazka}, the yield function has the form
+\begin{eqnarray}
+f = \alpha' I_1 + \sqrt{J_2} - K'\ ,
+\end{eqnarray}
+where
+\begin{eqnarray}
+\alpha' &=& \frac{2 \sin \varphi'}{\sqrt{3}(3-\sin \varphi')}
+\\
+K' &=& \frac{6 c' \cos \varphi'}{\sqrt{3}(3-\sin \varphi')}
+\end{eqnarray}
+where $\varphi'$ is the internal friction angle and $c'$ is the cohesion.
+If the parameters are defined in the form
+\begin{eqnarray}
+\alpha' &=& \frac{\tan \varphi'}{\sqrt{9+12 \tan \varphi'}}
+\\
+K' &=& \frac{3 c'}{\sqrt{9+12 \tan \varphi'}}
+\end{eqnarray}
+the Mohr-Coulomb model is obtained.
+
+
+
+\section{Gurson model of plasticity}
+\index{model of plasticity!Gurson}
+
+In reference \cite{belytschko:nonlin}, the Gurson model of plasticity,
+which is used in progressive microrupture modelling,
+is based on the yield function in the form
+\begin{eqnarray}
+f = \frac{\sigma_e^2}{\bar{\sigma}^2} + 2 f^* \beta_1 \cosh \frac{\beta_2 I_{1,s}}{2\bar{\sigma}} - (\beta_1 f^*)^2 - 1\ ,
+\end{eqnarray}
+where
+$\sigma_e=\sqrt{\frac{3}{2}s_{ij}s_{ij}}$ is the effective macroscopic stress,
+$\bar{\sigma}$ is the effective stress in the matrix material,
+$f^*$ is the function of the void volume fraction,
+$\beta$ and $\beta_1$ are material parameters originally set to one.
+The function of the void volume fraction has the form
+\begin{eqnarray}
+f^* &=& f\ \  {\rm for} f \leq f_c
+\\
+f^* &=& f_c + \frac{(f_u-f_c)(f-f_c)}{f_f-f_c}\ \  {\rm for} f>f_c
+\end{eqnarray}
+where
+$f$ is the volume fraction,
+$f_u=\frac{1}{\beta_1}$,
+$f_c$ is the critical value
+and $f_f$ is the void volume fraction.
+
+First derivatives with respect to stress have the form
+\begin{eqnarray}
+\od{f}{\mbf{\sigma}} = \frac{3}{\bar{\sigma}^2} \mbf{s} + \frac{f^* \beta \beta_1}{\bar{\sigma}} \sinh \left(\frac{\beta_2 I_{1,s}}{2\bar{\sigma}}\right)\mbf{I} 
+\end{eqnarray}
+
+In reference \cite{crisfield2}, Tvergaard's modification of the Gurson model
+for porous materials has the form
+\begin{eqnarray}
+f = J_2 - a_0 + a_1 \cosh a_2 \sigma_m\ ,
+\end{eqnarray}
+where $a_0$, $a_1$ are related to the void volume fractions.
+
+\section{Chen model of plasticity}
+\begin{eqnarray}
+f_1 (\mbf{\sigma}) = J_2 + \del{1}{3} A I_1 - \tau^2 &=& 0 
+\\
+f_2 (\mbf{\sigma}) = J_2 -\del{1}{6} I_1^2 + \del{1}{3} A I_1 - \tau^2 &=& 0 
+\end{eqnarray}
+
+\begin{eqnarray}
+\ppd{f_1}{\mbf{\sigma}} = \left(\begin{array}{c}
+\frac{1}{3}(2\sigma_x - \sigma_z - \sigma_y) + \frac{1}{3} A
+\\[2mm]
+\frac{1}{3}(2\sigma_y - \sigma_z - \sigma_x) + \frac{1}{3} A
+\\[2mm]
+\frac{1}{3}(2\sigma_z - \sigma_x - \sigma_y) + \frac{1}{3} A
+\\[2mm]
+2 \tau_{yz}
+\\[2mm]
+2 \tau_{zx}
+\\[2mm]
+2 \tau_{xy}
+\\[2mm]
+\end{array}\right)
+\end{eqnarray}
+
+\begin{eqnarray}
+\ppd{f_2}{\mbf{\sigma}} = \left(\begin{array}{c}
+\frac{1}{3}(2\sigma_x - \sigma_z - \sigma_y) + \frac{1}{3} A - \frac{1}{3} I_1
+\\[2mm]
+\frac{1}{3}(2\sigma_y - \sigma_z - \sigma_x) + \frac{1}{3} A - \frac{1}{3} I_1
+\\[2mm]
+\frac{1}{3}(2\sigma_z - \sigma_x - \sigma_y) + \frac{1}{3} A - \frac{1}{3} I_1
+\\[2mm]
+2 \tau_{yz}
+\\[2mm]
+2 \tau_{zx}
+\\[2mm]
+2 \tau_{xy}
+\\[2mm]
+\end{array}\right)
+\end{eqnarray}
+
+\begin{eqnarray}
+\npd{2}{f_1}{\mbf{\sigma}} = \left(\begin{array}{rrrrrr}
+ \frac{2}{3} & -\frac{1}{3} & -\frac{1}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{1}{3} &  \frac{2}{3} & -\frac{1}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{1}{3} & -\frac{1}{3} &  \frac{2}{3} & 0 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 2 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 2 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 0 & 2
+\end{array}\right)
+\end{eqnarray}
+
+\begin{eqnarray}
+\npd{2}{f_2}{\mbf{\sigma}} = \left(\begin{array}{rrrrrr}
+ \frac{1}{3} & -\frac{2}{3} & -\frac{2}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{2}{3} &  \frac{1}{3} & -\frac{2}{3} & 0 & 0 & 0
+\\[2mm]
+-\frac{2}{3} & -\frac{2}{3} &  \frac{1}{3} & 0 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 2 & 0 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 2 & 0
+\\[2mm]
+          0  &           0  &           0  & 0 & 0 & 2
+\end{array}\right)
+\end{eqnarray}
+
+\section{Drucker-Prager}
+In reference \cite{zienkiewicz:viscoplasticity} is stated that
+Drucker and Prager formulated a yield function for soil-like materials
+in reference \cite{drucker:druckerprager} in the form
+\begin{eqnarray}
+f = \frac{6 \sin \psi}{3 - \psi} \sigma_m + \sqrt{3 J_2} - \frac{6 c \cos \psi}{3 - \sin \psi} 
+\end{eqnarray}
+where $c$ is the cohesion and $\psi$ is the friction angle.
+If $\psi=0$, Von Mises criterion is obtained
+\begin{eqnarray}
+f = \sqrt{3 J_2} - 2 c
+\end{eqnarray}
+
+\section{Mohr-Coulomb yield surface}
+\begin{eqnarray}
+f = 2 \sigma_m \sin \psi + \left(2 \cos \theta - \frac{1}{\sqrt{3}} \sin \psi \sin \theta\right) \sqrt{J_2} - 2 c \cos \psi
+\end{eqnarray}
+where $c$ is the cohesion, $\psi$ is the friction angle and $\theta$ is the Lode angle.
+If $\psi=0$, Tresca criterion is obtained
+\begin{eqnarray}
+f = 2 \cos \theta \sqrt{J_2} - 2 c
+\end{eqnarray}
+
+
+\section{Stress return algorithm}
+
+plastic strains
+\begin{eqnarray}
+\dot{\mbf{\varepsilon}}^p = \dot{\gamma} \mbf{r}
+\\
+\dot{\mbf{\varepsilon}}^p = \dot{\gamma} \ppd{g}{\mbf{\sigma}}
+\\
+\dot{\mbf{\varepsilon}}^p = \dot{\gamma} \ppd{f}{\mbf{\sigma}}
+\end{eqnarray}
+stress
+\begin{eqnarray}
+\mbf{\sigma} = \mbf{D} (\mbf{\varepsilon} - \mbf{\varepsilon}^p)
+\end{eqnarray}
+hardening
+\begin{eqnarray}
+\dot{\mbf{q}} = \dot{\gamma} \mbf{h}
+\end{eqnarray}
+
+discrete version
+
+increment of plastic strains
+\begin{eqnarray}
+\Delta \mbf{\varepsilon}^p_{n+1} = \Delta \gamma_{n+1} \ppd{g_{n+1}}{\mbf{\sigma}}
+\end{eqnarray}
+new stress
+\begin{eqnarray}
+\mbf{\sigma}_{n+1} = \mbf{D} \left(\mbf{\varepsilon}_{n+1} - \mbf{\varepsilon}^p_{n+1} - \Delta \gamma_{n} \ppd{g_{n+1}}{\mbf{\sigma}}\right)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{\sigma}_{n} + \Delta \mbf{\sigma}_{n}^i = \mbf{D} \left(\mbf{\varepsilon}_{n+1} - \mbf{\varepsilon}^p_{n+1} -
+\Delta \gamma_{n} \ppd{g_{n+1}}{\mbf{\sigma}}\right)
+\end{eqnarray}
+
+
+\section{Implementation comments}
+Models of plasticity work in tensorial notation. Strains and stresses
+are stored in 3x3 matrices, first derivatives of yield function and
+plastic potential with respect to stresses are stored in 3x3
+matrices, second derivatives of yield function and plastic potential
+with respect to stresses are stored in 6x6 matrices. Conversion
+of tensorial form to the vector (matrix) form is done in mechmat
+in functions dfdsigma, dgdsigma, dfdsigmadsigma and dgdsigmadsigma.
+
+\section{Elastic--damage--plastic models}
+
+Step 1. Initialization
+\begin{eqnarray}
+k&=&0
+\\
+\mbf{\varepsilon}_{n+1,k}^{pl} &=& \mbf{\varepsilon}_n^{pl}
+\\
+\mbf{\varepsilon}_{n+1,k}^{el} &=& \mbf{\varepsilon}_{n+1}^{tot} - \mbf{\varepsilon}_{n+1,k}^{pl}
+\\
+\mbf{q}_{n+1,k} &=& \mbf{q}_n
+\end{eqnarray}
+
+Step 2. Update of damage parameters
+\begin{eqnarray}
+\tilde{\varepsilon}_{n+1} &=& f(\mbf{\varepsilon}_{n+1,k}^{el})
+\\
+{\rm if}\ & & \tilde{\varepsilon}_{n+1} > \kappa\ \ \ \Rightarrow \ \ \ \ \kappa=\tilde{\varepsilon}_{n+1}
+\\
+\omega_{n+1} &=& g(\kappa)
+\end{eqnarray}
+
+Step 3. Stress and yield function
+\begin{eqnarray}
+\bar{\mbf{\sigma}}_{n+1,k} &=& \mbf{D} (\mbf{\varepsilon}_{n+1}^{tot} - \mbf{\varepsilon}_{n+1,k}^{pl}) = \mbf{D} \mbf{\varepsilon}_{n+1,k}^{el}
+\\
+\mbf{\sigma}_{n+1,k} &=& (1-\omega_{n+1}) \bar{\mbf{\sigma}}_{n+1,k}
+\\
+f_{n+1,k} &=& f(\mbf{\sigma}_{n+1,k}, \mbf{q}_{n+1,k})
+\\
+{\rm if}\ & & f_{n+1,k}\leq \varepsilon_{tol}\ \ \ \Rightarrow \ \ \ \mbf{\varepsilon}_{n+1}^{pl} = \mbf{\varepsilon}_{n+1,k}^{pl},\ \ \mbf{q}_{n+1} = \mbf{q}_{n+1,k}\ \ {\rm go\ to}\ n+2
+\end{eqnarray}
+
+Step 4. Increment of plastic consistency parameter
+\begin{eqnarray}
+\Delta \lambda_{n+1,k} = \Delta \lambda_{n+1,k} (\mbf{\sigma}_{n+1,k}, \mbf{q}_{n+1,k})
+\end{eqnarray}
+
+Step 5. Update of plastic strain, elastic strain and hardening parameters
+\begin{eqnarray}
+\mbf{\varepsilon}_{n+1,k+1}^{pl} &=& \mbf{\varepsilon}_{n+1,k}^{pl} + \Delta \lambda_{n+1,k} \mbf{r}_{n+1,k} (\mbf{\sigma}_{n+1,k}, \mbf{q}_{n+1,k})
+\\
+\mbf{\varepsilon}_{n+1,k+1}^{el} &=& \mbf{\varepsilon}_{n+1} - \mbf{\varepsilon}_{n+1,k+1}^{pl}
+\\
+\mbf{q}_{n+1,k+1} &=& \mbf{q}_{n+1,k} + \Delta \lambda_{n+1,k} \mbf{h}_{n+1,k} (\mbf{\sigma}_{n+1,k}, \mbf{q}_{n+1,k})
+\\
+k &=& k+1
+\\
+{\rm go\ to\ } & & {\rm step\ 3}
+\end{eqnarray}

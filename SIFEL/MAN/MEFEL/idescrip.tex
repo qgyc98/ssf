@@ -1,0 +1,581 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Description of MEFEL Philosophy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Strategy of Nonlinear Static Problems}
+
+Nonlinear static problems are described by (\ref{eqnnonlinstat}). Dependence of stiffness matrix on actual
+configuration represented by vector of displacements $\mbf{d}$ is the main difficulty. System of nonlinear
+algebraic equations (\ref{eqnnonlinstat}) is solved by the arc-length method or by the Newton-Raphson method.
+Increments of displacements and loads are computed from the attained state which is in equilibrium. New
+vectors of displacements and loads define new state which is generally not in equilibrium. Therefore vector
+of residuals is assembled and corrections of mentioned vectors are computed. The last step is repeated until
+equilibrium state is obtained.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Integration Points}
+\index{integration points}
+
+Integration points play significant role in the code. They contain information about used material models,
+strains and stresses, important material parameters etc.
+
+
+There are the following arrays at every integration point
+\begin{itemize}
+\item{{\sf tm} - contains type of material or materials,}
+\item{{\sf idm} - contains identification number of material or materials,}
+\item{{\sf stress} - contains stress components,}
+\item{{\sf strain} - contains strain components,}
+\item{{\sf other} - contains all other parameters, which are not in the equilibrium during the iteration,}
+\item{{\sf eqother} - contains equilibriated parameters stored in the array {\sf other},}
+\item{{\sf nonloc} - contains nonlocal averaged values (allocated only for nonlocal material models).}
+\end{itemize}
+\index{array!other}\index{array!eqother}\index{array!stress}\index{array!strain}\index{array!nonloc}
+
+The array {\sf other} contains all necessary material parameters. Elastic models do not use it. Plastic
+models require to store plastic strains, consistency parameter and optionally hardening parameters.
+Damage models require to store damage parameter etc. Stored parameters in the array {\sf other} are
+defined by used material model. The material model should describe an order of parameters in the
+array {\sf other}.
+
+The array {\sf eqother} contains the same parameters as the array {\sf other}. The array {\sf other}
+is changed in each iteration and contains values of material parameters which can be unequilibriated.
+On the other hand, the array {\sf eqother} contains values of material parameters which are
+equilibriated and this array is changed only when the new global equilibrium is attained.
+Components of the array {\sf eqother} are changed by the function {\sf void mechmat::updateipval (void)}
+which is called by the solver (arc-length, Newton-Raphson method etc.).
+
+The situation is more complicated in the case of combination of several material models. Since it is
+not clear the maximum number of combined material models, the arrays {\sf other} and {\sf eqother}
+are not multiplied. The arrays are allocated longer. The number of components of the arrays is
+equal to the sum of number of material parameters of combined models. The number of components
+of the arrays can be obtained by the function {\sf long mechmat::givencompother (long ipp,long im)}.
+The {\it ipp} denotes the number of integration point and {\it im} stands for the number of
+material model used at the integration point (it is index in the array {\sf tm}).
+The defualt value of {\it im} is 0.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nodes}
+
+Nodes of finite element mesh are described by the class {\sf node} in file
+{\tt node.h} and {\tt node.cpp}. Some of information are also located in
+the class {\sf gnode} in file {\tt gnode.h} and {\tt gnode.cpp} in GEFEL.
+
+\begin{itemize}
+\item{{\sf crst} - contains type of cross section,}
+\item{{\sf idcs} - contains id of cross section,}
+\item{{\sf transf} - local coordinate system indicator,}
+\item{{\sf react} - reaction indicator,}
+\item{{\sf ncompstr} - number of strain/stress components,}
+\item{{\sf ncompother} - number of components in array other,}
+\end{itemize}
+%\index{array!other}\index{array!eqother}\index{array!stress}\index{array!strain}\index{array!nonloc}
+
+
+{\sf transf} is set to zero in constructor.
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+0 & global coordinate system is used
+\\
+  & no basis vectors are defined at node
+\\[2mm] \hline
+2 & local coordinate system with two basis vectors
+\\
+  & used in twodimensional problems (plane stress/strain, plates)
+\\[2mm] \hline
+3 & local coordinate system with three basis vectors
+\\
+  & used in threedimensional problems, shells
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Combination of Material Models}
+
+The code contains many material models in the following areas:
+\begin{itemize}
+\item{elasticity}
+\item{plasticity}
+\item{damage}
+\item{viscosity}
+\item{microplane models}
+\end{itemize}
+
+In order to keep the code general in the area of material modelling, the code enables many combinations
+of implemented material models. For this purpose, artificial material models are introduced. They are called
+artificial because they do not contain any material parameters. Their main and only purpose is that they
+call appropriate functions of combined models.
+
+The array {\sf tm} of the class {\sf intpoints} play important role in the case of combination of several
+material models. The main material model is located at the first position. This model controls whole
+computation. It means, that it calls appropriate methods of classes, stores and restores required data etc.
+The artificial material models are always located at the first position of the array {\sf tm}.
+
+The type elastic material model is always located at the last position of the array {\sf tm}. The only exception
+is the case with temperature load which requires a model of thermal dilatancy. The type of the thermal dilatancy
+is located at the last position of the array {\sf tm} and the type of elastic model is at the last but one position.
+The type of elastic material can be obtained by the function {\sf long intpoints::gemid(void)}. It returns
+the index of the elastic model in the array {\sf tm}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Combination of damage and plasticity}
+
+Combination of damage and plasticity models is guaranteed by the artificial model defined in the class {\sf damplast}.
+It enables combination of any model of plasticity with any model of damage. The user is responsible for
+meaningful choice of particular material models.
+
+If the artificial model defined by the class {\sf damplast} is used, the array {\sf tm}
+at integration points has the following components:
+
+\begin{center}
+\begin{tabular}{cl}
+tm[0] =& damplast\\
+tm[1] =& type of plasticity\\
+tm[2] =& type of damage\\
+tm[3] =& type of elasticity\\
+\end{tabular}
+\end{center}
+
+From the ordering of material models in the array {\sf tm} follows that the arrays {\sf other}
+and {\sf eqother} contain material parameters of plasticity model at the beginning and
+material parameters of damage model at the end. Therefore, any function of plasticity model
+is called with parameters {\it im}=1 (the position with zero index contains damplast model) and {\it ido}=0.
+The function {\sf Mm--$>$givencompother (ipp,1)} returns the number of components of plasticity model.
+Any function of damage model is called with parameters {\it im}=2 and {\it ido} is equal to the
+number of components of plasticity model.
+The function {\sf Mm--$>$givencompother (ipp,2)} returns the number of components of damage model.
+The function {\sf Mm--$>$givencompother (ipp,0)} returns the total number of components in the arrays
+{\sf other} and {\sf eqother}.
+
+The function {\sf void damplast::nlstresses (long ipp)} of the class {\sf damplast}
+calls the function {\sf Mm--$>$computenlstresses(long ipp, long im, long ido);} of the class {\sf mechmat}.
+The type of plasticity model is defined at the integration point in the array {\sf tm[1]}, therefore {\it im}=1.
+Parameters of the plasticity models are at the beginning of the array {\sf other}, therefore {\it ido}=0.
+At this stage, the plasticity is solved and the damage will be computed.
+
+Then, the function {\sf void damplast::nlstresses (long ipp)} of the class {\sf damplast}
+calls solution of the damage problem. It is nearly identical to the function
+{\sf nlstresses (long ipp, long im, long ido)} of damage models. The only difference is based
+on the computation of elastic strains which are obtained from the total strains and currently
+computed plastic strains (see comments in the code).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nonlocal Computations}
+
+Nonlocal computations are used for various problems which suffer by difficulties during the classical
+local approximation. The typical example is description of damage which has to be localized in a narrow
+band.
+
+The application of material models based on nonlocal approximation is clearly more complicated than
+the classical material models. For better understanding, the order of method calling is described in this section.
+
+Solver of nonlinear algebraic equations (arc-length, Newton-Raphson) calls function
+\newline {\sf internal\_forces (lcid,fi);} from the file {\sf globmat.cpp}.
+\newline With respect to the nonlocal model, the function
+\newline {\sf nonloc\_internal\_forces (lcid,intfor);} from the file {\sf globmat.cpp}
+\newline is called. This function calls the function
+\newline {\sf local\_values(lcid, i, 0, 0);}
+\newline with respect to the type of finite element. The finite element calls
+\newline {\sf Mm--$>$computenlstresses (ipp);} from the file {\sf mechmat.cpp}
+\newline in order to obtain correct stresses. With respect to the used material model, the function
+\newline {\sf nlstresses (ipp);} or {\sf nonloc\_nlstresses (ipp,im,ido);}
+\newline is called. Then the code is going back to the function
+\newline {\sf nonloc\_internal\_forces (long lcid,double *intfor)} from the file {\sf globmat.cpp}
+\newline where the averaging is performed. Then the function
+\newline {\sf nonloc\_internal\_forces (lcid, i, 0, 0, ifor);}
+\newline is called with respect to the used element. This function calls
+\newline {\sf Mm--$>$compnonloc\_nlstresses (ipp);} from the file {\sf mechmat.cpp}
+\newline With respect to the type of material model, the function
+\newline {\sf nonloc\_nlstresses (ipp,im,ido);}
+\newline is called. After its execution, the stresses are known and nodal forces
+are computed at the element level. The resulting vector of nodal forces is obtained
+after execution
+\newline {\sf nonloc\_internal\_forces (long lcid,double *intfor)}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Handling with plasticity}
+
+Theory of plasticity applied to problems with small strains is roughly described in Section \ref{sectplasmatmodels}.
+In the MEFEL code, material models of plasticity are used in connection with nonlinear static problems.
+The main aim of any material model of plasticity is to compute correct stresses from given strains.
+Strains are computed by any method which solves system of nonlinear algebraic equations. Correct stresses
+are extremely important for evaluation of internal forces which are used in computation of the vector of residuals.
+If the norm of vector of residuals is less than required error, equilibrium state is obtained.
+
+There are several methods of the class {\sf mechmat} which serve to mentioned main aim of any model of plasticity.
+Method {\sf computenlstresses (long ipp,long im,long ido)} of the class {\sf mechmat} is the most important one.
+It is called by finite elements during computation of internal forces. Internal forces are obtained by numerical
+integration and therefore the number of integration point {\it ipp} is a parameter of the method. The default
+value of the two other parameters are equal to 0. They are important only in a case of combination of several
+material models. {\it im} stands for the number of material and {\it ido} denotes the position in the array {\sf other}.
+The method {\sf computenlstresses (long ipp,long im,long ido)} detects type of material model defined at
+required integration point and calls its method {\sf nlstresses (long ipp,long im,long ido)}.
+
+Each class which represents a material model must contain method {\sf nlstresses (long ipp,long im,long ido)} which computes
+stresses from given strains.
+Method {\sf nlstresses (long ipp,long im,long ido)} of a class representing a material model of plasticity must compute
+stresses satisfying yield condition. Given strains and other parameters (plastic strains, hardening/softening parameters, etc.)
+are stored at integration point in arrays {\sf strain} and {\sf other}. Number of integration point is a parameter of the
+method {\sf nlstresses (long ipp,long im,long ido)}. The method computes stresses and stores them to array {\sf stress} at integration
+point.
+
+Stress computation is done by any method which returns trial stresses to yield surface. There is cutting plane method
+\index{method!cutting plane} which is described in Section \ref{sectcutplanemet} implemented in the code. Method
+{\sf cutting\_plane (long ipp,long im,double \&gamma,vector \&epsn,vector \&epsp,vector \&q)} of the class {\sf mechmat} is
+implementation of the cutting plane method. {\it ipp} denotes number of integration point (its id), {\it im} denotes index in the {\it ipp} integration point {\sf tm} array 
+- determines material type, {\it gamma} stands for consistency parameter, {\it epsn} contains new strains, {\it epsp} contains plastic strains and {\it q}
+contains hardening parameter(s). The cutting plane method requires evaluation of yield function, derivatives of
+yield function and plastic potential with respect to stress components and hardening modulus. There are methods
+of the class {\sf mechmat} which provide these requirements.
+
+Method {\sf yieldfunction (long ipp, long idpm, matrix \&sig,vector \&q)} of the class {\sf mechmat} evaluates
+yield function for given stress stored in {\it sig} and hardening parameter(s) stored in {\it q}. {\it ipp} denotes
+number of integration point and {\it idpm} contains id of plastic material model. The method detects type of
+material model at required integration point and calls its method {\sf yieldfunction (matrix \&sig,vector \&q)}
+which evaluates yield function of the material model. Each class which represents a material model of plasticity
+must contain such method. The second parameter {\it q} is optional.
+
+Method {\sf dfdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dfds)} of the class {\sf mechmat}
+assembles derivatives of yield function with respect to stress components. {\it ipp} denotes number of integration
+point, {\it idpm} stands for id of plastic material, {\it sig} contains stress components, {\it q} contains hardening
+parameter(s) and {\it dfds} contains required derivatives. The method detects type of material model at required
+integration point and calls its method {\sf deryieldfsigma (matrix \&sig, vector \&q, matrix \&dfds)} which
+assembles required derivatives of the material model. Each class which represents a material model of plasticity
+must contain such method.
+
+Method {\sf dgdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dgds)} of the class {\sf mechmat}
+assembles derivatives of plastic potential with respect to stress components. {\it ipp} denotes number of
+integration point, {\it idpm} stands for id of plastic material, {\it sig} contains stress components, {\it q}
+contains hardening parameter(s) and {\it dfds} contains required derivatives. The method detects type of material
+model at required integration point and calls its method {\sf deryieldfsigma (matrix \&sig, vector \&q, matrix \&dgds)}
+which assembles required derivatives of the model. Each class which represents a material model of plasticity
+must contain such method.
+
+Method {\sf plasmodscalar(long ipp, long idpm, matrix \&sig, vector \&eps, vector \&epsp, vector \&qtr)}
+of the class {\sf mechmat} computes plastic modulus. {\it ipp} denotes number of integration point, {\it idpm}
+stands for id of plastic material, {\it sig} contains stress components, {\it eps} contains strain components,
+{\it epsp} contains plastic strain components and {\it qtr} contains hardening parameter(s). The method detects
+type of material model at required integration point and calls its method {\sf plasmodscalar (vector \&qtr)}
+which computes plastic modulus of the model. Each class which represents a material model of plasticity must
+contain such method.
+
+Method {\sf computenlstresses (long ipp, long im, long ido)} of the class {\sf mechmat} is the most important one.
+It is called by finite elements during computation of internal forces. Internal forces are obtained by numerical
+integration and therefore id of required integration point is a parameter of the method. The method
+{\sf computenlstresses (long ipp, long im, long ido)} detects type of the material model given by the index {\it im} of
+the required integration point and calls its method {\sf nlstresses (long ipp, long im, long ido)}.
+
+Each class which represents a material model must contain method {\sf nlstresses (long ipp, long im, long ido)} which computes
+stresses from given strains.
+Method {\sf nlstresses (long ipp, long im, long ido)} of a class representing a material model of plasticity must compute
+stresses satisfying yield condition. Given strains and other parameters (plastic strains, hardening/softening parameters, etc.)
+are stored at integration point in arrays {\sf strain} and {\sf other}. Number of integration point is a parameter of the
+method {\sf nlstresses (long ipp, long im, long ido)}. The method computes stresses and stores them to array {\sf stress} at integration
+point.
+\begin{center}
+{\tt
+\begin{tabular}{l}
+computenlstresses (long ipp, long im, long ido)
+\\
+cutting\_plane (long ipp,long im,double \&gamma,vector \&epsn,
+\\
+vector \&epsp,vector \&q)
+\\
+yieldfunction (long ipp, long idpm, matrix \&sig,vector \&q)
+\\
+dfdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dfds)
+\\
+dgdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dgds)
+\\
+plasmodscalar(long ipp, long idpm, matrix \&sig, vector \&eps,
+\\
+vector \&epsp, vector \&qtr)
+\\
+\end{tabular}
+}
+\end{center}
+
+%\begin{center}
+{\tt
+\begin{tabular}{l}
+nlstresses (long ipp, long im, long ido)
+\\
+yieldfunction (matrix \&sig,vector \&q)
+\\
+deryieldfsigma (matrix \&sig, vector \&q, matrix \&dfds)
+\\
+deryieldfsigma (matrix \&sig, vector \&q, matrix \&dgds)
+\\
+plasmodscalar(vector \&qtr)
+\\
+\end{tabular}
+}
+%\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Handling with scalar damage}
+
+There are several methods of the class {\sf mechmat} which serve to mentioned main aim of any model of scalar damage.
+
+Method {\sf computenlstresses (long ipp, long im, long ido)} of the class {\sf mechmat} is the most important one.
+It is called by finite elements during computation of internal forces. Internal forces are obtained by numerical
+integration and therefore id of required integration point is a parameter of the method. The method
+{\sf computenlstresses (long ipp, long im, long ido)} detects type of material model defined at required integration point and calls
+its method {\sf nlstresses (long ipp, long im, long ido)}.
+
+Each class which represents a material model must contain method {\sf nlstresses (long ipp, long im, long ido)} which computes
+stresses from given strains.
+Method {\sf nlstresses (long ipp, long im, long ido)} of a class representing a material model of damage must compute
+stresses corresponding reached strains. Given strains and other parameters are stored at integration point in arrays
+{\sf strain} and {\sf other}. Number of integration point is a parameter of the method {\sf nlstresses (long ipp, long im, long ido)}.
+The method computes stresses and stores them to array {\sf stress} at integration ponit.
+
+Algorithm which solves stresses in the scalar damage problem is implemented in the method {\sf scal\_dam\_sol (long ipp, long im, 
+vector \&eps,vector \&kappa, vector \&sigma)} of the class {\sf mechmat}. See Section \ref{sectdammatmodels} for the
+theoretical background.
+{\it ipp} denotes number of integration point (its id), {\it im} denotes index in the {\it ipp} integration point {\sf tm} array - determines material type,
+{\it eps} contains new strains, {\it kappa} damage parameter and {\it sigma} is containing returned corresponding stresses. This function requires
+evaluation of damage function and evaluation of the parameters for damage function. There are methods of the class {\sf mechmat} which provide 
+these requirements.
+
+
+Method {\sf damfunction(long ipp, long im, vector \&kappa, vector \&eps)} of the class {\sf mechmat} evaluates
+damage for given strains stored in {\it eps} and previous reached damage {\it kappa}. {\it ipp} denotes
+number of integration point. The method detects type of material model at required integration point by the parameter {\it im} and
+calls its method {\sf damfunction(long ipp, vector \&kappa, vector \&eps)} which evaluates damage function
+of the material model. Each class which represents a material model of scalar damage must contain such method.
+
+Method {\sf damfuncpar(long ipp, long im, vector \&eps, vector \&kappa)} of the class {\sf mechmat} assembles vector of
+damage function parameters for given strains {\it eps}. {\it ipp} denotes number of integration point, {\it im} denotes index in the {\it ipp} 
+integration point {\sf tm array} - determines material type, {\it kappa} stands for vector of damage function parameters. The method detects type 
+of material model at required integration point and calls its method {\sf damfuncpar(long ipp, vector \&eps, vector \&kappa)} which assembles required 
+parameters of the material model. Each class which represents a material model of scalar damage must contain such method.
+
+Each class which represents a material model must contain method {\sf nlstresses (long ipp)} which computes
+stresses from given strains.
+Method {\sf nlstresses (long ipp, long im, long ido)} of a class representing a material model of scalar damage must compute
+stresses for given actual strains. Given strains and other parameters are stored at integration point in arrays
+{\sf strain} and {\sf other}. Number of the integration point is a parameter of the method {\sf nlstresses (long ipp, long im, long ido)}.
+The method computes stresses and stores them to array {\sf stress} at integration point.
+
+%\begin{center}
+{\tt
+\begin{tabular}{l}
+computenlstresses (long ipp, long im, long ido)
+\\
+scal\_dam\_sol (long ipp, long im, long ido, vector \&eps,vector \&kappa, vector \&sigma)
+\\
+damfunction(long ipp, long im, vector \&kappa, vector \&eps)
+\\
+damfuncpar(long ipp, long im, vector \&eps, vector \&kappa)
+\\
+\end{tabular}
+}
+%\end{center}
+
+%\begin{center}
+{\tt
+\begin{tabular}{l}
+nlstresses (long ipp, long im, long ido)
+\\
+damfuncpar(long ipp, vector \&eps, vector \&kappa)
+\\
+damfunction(long ipp, vector \&kappa)
+\\
+\end{tabular}
+}
+%\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Handling with viscoplasticity}
+
+Theory of viscoplasticity applied to problems with small strains is described in Section \ref{sectvisplasmatmodels}.
+In the MEFEL code, material of viscoplasticity are used in connection with time dependent mechanical problems with
+negligible inertial forces.
+
+
+\begin{itemize}
+\item {\sf void mechmat::readmatchar (FILE *in)}
+\item {\sf void mechmat::matstiff (matrix \&d,long ipp)}
+\item {\sf void mechmat::damfuncpar(long ipp, vector \&eps, vector \&kappa)}
+\item {\sf double mechmat::damfunction(long ipp, vector \&kappa, vector \&eps)}
+\item {\sf void updateipval ()}
+\item {\sf void mechmat::computenlstresses (long ipp)}
+\end{itemize}
+
+
+%\section{Handling with viscosity}
+%\section{Handling with damage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Layered problems}
+
+Layered problems must be described more carefully than usual problems because there are many possibilities
+of implementation. There are no layered elements because each layer is covered by the finite element mesh
+with usual elements. Continuity is enforced by Lagrange multipliers which are defined at nodes. Projection
+of meshes from all layers into tangential plane must lead to one mesh. If the number of layers in the problem
+is constant everywhere, all meshes in layers must be identical. If the number of layers is variable, there are
+missing elements in meshes of particular layers. Consider any node of mesh of any layer and normal vector to
+the plate or shell. Then meshes in other layers must contain node on this normal vector. The situation is
+depicted in Figure ??. Nodes lying on one normal vector to the plate or shell create layered node. Therefore
+two types of nodes are used in layered problems, usual node and layered node. Usual node is represented
+by classes {\sf gnode} and {\sf node} while layered node is represented by the class {\sf lgnode}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problems with several subdomains}
+
+Problem type lin\_floating\_subdomain solves mechanical problems where at least two domains
+are connected by Lagrange multipliers together. It is tool, e.g., for solution of interaction
+of reinforcement and the matrix.
+
+The implementation is based on several subdomains used in the code. The first subdomain
+should be constrained properly and it should contain no rigid body motions. All other
+subdomains may be unconstrained and may contain rigid body motions. They are connected
+to the first subdomain by Lagrange multipliers. The problem is solved by the modification
+of the FETI method which is domain decomposition method.
+
+
+In order to save memory and computational work, several rules have to be used. The rules deal
+with node and element ordering.
+
+
+\subsection{Nodes}
+
+The number of nodes in the problem nn has to be equal to the sum of numbers of nodes defined
+on particular subdomains. Each subdomain has to be covered by a finite element mesh with nodes.
+The implementation is based on matching meshes. There are doubled nodes along boundary
+between two subdomains. The same displacements of the doubled nodes are enforced by Lagrange
+multipliers.
+
+Nodes belonging to the first subdomain have to be defined first. Then, nodes belonging to the second
+subdomain have to be defined in the list of nodes and so on. The ordering of nodes is important
+because the numbering of unknowns depends on it. Wrong ordering of nodes will result in code
+failure because submatrices are selected from the whole matrix and improper values will be used.
+
+Definition of interaction is realized by lgnodes. After the list of all nodes, additional
+list of generalized nodes is required. Generalized node contain information which two or
+more nodes are connected and should be constrained by Lagrange multipliers. Number of connected
+nodes and list of connected nodes have to be mentioned for each generalized node.
+
+\subsection{Constrained nodes}
+
+Constrained nodes should be defined only for the fisrt subdomain which has to be supported properly.
+It means, the first subdomain contains no rigid body modes.
+
+\subsection{Elements}
+
+The total number of all elements is defined first. 
+Then, number of elements for each subdomain is defined. Array of the first elements on
+subdomains is assembled. Finally, 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Modelling of Gradual Construction}
+
+Modelling of gradual construction is based on {\sf problemtype} growing\_mech\_structure.
+It is assumed especially for modelling of casting of concrete structures. It can be used
+also for any problems with variable number of nodes and elements.
+
+There are small changes in input files in comparison with the classical time dependent
+problems ({\sf problemtype} mech\_timedependent\_prob=15).
+In the classical problems (with constant numbers of nodes
+and elements), only supported nodes or nodes with prescribed displacements are mentioned
+in the list of constrained nodes. 0 denotes supported nodes, negative numbers denote
+prescribed displacements and positive numbers except 1 denote joined degrees of freedom.
+Number 1 may not be read because it is assigned automatically in the code. In problems
+with changing numbers of nodes and elements, all nodes must be mentioned at the list of
+constrained nodes. Positive numbers are used for definition of time functions which
+describe actual state/status of node. Time function returns 0 for nodes which are
+switched off and returns 1 for nodes which are switched on. Negative numbers serves
+as definition of prescribed displacements and positive numbers except 1 serves for
+definition of joined degrees of freedom.
+Values of time functions are copied to array cn located at objects gnodes and then the
+classical treatment is used. Especially, function gencodnum () from the class gtopology
+is used.
+
+Changing status of nodes is not enough for complex description of problems with variable
+number of elements and nodes. Therefore, time function must be also defined for elements.
+It is important to emphasize, that node time functions and element time functions must be
+compatible, otherwise, unexpectable response is computed by the code. Element time functions
+id are read after code numbers on element and they are located in objects gelements.
+
+Time functions themself are read after initial values and before outdriver description.
+It is convenient to use the same time functions for nodes and elements. This approach
+helps to keep compatibility between nodes and elements.
+
+
+Variable leso is allocated and set up at the function Gtm->lneso\_init (); called in the function 
+mechtop::read (FILE *in). At the same time, variables gelements[i].auxinf are set up to zero.
+Arrays nodval, nvgraph, nvforce at nodes and the array initdispl at elements are allocated
+and cleaned in the function mechtop::alloc\_growstr (). The function is called in the function
+mefel\_init (char *argv,stochdriver *stochd).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Stochastic and Fuzzy Computations}
+
+MEFEL enables solution of stochastic and fuzzy computations. The class probdesc contains variable
+stochasticcalc which describes type of computation.
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+0 & deterministic problem
+\\[2mm] \hline
+1 & stochastic or fuzzy problem,
+\\
+  & input data are read all at once at the beginning
+\\
+  & input data are stored in RAM
+\\
+  & output data are stored in RAM
+\\[2mm] \hline
+2 & stochastic or fuzzy problem,
+\\
+  & input data are read sequentially
+\\
+  & input data are not stored in RAM
+\\
+  & output data are printed out after each step
+\\[2mm] \hline
+3 & fuzzy problem
+\\
+  & input data are generated automatically in the code
+\\
+  & output data are stored in the form of fuzzy numbers
+\\ \hline
+\end{tabular}
+\end{center}
+
+There are non-deterministic materials, cross sections and nodal loads.
+
+Output: printed nodal displacements, element output
+
+
+Number of samples is read or computed then.
+
+Computation of output values
+
+Two important variables are obtained, nstochvar denotes the number
+of non-deterministic variables, nprunknowns denotes number of
+output variables.
+Object Stochdriver contains two arrays, avi and avo. avi stores input
+data in one sample while avo contains output data. avi contains nstochvar
+components, avo contains nprunknowns unknowns.

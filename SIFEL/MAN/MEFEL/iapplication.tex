@@ -1,0 +1,2209 @@
+\chapter{Application of the MEFEL}
+
+\section{The most common variables used in MEFEL}
+
+The most common and used vriables and their notation are summarized in this section.
+This list is definitely not complete.
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+{\tt napfun} & number of approximated functions on the element
+\\ \hline
+{\tt nb} & number of blocks
+\\ \hline
+{\tt ncompother} & number of components in array other
+\\ \hline
+{\tt ncompstr} & number of components of stress and strain tensors
+\\ \hline
+{\tt ndofe} & number of degrees of freedom defined on element
+\\ \hline
+{\tt ne} & number of nodes on element
+\\ \hline
+{\tt ned} & number of edges on element
+\\ \hline
+{\tt nned} & number of nodes on one edge
+\\ \hline
+{\tt tncomp} & total number of components of stress and strain tensors
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{MEFEL data types}
+
+Description of MEFEL enumerate data types is summarized in this section.
+The MEFEL enumerate data types are used in abundance in the code. They are defined
+in the file alias.h.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf problemtype}}
+\index{type!{\sf problemtype}}
+\label{sectproblemtype}
+
+This generalized data type defines type of mechanical problem.
+Admissible values of a variable of the {\sf problemtype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt linear\_statics} & 1 & solution of linear static problems
+\\[2mm] \hline
+{\tt eigen\_dynamics} & 2 & solution of eigenfrequencies and
+\\
+ & & eigenvectors of structures and bodies
+\\[2mm] \hline
+{\tt forced\_dynamics} & 3 & solution of forced vibrations problems
+\\[2mm] \hline
+{\tt linear\_stability} & 5 & solution of problems of linear stability,
+\\[2mm] \hline
+{\tt nonlinear\_statics} & 10 & solution of static problems with material nonlinearity
+\\
+ & & (plasticity, damage, nonlinear elasticity, etc.)
+\\ \hline
+{\tt mech\_timedependent\_prob} & 15 & solution of time dependent problems with
+\\
+ & & negligible inertial forces and material nonlinearity
+\\
+ & & (viscosity, creep, viscoplasticity, etc.)
+\\ \hline
+{\tt growing\_mech\_structure} & 17 & solution of gradual construction,
+\\
+ & & several construction phases may be defined
+\\
+ & & negligible inertial forces and material nonlinearity
+\\ \hline
+{\tt earth\_pressure} & 20 & solution of earth pressure problem using GLPT
+\\ \hline
+{\tt layered\_linear\_statics} & 30 & solution of linear layered static problems
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf forcedsolver}}
+\index{type!{\sf forcedsolver}}
+\label{sectforcedsolver}
+
+This generalized data type defines type of numerical integration of system of linear ordinary differential equations
+which are used e.g. in problems of forced dynamics.
+Admissible values of a variable of the {\sf forcedsolver} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt newmark} & 1 & Newmark method \index{method!Newmark}
+\\ \hline
+{\tt hughes} & 2 & Hughes' implementation of the Newmark method
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf nonlinsolvertype}}
+\index{type!{\sf nonlinsolvertype}}
+\label{sectnonlinsolvertype}
+
+This generalized data type defines type of solver of system of nonlinear algebraic equations.
+Admissible values of a variable of the {\sf nonlinsolvertype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt arcl} & 1 & arc-length method (also called continuation method) is used \index{method!arc-lenght}
+\\ \hline
+{\tt newton} & 2 & Newton-Raphson method is used \index{method!Newton-Raphson}
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf epsolvertype}}
+\index{type!{\sf epsolvertype}}
+\label{sectepsolvertype}
+
+This generalized data type defines type of special solver of system of nonlinear algebraic equations, which is used
+for solution of earth pressures. Admissible values of a variable of the {\sf epsolvertype} are defined by a list of
+symbolic constant names (aliases) and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt gep\_sol} & 1 & Solver of general earth pressure with load iteration
+\\
+ & & method is used
+\\ \hline
+{\tt gepvarsup\_sol} & 2 & Solver of general earth pressure with variable
+\\
+ & & supports method is used
+\\ \hline
+{\tt epplast\_sol} & 3 &
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf displacementnorm}}
+\index{type!{\sf displacementnorm}}
+\index{control!arc-length method}
+\label{sectdisplacementnorm}
+
+This generalized data type defines type of system of length control in the arc-length method.
+Admissible values of a variable of the {\sf displacementnorm} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt alldofs} & 1 & all degrees of freedom are used
+\\ \hline
+{\tt seldofs} & 2 & selected degrees of freedom are used,
+\\
+ & & DOFs are defined by their indices
+\\ \hline
+{\tt seldofscoord} & 3 & selected degrees of freedom are used,
+\\
+ & & DOFs are defined by the coordinates
+\\ \hline
+{\tt selnodes} & 6 & DOFs from selected nodes are used
+\\ \hline
+{\tt nodesdistincr} & 8 & length is defined as a distance between two nodes
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf stressretalgtype}}
+\index{type!{\sf stressretalgtype}}
+\label{sectstressretalgtype}
+
+This generalized data type defines type of stress return algorithm used in models of plasticity or any
+other model which needs iteration loop in the nlstresses function.
+Stress return algorithms return trial stresses onto yield surface in case plasticity or 
+computes correction of disipated energy in case of scalar damage.
+Admissible values of a variable of the {\sf stressretalgtype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt nostressretalg} & 0 & no stress return algorithm is necessary
+\\ \hline
+{\tt cp} & 1 & cutting plane algorithm is used \index{method!cutting plane}
+\\ \hline
+{\tt gsra} & 10 & general iterartion algorithm is used
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf stiffmatrix}}
+\index{type!{\sf stiffmatrix}}
+\label{sectstiffmatrix}
+
+This generalized data type defines type of stiffness matrix used in computation.
+Admissible values of a variable of the {\sf stiffmatrix} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt initial\_stiff} & 1 & initial tangent stiffness matrix is used \index{matrix!stiffness!initial}
+\\ \hline
+{\tt tangent\_stiff} & 2 & actual tangent stiffness matrix is used \index{matrix!stiffness!tangent}
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf proptype}}
+\index{type!{\sf proptype}}
+\label{sectproptype}
+
+This generalized data type defines type of assigned properties used in the mechprep source files.
+Admissible values of a variable of the {\sf proptype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt ndofs} & 1 & Number of dofs will be assigned
+\\ \hline
+{\tt boundarycond} & 2 & Boundary condition will be assigned
+\\ \hline
+{\tt loadnodes} & 3 & Nodal load will be assigned
+\\ \hline
+{\tt crosssec} & 4 & Cross-section will be assigned (both for elements and nodes)
+\\ \hline
+{\tt localsystem} & 5 & Local coordinate system will be assigned
+\\ \hline
+{\tt eltype} & 6 & Element type will be assigned
+\\ \hline
+{\tt matel} & 7 & Material type will be assigned
+\\ \hline
+{\tt loadelems} & 8 & Element load will be assigned
+\\ \hline
+{\tt dloadnodes} & 9 & Nodal dynamical load will be assigned
+\\ \hline
+{\tt dloadelems} & 10 & Element dynamical load will be assigned
+\\ \hline
+{\tt initcond} & 11 & Initial conditions will be assigned
+\\ \hline
+{\tt comcodnum} & 12 & Common code numbers will be assigned
+\\ \hline
+{\tt loadedge} & 13 & Element edge load will be assigned (only 2D problems)
+\\ \hline
+{\tt sscomp} & 14 & Type of stress/strain computation will be assigned
+\\ \hline
+{\tt nodetemp} & 15 & Nodal temperature will be assigned
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf elemtype}}
+\index{type!{\sf elemtype}}
+\label{sectelemtype}
+
+This generalized data type defines type of finite element.
+Admissible values of a variable of the {\sf elemtype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt bar2d} & 1 & 2D bar element with linear approximation functions
+\\ \hline
+{\tt beam2d} & 2 & 2D beam element with cubic approximation functions
+\\ \hline
+{\tt beam3d} & 4 & 3D beam element with cubic approximation functions
+\\ \hline
+{\tt barq2d} & 6 & 2D bar element with quadratic approximation functions
+\\ \hline
+{\tt subsoilbeam} & 8 &
+\\ \hline
+{\tt spring\_1} & 10 & Spring support in the global X direction
+\\ \hline
+{\tt spring\_2} & 11 & Spring support in the global Y direction
+\\ \hline
+{\tt spring\_3} & 12 & Spring support in the global Z direction
+\\ \hline
+{\tt spring\_4} & 13 & Torsion spring support in the global X direction
+\\ \hline
+{\tt spring\_5} & 14 & Torsion spring support in the global Y direction
+\\ \hline
+{\tt spring\_6} & 15 & Torsion spring support in the global Z direction
+\\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt planeelementlt} & 20 & plane triangular element with
+\\
+ & & linear approximation functions
+\\ \hline
+{\tt planeelementqt} & 21 & plane triangular element with
+\\
+ & & quadratic approximation functions
+\\ \hline
+{\tt planeelementrotlt} & 22 & plane triangular element with
+\\
+ & & rotational degrees of freedom
+\\ \hline
+{\tt planeelementlq} & 23 & plane quadrilateral element with
+\\
+ & & bi-linear approximation functions
+\\ \hline
+{\tt planeelementqq} & 24 & plane quadrilateral element with
+\\
+ & & bi-quadratic approximation functions
+\\ \hline
+{\tt planeelementrotlq} & 25 & plane quadrilateral element with
+\\
+ & & rotational degrees of freedom
+\\ \hline
+{\tt planeelementsubqt} & 30 & subparametric plane triangular element with
+\\
+ & & quadratic approximation functions and
+\\
+ & & linear shape functions
+\\ \hline
+{\tt cctel} & 41 & plate element -- constant curve triangle
+\\ \hline
+{\tt dktel} & 42 & triangular plate element based on
+\\
+ & & discerete Kirchhoff theory
+\\ \hline
+{\tt dstel} & 43 & dst element
+\\ \hline
+{\tt q4plateel} & 45 & quadrilateral plate element based on
+\\
+ & & discerete Kirchhoff theory
+\\ \hline
+{\tt subsoilplatetr} & 50 & triangular soil element based on
+\\
+ & & plate Kirchhoff theory with incompatible
+\\
+ & & cubic function (Zienkiewicz)
+\\ \hline
+{\tt subsoilplateq} & 51 & quadrilateral soil plate element based on
+\\
+ & & plate q4plateel
+\\ \hline
+{\tt axisymmlt} & 60 &
+\\ \hline
+{\tt axisymmlq} & 63 &
+\\ \hline
+{\tt shelltrelem} & 80 & shell triangular element
+\\ \hline
+{\tt shellqelem} & 81 & shell triangular element
+\\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt lineartet} & 100 & tetrahedral element with linear
+\\
+ & & approximation functions
+\\ \hline
+{\tt linearhex} & 102 & hexahedral element with tri-linear
+\\
+ & & approximation functions
+\\ \hline
+{\tt quadrhex} & 103 & hexahedral element with tri-quadratic
+\\
+ & & approximation functions
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf strastrestate}}
+\index{type!{\sf strastrestate}}
+\label{sectstrastrestate}
+
+This generalized data type defines state of strain and stress.
+Admissible values of a variable of the {\sf strastrestate} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt bar} & 1 & pure onedimensional strain/stress state
+\\ \hline
+{\tt plbeam} & 2 & onedimensional strain/stress state on 2D beams
+\\ \hline
+{\tt spacebeam} & 5 & onedimensional strain/stress state on 3D beams
+\\ \hline
+{\tt planestress} & 10 & plane stress
+\\ \hline
+{\tt planestrain} & 11 & plane strain
+\\ \hline
+{\tt plate} & 15 & plate strains/stresses
+\\ \hline
+{\tt axisymm} & 20 & axisymmetric strains/stresses state
+\\ \hline
+{\tt shell} & 25 & strains/stresses on shells
+\\ \hline
+{\tt spacestress} & 30 & space strains/stresses state
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf materialmodel}}
+\index{type!{\sf materialmodel}}
+\label{sectmaterialmodel}
+
+This generalized data type defines whether material model is local or nonlocal.
+%\index{local material model}\index{nonlocal material model}
+Admissible values of a variable of the {\sf materialmodel} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt local} & 0 & local material model is used, all quantities at every point are
+\\
+ & & computed locally, only from informations located at the point
+\\ \hline
+{\tt nonlocal} & 1 & nonlocal material model is used, one or more quantitites at every
+\\
+ & & point are computed by averaging from suitable vicinity of the point
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf mattype}}
+\index{type!{\sf mattype}}
+\label{sectmattype}
+
+This generalized data type defines type of material model.
+Admissible values of a variable of the {\sf materialmodel} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt elisomat} & 1 & elastic isotropic material model
+\\ \hline
+{\tt elgmat3d} & 2 & elastic fully anisotropic material model
+\\ \hline
+{\tt simplas1d} & 10 & onedimensional model of plasticity
+\\ \hline
+{\tt jflow} & 11 & $J_2$ flow model of plasticity
+\\ \hline
+{\tt mohrcoul} & 24 & Mohr-Coulomb model of plasticity
+\\ \hline
+{\tt mohrcoulparab} & 22 & parabolic Mohr-Coulomb model (Hook\&Brown)
+\\ \hline
+{\tt boermaterial} & 25 & Boer model of plasticity
+\\ \hline
+{\tt druckerprager} & 26 & Drucker-Prager model of plasticity
+\\ \hline
+{\tt modcamclaymat} & 30 & Modified Cam-Clay model
+\\ \hline
+{\tt shefpl} & 40 &
+\\ \hline
+{\tt microplaneM4} & 50 &
+\\ \hline
+{\tt microsimp} & 51 &
+\\ \hline
+{\tt microfibro} & 52 &
+\\ \hline
+{\tt simvisplas} & 70 & onedimensional viscoplastic model
+\\ \hline
+{\tt lemaitr} & 75 &
+\\ \hline
+{\tt scaldamage} & 100 & scalar isotropic damage
+\\ \hline
+{\tt scaldamagecc} & 101 &
+\\ \hline
+{\tt aci} & 200 &
+\\ \hline
+{\tt cebfip} & 202 &
+\\ \hline
+{\tt nonlocalmod} & 300 &
+\\ \hline
+{\tt nonlocplastmat} & 310 & nonlocal plasticity model
+\\ \hline
+{\tt nonlocdamgmat} & 320 & nonlocal damage model
+\\ \hline
+{\tt nonlocalmicroM4} & 340 & nonlocal microM4 model
+\\ \hline
+{\tt graphm} & 400 & model with given force/displacement diagram
+\\ \hline
+{\tt geoelast} & 401 & model for soils with special unloading modulus
+\\ \hline
+{\tt creepbaz} & 500 & B3 model of creep
+\\ \hline
+{\tt winklerpasternak} & 550 & Winkler-Pasternak model of subbase
+\\ \hline
+{\tt consolidation} & 600 & uniaxial consolidation of fully saturated soils
+\\ \hline
+{\tt therisodilat} & 900 &
+\\ \hline
+{\tt damage\_plasticity} & 1000 & combination damage and plsticity
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf crsectype}}
+\index{type!{\sf crsectype}}
+\label{sectcrsectype}
+
+This generalized data type defines type of cross section. Cross sections contain various quantities
+like thickness, area of cross section, etc.
+Admissible values of a variable of the {\sf crsectype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt nocrosssection} & 0 & no cross section is required
+\\ \hline
+{\tt csbar2d} & 1 & cross section for bar elements in 2D
+\\ \hline
+{\tt csbeam2d} & 2 & cross section for beam elements in 2D
+\\ \hline
+{\tt csbeam3d} & 4 & cross section for beam elements in 3D
+\\ \hline
+{\tt csplanestr} & 10 & cross section for plane stress elements
+\\ \hline
+{\tt cs3dprob} & 20 & cross section for 3D elements
+\\ \hline
+{\tt csnodal} & 40 &
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf elloadtype}}
+\index{type!{\sf elloadtype}}
+\label{sectelloadtype}
+
+This generalized data type defines type of element load.
+Admissible values of a variable of the {\sf elloadtype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt volume} & 1 & volume load
+\\ \hline
+{\tt edge} & 2 & edge load
+\\ \hline
+{\tt surface} & 3 & surface load
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf elemposition}}
+\index{type!{\sf elemposition}}
+\label{sectelemposition}
+
+This generalized data type defines points where strains and stresses are evaluated.
+Admissible values of a variable of the {\sf elemposition} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt nowhere} & 0 & nowhere
+\\ \hline
+{\tt intpts} & 1 & integration points
+\\ \hline
+{\tt enodes} & 2 & nodes of elements
+\\ \hline
+{\tt userdefined} & 3 & user defined points
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf strastre}}
+\index{type!{\sf strastre}}
+\label{sectstrastre}
+
+This generalized data type defines type of processed quantity.
+Admissible values of a variable of the {\sf strastre} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt strain} & 0 & strains are computed
+\\ \hline
+{\tt stress} & 1 & stresses are computed
+\\ \hline
+{\tt other} & 2 & other values are computed
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf inictype}}
+\index{type!{\sf inictype}}
+\label{sectinictype}
+
+This generalized data type defines type of initial condition. Variable type of initial conditions can be used
+and also its combinations. So the basic admissible values can be combined via addition. The values of initial
+conditions with lower basic number will be read preceding one with the higher basic number. For example
+combination initial displacements and stresses is represented by the value 5 = 1 + 4 and when the input file will be
+processed, the first the values of the displacements will be read and then the values of stresses will be read.
+Basic admissible values of a variable of the {\sf inictype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt none} & 0 & no initial condition
+\\ \hline
+{\tt inidisp} & 1 & initial displacements
+\\ \hline
+{\tt inistrain} & 2 & initial strains
+\\ \hline
+{\tt inistress} & 4 & initial stresses
+\\ \hline
+{\tt iniother} & 8 & other initial values
+\\ \hline
+{\tt inicond} & 16 &
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf paramf\_type}}
+\index{type!{\sf paramf\_type}}
+\label{sectparamftype}
+
+This generalized data type defines type of function which is used for $\tilde\varepsilon$ computation in the scalar
+damage material models. Admissible values of a variable of the {\sf paramf\_type} are defined by a list of symbolic
+constant names (aliases) and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt norstrain} & 1 & strain norm, see Eqn. (\ref{eqnorstrain})
+\\ \hline
+{\tt norenergy} & 2 & energy norm, see Eqn. (\ref{eqnorenergy})
+\\ \hline
+{\tt norposstrain} & 3 & positive strain norm, see Eqn. (\ref{eqnorposstrain})
+\\ \hline
+{\tt norposenergy} & 4 & positive energy norm, see Eqn. (\ref{eqnorposenergy})
+\\ \hline
+{\tt norrankine} & 5 & Rankine norm, see Eqn. (\ref{eqnorrankine})
+\\ \hline
+{\tt norrankinesmooth} & 6 & smoothed Rankine norm, see Eqn. (\ref{eqnorrankinesmooth})
+\\ \hline
+{\tt normazar} & 7 & Mazar's norm, see Eqn. (\ref{eqnormazar})
+\\ \hline
+{\tt vonmises} & 8 & von Mises norm, see Eqn. (\ref{eqnorvonmises})
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf corr\_disip\_en}}
+\index{type!{\sf corr\_disip\_en}}
+\label{sectparamftype}
+
+This generalized data type defines correction of damage models with respect to the dissipated energy.
+Admissible values of a variable of the {\sf corr\_disip\_en} are defined by a list of symbolic
+constant names (aliases) and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt corr\_off} & 0 & correction is switched off
+\\ \hline
+{\tt corr\_on} & 1 & correction is switched on
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf wavrg}}
+\index{type!{\sf wavrg}}
+\label{sectwavrg}
+This generalized data type defines for nonlocal plasticity
+models the flag which determines what will be averaged.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt avggamma} & 0 & averaging of consitency parameter $\gamma$
+\\ \hline
+{\tt avgepsp} & 1 & averaging of plastic strains
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf avrgf}}
+\index{type!{\sf avrgf}}
+\label{sectavrgf}
+This generalized data type defines for nonlocal models the flag which
+determines type of function for averaging.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt parab} & 1 & parabolic function
+\\ \hline
+{\tt cubic} & 2 & cubic function
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf graphfmt}}
+\index{type!{\sf graphfmt}}
+\label{sectgraphfmt}
+This generalized data type defines in the output driver which type of
+output graphics format is used.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt grfmt\_no} & 0 & no graphics output
+\\ \hline
+{\tt grfmt\_open\_dx} & 1 & OpenDX format
+\\ \hline
+{\tt grfmt\_femcad} & 2 & FemCAD format
+\\ \hline
+{\tt grfmt\_gid} & 3 & GiD format
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf prunk}}
+\index{type!{\sf prunk}}
+\label{sectprunk}
+This generalized data type defines in the output diagrams type of
+printed unknowns. 
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt pr\_displ} & 1 & displacement vector
+\\ \hline
+{\tt pr\_strains} & 2 & strains
+\\ \hline
+{\tt pr\_stresses} & 3 & stresses
+\\ \hline
+{\tt pr\_forces} & 4 & load vector
+\\ \hline
+{\tt pr\_react} & 5 & reactions
+\\ \hline
+{\tt pr\_stepid} & 6 & step number
+\\ \hline
+{\tt pr\_appload} & 7 & load coefficient or time
+\\ \hline
+{\tt pr\_other} & 8 & values of other array
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Types of mechanical problems}
+Type of mechanical problem is described by attribute {\it tprob} of the class {\sf probdesc}. {\it tprob}
+is a {\sf problemtype} defined in the file alias.h and it is described in Section \ref{sectproblemtype}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computation of particular quantities}
+
+This section contains subsections describing computation of various quantities.
+
+\subsection{Computation of strains}
+\label{sectstraincomp}
+
+Strain evaluation is based on adopted strategy of decomposition of strain components
+into blocks. The decomposition is theoreticaly described in Section \ref{sectgencom} and the
+implementation is mentioned in Section \ref{sectgeninform}. The existence of several sets of
+integration points leads to application of interpolation methods. They are described in details
+in Section \ref{sectgeninform}.
+
+Computation of strains is controlled by attributes {\it straincomp} and {\it strainaver} of the class
+{\sf probdesc}. Admissible values of the attributes are collected in Table \ref{tabstraincompcontr}.
+
+%\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & action
+\\ \hline \hline
+{\it straincomp} & 0 & do not compute strains
+\\ \hline
+{\it straincomp} & 1 & compute strains
+\\ \hline \hline
+{\it strainaver} & 0 & do not average strain values in nodes
+\\ \hline
+{\it strainaver} & 1 & average strain values in nodes
+\\ \hline
+\end{tabular}
+%\caption{}
+\label{tabstraincompcontr}
+\end{center}
+%\end{table}
+
+The code is able to compute strains at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of stresses}
+\label{sectstresscomp}
+
+Stress evaluation is based on adopted strategy of decomposition of strain components
+into blocks. The decomposition is theoreticaly described in Section \ref{sectgencom} and the
+implementation is mentioned in Section \ref{sectgeninform}. The existence of several sets of
+integration points leads to application of interpolation methods. They are described in details
+in Section \ref{sectgeninform}.
+
+Computation of stresses is controlled by attributes {\it stresscomp} and {\it stressaver} of the class
+{\sf probdesc}. Admissible values of the attributes are collected in the following table.
+%Table \ref{tabstresscompcontr}.
+
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & action
+\\ \hline \hline
+{\it stresscomp} & 0 & do not compute stresses
+\\ \hline
+{\it stresscomp} & 1 & compute stresses
+\\ \hline \hline
+{\it stressaver} & 0 & do not average stress values in nodes
+\\ \hline
+{\it stressaver} & 1 & average stress values in nodes
+\\ \hline
+\end{tabular}
+
+The code is able to compute stresses at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level. There is no connection between location where strains are computed and
+location where stresses are computed.
+
+Stress computation requires computation of strains at least at integration points.
+A choice straincomp=0 and stresscomp=1 leads
+to error because there are no data for stress evaluation. Averaging of strains and averaging of stresses
+are independent in the code. User must make decision which strategy should be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of reactions}
+\label{sectreactcomp}
+
+Control of reaction computation is done by attribute {\it reactcomp} of the class {\sf probdesc}.
+Default value of the {\it reactcomp} is 0 which means no computation of reactions. If the attribute
+{\it reactcomp} is 1, reactions are computed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of element level matrices}
+This section is devoted to the description of particular finite elements. Notion characteristic
+matrix \index{matrix!characteristic} means any matrix of finite element. It can be for example
+stiffness matrix, mass matrix, geometric matrix and so on. All matrices are considered at element level.
+
+With respect to maximal universality, block structure of all characteristic matrices is used.
+Decomposition of geometric matrix and stiffness matrix of the material is described in Section \ref{sectgencom}.
+The stiffness matrix is obtained as the sum of contributions (see Equation (\ref{eqstiffmatblockint})).
+As was mentioned in Section \ref{sectgencom}, each contribution can be integrated by different integration
+scheme. This fact is important for example in case of underintegrated finite elements. Block structure of
+matrices allows application of various approximation functions for particular unknown functions.
+On the other hand, existence of several sets of integration points on one element produces difficulty because
+various blocks of data are computed at various points on element and some interpolation must be used. The
+mentioned difficulty will be described with help of plane stress quadrilateral finite element. Plane stress
+is characterized by stress components $\sigma_{xx}, \sigma_{yy}, \tau_{xy}$ and by strain components
+$\varepsilon_{xx}, \varepsilon_{yy}, \gamma_{xy}$. If the bi-linear approximation functions are used, the full
+$2 \times 2$ numerical integration of all components leads to well known shear locking. Reduced integration
+which is based on $2 \times 2$ integration of normal components and one-point integration of tangent component
+is recommended for improving the behaviour of the element. In this case, the shear component must be evaluated
+at the center of the element otherwise nonsence is obtained. Normal components are therefore computed at points
+with natural coordinates equal to $\pm0.55$ while shear components are computed only at point with natural
+coordinates equal to $0$.
+
+Knowledge of all quantities at all integration points is important because during numerical integration
+various quantities are required. But there is also another requirement arising from users of the software.
+Users usually do not require any quantities expressed at the integration points but at the nodes.
+These reasons provoke construction of interpolation of any quantity from any integration point to any other
+point on element.
+
+The least square method is the basis of the interpolation. Suitable function for every quantity is used for
+interpolation and appropriate coefficients are obtained by the least square method. Nodal values of interpolated
+quantity are computed and there are two possibilities how to store them. The first variant is based on storage
+on processed element. In this case, adjacent elements do not influence on the element. This variant is denoted
+{\it no averaging}. The second variant is based on storage of nodal values on nodes. Therefore average of contributions
+from adjacent elements are obatined for every quantity. This resembles simple adaptive technique. The second
+variant is denoted as {\it averaging}.
+
+Not averaging variant can be always used. Averaging variant must be used carefully. The same components (quantities)
+must be sent to nodes otherwise nonsence is obtained. Typically, there are different coordinate systems on elements
+in shell analysis or analysis of beam structures. Therefore incompatible components can be obtained without
+suitable transformation.
+
+
+Evaluation of any quantity anywhere on element is simple if the nodal values are known.
+% je treba zjistit, zda-li se pouzivaji interpolacni funkce z MNC nebo bazove funkce prvku
+
+Components of strain tensor play important role in the decomposition. They are stored in vector and only in specific
+cases are stored in matrix form. The vector containing strain components is decomposed with respect to feature of
+solved problem (plane stress, axisymmetric problem, etc.). Particular decompositions are defined in sections devoted
+to the finite elements.
+
+\subsection{Computation of several load cases}
+The code enables computation with several load cases in linear static problems (problemtype = linear\_statics=1,
+see Section \ref{sectproblemtype}), linear layered static problems (problemtype = layered\_linear\_statics=30)
+and earth pressure problems (problemtype = earth\_pressure=20) where results can be combined and superposition can be used.
+Other types of problems do not enable it. There is no reason for several
+load cases in remaining problems. Analysis of eigenfrequencies and eigenvectors does not contain
+any load case, nonlinear static problems and time-dependent problems without inertial forces do not enables
+combination of results because the principle of superposition is not valid. Results from forced dynamics
+can be combined only for harmonic loading with the same frequencies.
+The total number of load cases is stored in the instance nlc in the class mechbclc.\index{class!mechbclc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Control of particular processes}
+
+This section contains subsections describing control of various processes.
+
+\subsection{Control of solver of systems of linear algebraic equations}
+\label{sectcontrlineqsolver}
+
+There are many possibilities of solution of systems of linear algebraic equations in the code. Basically,
+there are two strategies: direct or iterative method. An attribute {\it ssle} of the class {\sf probdesc}
+contains all necessary informations. The attribute {\it ssle} is an instance of the class {\sf slesolv} which
+is described in GEFEL.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control of solver of nonlinear algebraic equations}
+
+An attribute {\it nlman}\index{attribute!{\it nlman}}\index{instance!{\it nlman}} of
+the class {\sf probdesc}\index{class!{\sf probdesc}} is an instance of
+the class {\sf nonlinman}\index{class!{\sf nonlinman}}. The attribute
+{\it nlman} contains all necessary informations about solver of nonlinear algebraic equations.
+
+
+Type of solver of systems of nonlinear algebraic equations is defined by
+attribute {\it tnlinsol}\index{attribute!{\it tnlinsol}} of the class
+{\sf nonlinman}.
+The attribute {\it tnlinsol} is a {\sf nonlinsolvertype} (see Section \ref{sectnonlinsolvertype}). Two methods are
+implemented in the code at this time, the arc-length method\index{arc-length method} and
+the Newton-Raphson method.\index{Newton-Raphson method}
+
+\subsubsection{Control of the arc-length method}
+\label{sectcontracrmet}
+
+Arc-length method requires several control parameters.
+They are described by following attributes of the class {\sf nonlinman}:
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline
+{\it displnorm} & {\sf displacementnorm} & type of norm used for increments of
+\\
+ & & displacements, see Section \ref{sectdisplacementnorm}
+\\ \hline
+{\it hdbackupal} & {\sf long} & control of backup and recover of arc-length
+\\ \hline
+{\it nial} &  {\sf long} & maximum number of increments
+\\ \hline
+{\it niilal} & {\sf long} & maximum number of iterations in inner loop
+\\ \hline
+{\it erral} & {\sf double} & required norm of vector of unbalanced forces
+\\ \hline
+{\it dlal} & {\sf double} & length of the arc at the beginning
+\\ \hline
+{\it dlminal} & {\sf double} & minimum length of the arc
+\\ \hline
+{\it dlmaxal} & {\sf double} & maximum length of the arc
+\\ \hline
+{\it psial} & {\sf double} & control parameter of displacement-loading
+\\
+ & & contributions, it must be from $\langle0;1\rangle$
+\\ \hline
+{\it nsnal} & {\sf long} & number of selected nodes
+\\
+ & & (for norm computation)
+\\ \hline
+{\it selnodal} & {\sf long} & array containing selected nodes
+\\
+ & & (for norm computations)
+\\ \hline
+{\it nsdofal} & {\sf long} & number of selected DOFs
+\\
+ & & (for norm computation)
+\\ \hline
+{\it seldofal} & {\sf long} & array containing selected degrees of freedom
+\\ \hline
+{\it selnodcoord} & {\sf double} & array containing coordinates of selected nodes
+\\ \hline
+{\it probdimal} & {\sf long} & problem dimension
+\\
+ & & (for increment of two node distance)
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+With respect to possible convergence problems, backup of attained state and successive restart with modified
+parameters is supported in the code. The backup and restart is controlled by
+the attribute {\it hdbackupal}.\index{attribute!{\it hdbackupal}}
+Admissible values of the attribute are
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & description
+\\ \hline \hline
+{\it hdbackupal} & 0 & do not make backup on hard-disc
+\\ \hline
+{\it hdbackupal} & 1 & make backup on hard-disc
+\\ \hline
+{\it hdbackupal} & 2 & start arc-length method from backup on hard-disc
+\\ \hline
+{\it hdbackupal} & 11 & start arc-length method in adaptivity from backup on hard-disc
+\\ \hline
+\end{tabular}
+\end{center}
+
+\noindent
+In case of backup of attained state to the hard disc, following data are stored: number of preformed
+steps, number of equations (DOFs), coefficient of proportionality, the length of arc, number of
+selected DOFs for norm evaluation, list of selected DOFs for norm evaluation, vector of solution,
+vector of proportional load, total number of integration points in the solved problem, all
+components of strain, stress and other arrays for all integration points.
+
+
+
+\subsubsection{Control of the Newton-Raphson method}
+
+The Newton-Raphson method method requires several control parameters.
+They are described by following attributes of the class {\sf nonlinman}:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\it ninr} &  {\sf long} & maximum number of increments
+\\ \hline
+{\it niilnr} & {\sf long} & maximum number of iterations in inner loop
+\\ \hline
+{\it errnr} & {\sf double} & required norm of vector of unbalanced forces
+\\ \hline
+{\it incrnr} & {\sf double} & the size of increment
+\\ \hline
+{\it minincrnr} & {\sf double} & minimum size of increment
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Control of numerical integration of time dependent equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control of deterministic and stochastic computations}
+\label{sectdetstochcontr}
+
+MEFEL enables stochastic computations which are based on simple Monte Carlo method.
+Set of randomly generated input data is created before application of MEFEL. Randomly
+means with respect to required probability densities and covariance matrices.
+Then MEFEL computes sequence of deterministic problems defined by input data from
+the set mentioned before. The MEFEL stores required output data which are then
+analysed by usual methods of theory of probability and mathematical statistics.
+
+Software for generation of random input data and for analysis of results is separated
+from the MEFEL and it creates independent library.
+
+Whether computation will be deterministic or stochastic is defined by attribute
+{\it stochasticcalc}\index{attribute!{\it stochasticcalc}} of the class {\sf probdesc}.
+If {\it stochasticcalc}=0, deterministic
+computation will be used.  If {\it stochasticcalc}=1, stochastic computation will be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Definitions in the MEFEL}
+
+This section deals with various definitions in the code. There are mentioned definitiones
+like definition of type of finite element, type of material model etc.
+
+
+\subsection{Definition of finite element}
+
+List of available finite elements for mechanical problems is given here. Names of classes, their objects
+(instances) and basic data are mentioned. For theoretical description of particular finite elements
+see Section \ref{finitelements}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Rectangular element for plane stress/strain ana\-lysis with bilinear approximation functions}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf planeelemlq}\index{class!{\sf planeelemlq}}
+\\ \hline
+object name & {\it Pelq}\index{instance!{\it Pelq}}
+\\ \hline
+theoretical description & Section \ref{sectrectelemlinfunct}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & $u,v$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Rectangular element for plane stress/strain ana\-lysis with biquadratic approximation functions}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf planeelemqq}\index{class!{\sf planeelemqq}}
+\\ \hline
+object name & {\it Peqq}\index{instance!{\it Peqq}}
+\\ \hline
+theoretical description & Section \ref{sectrectelemquadfun}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & $u,v$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Rectangular element for plane stress/strain ana\-lysis with rotational degrees of freedom}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf planeelemrotlq}\index{class!{\sf planeelemrotlq}}
+\\ \hline
+object name & {\it Perlq}\index{instance!{\it Perlq}}
+\\ \hline
+theoretical description & Section \ref{sectrecelemrotdof}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & 1 rotation around $z$ axis
+\\ \cline{2-2}
+ & $u,v,\omega_z$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Triangular element for plate problem ba\-sed on Mindlin theory --- CCT}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf cctelem}\index{class!{\sf cctelem}}
+\\ \hline
+object name & {\it Cct}\index{instance!{\it Cct}}
+\\ \hline
+theoretical description & Section \ref{sectcctelem}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\kappa_{xx},\kappa_{yy},\kappa_{xy}), (\gamma_{xz},\gamma_{yz})$
+\\ \hline
+numer. integration & (3 int. points), (1 int. point)
+\\ \hline
+nodal DOF & 1 deflection and 2 rotations around $x$ and $y$ axes
+\\ \cline{2-2}
+ & $w, \phi_x, \phi_y$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{DKT element}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf dktelem}\index{class!{\sf dktelem}}
+\\ \hline
+object name & {\it Dkt}\index{instance!{\it Dkt}}
+\\ \hline
+theoretical description & Section \ref{sectdktplate}
+\\ \hline
+number of blocks & 1
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{DST element}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf dstelem}\index{class!{\sf dstelem}}
+\\ \hline
+object name & {\it Dst}\index{instance!{\it Dst}}
+\\ \hline
+theoretical description & Section \ref{sectdstelem}
+\\ \hline
+number of blocks & 3
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy}),(\gamma_{xz}),(\gamma_{yz})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Quadrilateral plate element}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf q4plate}\index{class!{\sf q4plate}}
+\\ \hline
+object name & {\it Q4pl}\index{instance!{\it Q4pl}}
+\\ \hline
+theoretical description & Section \ref{sectq4elem}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy}),(\gamma_{xz},\gamma_{yz})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Triangular shell element}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf shelltr}\index{class!{\sf shelltr}}
+\\ \hline
+object name & {\it Shtr}\index{instance!{\it Shtr}}
+\\ \hline
+theoretical description & Section \ref{secttrshellelem}
+\\ \hline
+number of blocks & 3
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy}), (\kappa_x,\kappa_y,\kappa_{xy})$
+\\ \hline
+nodal DOF & $u,v,w,\phi_x,\phi_y,\phi_z$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Hexahedral element with tri-linear approximation functions}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf linhex}\index{class!{\sf linhex}}
+\\ \hline
+object name & {\it Lhex}\index{instance!{\it Lhex}}
+\\ \hline
+theoretical description & Section \ref{secthexlinelem}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\ \varepsilon_{yy},\ \varepsilon_{zz}),\ (\gamma_{yz},\ \gamma_{zx},\ \gamma_{xy})$
+\\ \hline
+nodal DOF & $u,v,w$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Hexahedral element with quadratic approximation functions}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadhex}\index{class!{\sf quadhex}}
+\\ \hline
+object name & {\it Qhex}\index{instance!{\it Qhex}}
+\\ \hline
+theoretical description & Section \ref{secthexquadelem}
+\\ \hline
+number of blocks & 1
+\\ \hline
+block components & $(\varepsilon_{xx},\ \varepsilon_{yy},\ \varepsilon_{zz},\ \gamma_{yz},\ \gamma_{zx},\ \gamma_{xy})$
+\\ \hline
+nodal DOF & $u,v,w$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of material models}
+
+List of available material models for mechanical problems is given here. Names of classes, their objects
+(instances) and basic data are mentioned. For theoretical description of particular material models
+see Section \ref{sectmatmodels}.
+
+\subsubsection{General description}
+
+Material properties can be defined on elements or on integration points. Default
+version is definition of the material properties on elements. Then the same material
+properties are defined at all integration points belonging to the element.
+
+Material models are split into several groups and various combinations can be used.
+
+\begin{center}
+\begin{tabular}{|l|}
+\hline
+elastic material model
+\\ \hline
+plastic material model
+\\
+elastic material model
+\\ \hline
+damage model
+\\
+elastic model
+\\ \hline
+viscous material model
+\\
+plastic material model
+\\
+elastic material model
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Elastic isotropic material model}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf elastisomat}\index{class!{\sf elastisomat}}
+\\ \hline
+object name & {\it eliso}\index{instance!{\it eliso}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectelastmatmodel}
+\\ \hline
+parameters & Young's modulus
+\\
+ & Poisson's coefficient
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Elastic fully anisotropic material model}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf elastgmat3d}\index{class!{\sf elastgmat3d}}
+\\ \hline
+object name & {\it elgm3d}\index{instance!{\it elgm3d}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectelasanimodel}
+\\ \hline
+parameters & 21 material coefficients
+\\
+ & $d_{11},\ d_{12},\ d_{13},\ d_{14},\ d_{15},\ d_{16},\ d_{22},\ d_{23},\ d_{24},\ d_{25},\ d_{26}$
+\\
+ & $d_{33},\ d_{34},\ d_{35},\ d_{36},\ d_{44},\ d_{45},\ d_{46},\ d_{55},\ d_{56},\ d_{66}$
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$J_2$ flow material model of plasticity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf j2flow}\index{class!{\sf j2flow}}
+\\ \hline
+object name & {\it j2f}\index{instance!{\it j2f}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectj2flowmodel}
+\\ \hline
+parameters & {\it fs} yield stress
+\\
+ & {\it k} hardening parameter
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Mohr-Coulomb model of plasticity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf mohrcoulomb}\index{class!{\sf mohrcoulomb}}
+\\ \hline
+object name & {\it mcoul}\index{instance!{\it mcoul}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectmohrcplasmodel}
+\\ \hline
+parameters & {\it phi} friction angle
+\\
+ & {\it c} cohesion
+\\
+ & {\it psi} dilatation angle
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Drucker-Prager model of plasticity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf drprag}\index{class!{\sf drprag}}
+\\ \hline
+object name & {\it drprm}\index{instance!{\it drprm}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectdruckpargmodel}
+\\ \hline
+parameters & {\it phi} friction angle
+\\
+ & {\it c} cohesion
+\\
+ & {\it psi} dilatation angle
+\\
+ & {\it theta} slope of linear dependency of hardening rule
+\\
+ & {\it clim} limit value of cohesion
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Boer model of plasticity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf boermat}\index{class!{\sf boermat}}
+\\ \hline
+object name & {\it boerm}\index{instance!{\it boerm}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectboermodel}
+\\ \hline
+parameters & {\it phi} friction angle
+\\
+ & {\it c} cohesion
+\\
+ & {\it psi} dilatation angle
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{CAM-CLAY model of plasticity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf camclay}\index{class!{\sf camclay}}
+\\ \hline
+object name & {\it cclay}\index{instance!{\it cclay}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectcamclaymodel}
+\\ \hline
+parameters & {\it m} constant based on friction angle and type of load
+\\
+ & {\it lambda} slope of normal consolidation line
+\\
+ & {\it kappa} slope of overconsolidation line
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Lemaitre model of viscosity}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf lemaitre}\index{class!{\sf lemaitre}}
+\\ \hline
+object name & {\it lmtr}\index{instance!{\it lmtr}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectlemaitremodel}
+\\ \hline
+parameters & {\it eta} viscosity coefficient
+\\
+ & {\it m} hardening parameter
+\\
+ & {\it n} stress exponent
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Scalar isotropic damage material}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf scaldam}\index{class!{\sf scaldam}}
+\\ \hline
+object name & {\it sdam}\index{instance!{\it sdam}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectscaldammodel}
+\\ \hline
+parameters & $d_0$ - intial value of damage variable $d$
+\\
+ & $\sigma_t$ - tensile strength
+\\
+ & $u_f$ - determines the softening
+\\
+ & $ft$ - type of the evaluation of the equivalent strain
+\\
+ & $cde$ - indicator of correction with respect to the dissipated energy
+\\
+ & $c$  - coefficient which is used when damage function
+\\
+ & parameters are computed as the energy norm.
+\\
+ & (This parameter is used in order to obtain correct units
+\\
+ & of the damage function parameter {\it kappa})
+\\ \hline
+\end{tabular}
+\end{center}
+
+If the correction of damage models is used, the parameters $u_f$, $\sigma_t$ together with the Young
+modulus of elasticity and the generalized size of elements must satisfy the condition (\ref{eqnscdamcons}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{B3 model for creep}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf creepb}\index{class!{\sf creepb}}
+\\ \hline
+object name & {\it crbaz}\index{instance!{\it crbaz}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectB3model}
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Winkler-Pasternak Subsoil model}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf winpast}\index{class!{\sf winpast}}
+\\ \hline
+object name & {\it wpast}\index{instance!{\it wpast}}
+\\ \hline
+superior class & {\sf mechmat}
+\\ \hline
+theoretical description & Section \ref{sectsubsoil}
+\\ \hline
+parameters & {\it $c_1$ } stiffness
+\\
+& {\it $c_2$ } shear stiffness
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of cross sections}
+
+The term cross section comes from the bars and beams where properties of the elements in two
+directions orthogonal to the dominant direction have to be defined. The typical quantities
+are the area of cross section, the moment of inertia of cross section, etc. Cross section in
+problems of plane stress or plate defines the thickness.
+
+
+Cross sections can be defined at nodes or at elements. Except of onedimensional finite
+elements (like bar, beam, etc.) the cross section is defined at nodes. Particular
+properties are interpolated with help of approximation functions into elements.
+Onedimensional elements should contain own definition of cross section because
+e.g. one cross section in node is not generally enough for description of several
+bars connected to the node.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cross section of 2D bars}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsec2dbar}\index{class!{\sf crsec2dbar}}
+\\ \hline
+object name & {\it cs2dbar}\index{instance!{\it cs2dbar}}
+\\ \hline
+superior class & {\sf mechcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $a$ } area of cross section
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cross section of 2D beams}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsec2dbeam}\index{class!{\sf crsec2dbeam}}
+\\ \hline
+object name & {\it cs2dbeam}\index{instance!{\it cs2dbeam}}
+\\ \hline
+superior class & {\sf mechcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $a$ } area of cross section
+\\
+ & {\it iy} moment of inertia
+\\
+ & {\it shearcoeff} shear coefficient
+\\
+ & {\it t} thickness of the layer in layered problems
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cross section of 3D beams}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsec3dbeam}\index{class!{\sf crsec3dbeam}}
+\\ \hline
+object name & {\it cs3dbeam}\index{instance!{\it cs3dbeam}}
+\\ \hline
+superior class & {\sf mechcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $a$ } area of cross section
+\\
+ & {\it ix, iy, iz} moments of inertia
+\\
+ & {\it shearcoeffy, shearcoeffz} shear coefficients
+\\
+ & {\it lcs} vector defining local coordinate system on the beam
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cross section of plane stress and plate problems}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsecplstr}\index{class!{\sf crsecplstr}}
+\\ \hline
+object name & {\it csplstr}\index{instance!{\it csplstr}}
+\\ \hline
+superior class & {\sf mechcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $t$ } thickness
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of output}
+
+There are the following output possibilities in the MEFEL:
+\begin{itemize}
+\item output into a specified text file,
+\item output into a graphic postprocessor,
+\item output in the form of diagrams in text files.
+\end{itemize}
+Particular possibilities are described further.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output into a specified text file}
+Common output from a finite element code contains several quantities at nodes, integration points,
+etc. It is not necessary to print out all quantities in many cases. Only required values at
+required positions are usefull. Therefore, a tool for selection of quantities and positions
+is necessary. Such a tool is defined in the class {\sf outdriverm} located in the file outdriverm.cpp.
+It is important to notice that the numbering of any quantity must start from 1 despite the fact, that
+the code is written in the C language and uses numbering from 0. It is automatically recomputed in the
+code.
+
+All variables, quantities, nodes, elements, integration points, etc. in the finite element code have
+their identification number. There is the following list of options for simple selection of
+identification numbers:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+ 0 & no selection (none identification numbers is selected)
+\\ \hline
+ 1 & select all identification numbers
+\\ \hline
+ 2 & select range of identification numbers
+\\ \hline
+ 3 & select list of identification numbers
+\\ \hline
+\end{tabular}
+\label{tabselect}
+\end{center}
+\end{table}
+
+The choices 0 (none identification numbers is selected) and 1 (all identification numbers) are clear
+and no special further description is necessary.
+
+The choice {\it range} has the following format:
+
+\begin{tabular}{l}
+{\it number of ranges}
+\\
+{\it the first index of the first range}
+\\
+{\it number of items in the first range}
+\\
+{\it the first index of the second range}
+\\
+{\it number of items in the second range}
+\\
+$\vdots$
+\\
+{\it the first index of the last range}
+\\
+{\it number of items in the last range}
+\\
+\end{tabular}
+
+The choice {\it list} has the following format:
+
+\begin{tabular}{l}
+{\it number of items}
+\\
+{\it the first item}
+\\
+{\it the second item}
+\\
+$\vdots$
+\\
+{\it the last item}
+\\
+\end{tabular}
+
+Output into a text file contains several blocks of data. Namely:
+\begin{itemize}
+\item block of quantities at nodes,
+\item block of quantities at integration points of finite elements,
+\item block of quantities at user defined points on finite elements.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Block of quantities at nodes}
+This block contains output of any quantity defined at nodes. Not all quantities are available
+at nodes.
+
+Nodal quantities can be printed out at selected numbers of iterations and for required
+load cases. The two first parameters define this choice.
+\begin{itemize}
+\item[] {\it step} number of every n-th iteration where the data are to be printed (e.g. 3 means that data from
+every third iteration will be printed),
+\item[] {\it sellc} selection of identification number of load case,
+see Table \ref{tabselect} and further description.
+\end{itemize}
+
+The following quantities can be printed out at nodes:
+\begin{itemize}
+\item displacements
+\item strains
+\item stresses
+\item quantities from the other array
+\item reactions
+\end{itemize}
+
+Except of reactions, selection of nodes and components of quantities must be defined for
+all items from the previos list.
+Reactions have a special position in the outdriverm. There are only two possibilities: print all
+reactions or do not print any reaction. User is not allowed to selected particular reaction.
+
+Simple example of part of an input file is attached. All nodes and all components
+are considered here. 
+
+\begin{itemize}
+\item[]
+EXAM/DAMAGE/cube-endo.out \# name of output file
+\item[]
+5 \# quantities from every fifth iterations will be printed
+\item[]
+1 \# quantities from all load case will be printed
+\item[]
+1 1 \# selection of nodes where displacements will be printed, all nodes
+are selected (1), all components of displacements will be printed (1)
+\item[]
+1 1 0 \# selection of nodes where strains will be printed, all nodes are selected (1),
+all components will be printed (1), no transformation of strain into
+local coordinate system is required (0)
+\item[]
+0 \# selection of nodes where stresses will be printed, none node is selected (0), it means that stresses
+will not be printed
+\item[]
+0 \# selection of nodes where components of array other will be printed, none node is selected (0)
+\item[]
+1 \# selection of nodes where reactions will be printed, all nodes are selected (1)
+\end{itemize}
+
+The second example shows various possibilities in node definitions and selection of particular components.
+
+\begin{itemize}
+\item[]
+EXAM/DAMAGE/cube-endo.out \# name of output file
+\item[]
+5 \# quantities from every fifth iterations will be printed
+\item[]
+1 \# quantities from all load case will be printed
+\item[]
+3 1 5 1 \# selection of nodes where displacements will be printed, nodes
+are defined by a list (3) with one item (1), node number (5),
+all components will be printed (1)
+\item[]
+1 1 0 \# selection of nodes where strains will be printed, all nodes are selected (1),
+all components will be printed (1), no transformation of strain into
+local coordinate system is required (0)
+\item[]
+3 2 5 6 \# selection of nodes where stresses will be printed, nodes are defined
+by a list (3) with two items (2), numbers of selected nodes (5 and 6)
+\item[]
+2 1 1 3 \# selection of stress components at node 5 is defined by a range (2), there is one range (1),
+index of the first component is one (1) and three following components are printed (3)
+\item[]
+1 \# selection of stress components at node 6 is defined by option all components (1),
+0 0 \# no stress transformation is required at nodes 5 and 6
+\item[]
+0 \# selection of nodes where components of array other will be printed, none node is selected (0)
+\item[]
+1 \# selection of nodes where reactions will be printed, all nodes are selected (1)
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Block of quantities at integration points of finite elements}
+This paragraph contains output of any quantity defined at integration points of finite elements.
+User can select an element or set of elements but cannot select particular integration point.
+Quantities at all integration points of selected elements are printed out.
+The block of quantities at integration points has a similar structure as the block with quantities at nodes.
+
+Quantities at integration points can be printed out at selected numbers of iterations and for required
+load cases. The two first parameters define this choice.
+\begin{itemize}
+\item[] {\it step} number of every n-th iteration where the data are to be printed (e.g. 3 means that data from
+every third iteration will be printed),
+\item[] {\it sellc} selection of identification number of load case,
+see Table \ref{tabselect} and further description.
+\end{itemize}
+
+The following quantities can be printed out at integration point:
+\begin{itemize}
+\item strains
+\item stresses
+\item quantities from the other array
+\end{itemize}
+
+Simple example of part of an input file is attached. All elements and all components
+are considered here. 
+
+\begin{itemize}
+\item[]
+5 \# quantities from every fifth iterations will be printed
+\item[]
+1 \# quantities from all load case will be printed
+\item[]
+1 1 0 \# selection of elements where strains will be printed, all elements are selected (1),
+all components will be printed (1), no transformation of strain into
+local coordinate system is required (0)
+\item[]
+0 \# selection of elements where stresses will be printed, none element is selected (0), it means that stresses
+will not be printed
+\item[]
+0 \# selection of elements where components of array other will be printed, none element is selected (0)
+\end{itemize}
+
+
+The second example shows various possibilities in element definitions and selection of particular components.
+
+\begin{itemize}
+\item[]
+2 \# quantities from every second iterations will be printed
+\item[]
+1 \# quantities from all load case will be printed
+\item[]
+1 1 0 \# selection of elements where strains will be printed, all elements are selected (1),
+all components will be printed (1), no transformation of strain into
+local coordinate system is required (0)
+\item[]
+3 2 5 6 \# selection of elements where stresses will be printed, elements are defined
+by a list (3) with two items (2), numbers of selected elements (5 and 6)
+\item[]
+2 1 1 3 \# selection of stress components at element 5 is defined by a range (2), there is one range (1),
+index of the first component is one (1) and three following components are printed (3)
+\item[]
+1 \# selection of stress components at element 6 is defined by option all components (1),
+0 0 \# no stress transformation is required at nodes 5 and 6
+\item[]
+1 \# selection of elements where components of array eqother will be printed, all elements are selected (1)
+\item[]
+2 2 1 2 5 3 \# printed components of the array eqother are defined by range description (2), there are two
+ranges (2), the first index of the first range (1), number of components (2),
+the first index of the second range (5), number of components (3),
+\end{itemize}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{User defined points block}
+User defined points (UDP) block specifies output of results at user defined points.
+element the selected values are printed at each integration point.
+The block is described in the  following lines and table :
+
+\begin{itemize}
+\item[] {\it step} specifies that the output will be performed each {\it step}-th step
+If user specifies 0, nodal results will not be printed, and element block follows.
+\item[] {\it number of UDP = n}
+\item[] {\it ksi, eta, zeta}, natural coordinates of UDP 1
+\item[] .
+\item[] .
+\item[] {\it ksi, eta, zeta}, natural coordinates of UDP n
+\item[] {\it sel} elements. This selection specifies elements, on which
+the UDP are defined. If user specifes in {\it sel} no elements, 
+UDP results will not be printed, and graphics output block follows.
+\item[] {\it sel} load case. If user specifes in {\it sel} no load case, UDP results
+will not be printed, and graphics output block follows.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+{\it sel} of strain components & transformation id
+\\ \hline
+{\it sel} of stress components &  transformation id
+\\ \hline
+{\it sel} of eqother array components &
+\\ \hline
+\end{tabular}
+\end{center}
+
+This table with selections of strains, stresses and other values for UDPs is repeated
+for each UDP.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output into graphic postprocessors}
+There are the following possibilities of output into a graphic posprocessor.
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+ 0 & no graphic output
+\\ \hline
+ 1 & OpenDX format
+\\ \hline
+ 2 & FemCAD format
+\\ \hline
+ 3 & GiD format
+\\ \hline
+\end{tabular}
+\end{center}
+
+In case of selection OpenDX or FemCAD or GiD format, the next line have to contain file name,
+to which the output will be performed. In case GiD and FemCAD the output file will contain
+selected quantities specified in previous sections. In case GiD only selected elements specified
+in previous section will be contained in the output GiD file. In case OpenDX the previous sections
+have no influence on the output and all quantities are printed to the OpenDX file.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output in the form of diagrams in text files}
+In order to construct graphs between any variables (e.g. stress-strain diagram,
+force-displacement graph, etc.), special output is available.
+This output is available only for nonlinear statics, forced dynamics, time dependent problems
+and earth pressure solver. Selected quantities for selected steps (time instances or numbers of iterations)
+are printed to text file. All quantities printed out at every step are located at one line.
+
+The first parameter defines the number of graphs which is equal to the number of auxiliary
+text files. In the case of one graph, name of text file folows. In the case of more than one graph,
+only one name has to be specified becuase the code will automatically generate auxiliary files
+with the specified name which is enlarged by a number of graph.
+
+Every graph has to be defined by the following form.
+The first parameter defines the number of quantities printed out (columns in the auxiliary file).
+The number of every iteration or time step, where the quantities will be printed is
+the second parameter.
+Values printed out in one column are defined by quantity position and quantity meaning.
+
+Position of a quantity contains two parts. The first part expresses the type of the position and the
+second part contains more detail description. In the following list, the second part starts after semicolon.
+\begin{itemize}
+\item[] 1 - node; then the number of required node follows,
+\item[] 2 - element; then the number of required element and local number of required integration point follow,
+local oredring of integration point can be found in definition of the finite element,
+\item[] 3 - the nearest node to point with defined coordinates; the coordinates $x,y,z$ follow, the nearest
+node to the required point is found automatically by the code.
+\end{itemize}
+ 
+The quantity is described by its meaning and by its index in some cases. The definition of quantity has the form
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+meaning & alias number & index
+\\ \hline \hline
+displacement & 1 & component id
+\\ \hline
+strain & 2 & component id
+\\ \hline
+stress & 3 & component id
+\\ \hline
+load vector & 4 & component id
+\\ \hline
+reaction & 5 & component id
+\\ \hline
+step number (integer) & 6 &
+\\ \hline
+load coefficient or time (real) & 7 &
+\\ \hline
+values of other array & 8 & component id
+\\ \hline
+\end{tabular}
+\end{center}
+Types 1 (displacement), 4 (load vector) and 5 (reaction) can be used only in connection with nodes, not
+with elements. Therefore component id expresses the number of component at node, not the number of
+component in the global vector.
+
+\begin{itemize}
+\item[]
+2 \# number of graphs
+\item[]
+EXAM/DAMAGE/cube-endo.dat \# name of auxiliary files, the code will generate the files cube-endo.1.dat
+and cube-endo.2.dat
+\item[]
+2 1 \# the first graph contains two quantities (columns) (2), quantities will be printed at every iteration step (1)
+\item[]
+1 5 1 1 \# quantity is located at node (1), node number (5), meaning of the quantity is displacement (1), the first
+component is required (1)
+\item[]
+1 5 7 \# quantity is located at node (1), node number (5), meaning of the quantity is load coefficient (7)
+\item[]
+2 3 \# the second graph contains two quantities (columns) (2), quantities will be printed at every third
+iteration step (3)
+\item[]
+2 1 1 2 1 \# quantity is located at element (2), element number (1), local integration point number (1),
+meaning of the quantity is strain (2), the first component is required (1)
+\item[]
+2 1 1 3 1 \# quantity is located at element (2), element number (1), local integration point number (1),
+meaning of the quantity is stress (3), the first component is required (1)
+\end{itemize}

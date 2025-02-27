@@ -1,0 +1,284 @@
+
+{\bf Liquid and gas transport}\\
+
+If moisture convection is neglected, the liquid and gas (moist air) transport and 
+the vapor diffusion taking place in the gas are the remaining driving mechanisms.
+The transport of the vapor phase is governed by Fick's law (\ref{fick})
+\begin{eqnarray}\label{fick_2}
+\tenss{J}^{gw}_s &=& n(1-S_w) \rho^{gw} \big( \tenss{v} ^{gw} - \tenss{v}^s \big) = 
+- \frac{k^{gw}}{\nu^{gw}} {\rm grad} p^{gw}\nonumber\\
+&=&-\delta^{gw}(S) {\rm grad} p^{gw}\nonumber\\
+&=&-\delta^{gw}(S)\Big[\frac{\partial p^{gw}}{\partial T} {\rm grad} T + \frac{\partial p^{gw}}{\partial S} {\rm grad} 
+S \Big].
+\end{eqnarray}
+The flux of the liquid phase (Darcy's law (\ref{darcy})) is expressed as
+\begin{eqnarray}\label{darcy_2}
+\tenss{J}_s^{w} &=& n S_w \rho^w \big( \tenss{v} ^{w} - \tenss{v}^s \big) = - \frac{K^w(s)}{g} {\rm grad} p^w\nonumber\\
+&=& - \frac{K^w(S)}{g} {\rm grad} (p^{gw} - p^c)\nonumber\\
+&=& - \frac{K^w(S)}{g}\Big[\Big(
+\frac{\partial p^{gw}}{\partial T} - \frac{\partial p^{c}}{\partial T}\Big) {\rm grad} T
++ \Big(\frac{\partial p^{gw}}{\partial S} - \frac{\partial p^{c}}{\partial S}\Big) {\rm grad} S \Big].
+\end{eqnarray}
+It remains to calculate the partial derivatives of $p^{gw}$ and $p^c$ with respect to $T$ and $S$.
+
+As $p^{gw} = h p^{gws}$ we have
+\begin{eqnarray}
+\frac{\partial p^{gw}}{\partial T} = \frac{\partial}{\partial T} \Big(h p^{gws}(T)\Big)\Big|_{h = {\rm const}} 
+= h \frac{\partial p^{gws}(T)}{\partial T}.
+\end{eqnarray}
+Making use of the Kelvin-Laplace law (\ref{kelvinlapl}) yields
+\begin{eqnarray}
+\frac{\partial p^{c}}{\partial T} = \frac{\partial}{\partial T} \Big[-\frac{\rho^w R T}{M_w}\ln h \Big]_{h = {\rm const}} 
+= -\frac{\rho^w R}{M_w}\ln h.
+\end{eqnarray}
+If $h$ approaches one, $S > S_{\rm irr}$ (II. and III. region) then 
+\begin{eqnarray}\label{region}
+\frac{\partial p^{gw}}{\partial T} \rightarrow \frac{{\rm d} p^{gws}(T)}{{\rm d} T} 
+\qquad {\rm and} \quad \frac{\partial p^{c}}{\partial T}\rightarrow 0.
+\end{eqnarray}
+\begin{eqnarray}
+\frac{{\rm d} w(S)}{{\rm d} S}  &=& \frac{n(\rho^w - \rho^g)}{(1-n)\rho^s} 
+\approx \frac{n}{1-n}\frac{(\rho^w - \rho^{gw})}{\rho^s} \doteq {\rm const}.
+\end{eqnarray}
+Proceeding in a standard way, we find the partial derivative
+\begin{eqnarray}
+\frac{\partial p^{gw}}{\partial S}\Big|_{T = {\rm const}} &=& 
+\frac{\partial p^{gw}}{\partial h} \cdot \frac{\partial h}{\partial w}
+\cdot \frac{\partial w}{\partial S}\nonumber\\
+&=& \frac{\partial p^{gw}}{\partial w} \frac{n}{1-n}\frac{(\rho^w - \rho^{gw})}{\rho^s}
+\end{eqnarray}
+where
+\begin{eqnarray}
+\frac{\partial p^{gw}}{\partial w} = p^{gws}(T) \frac{{\rm d} h(w)}{{\rm d} w}.
+\end{eqnarray}
+There are two possibilities how to evaluate the partial derivative of $p^c$ with respect to $\varPsi = S, w, h$:
+\begin{itemize}
+\item{by starting from formula (\ref{Sw}) to get}
+\begin{eqnarray}
+\frac{\partial p^{c}}{\partial \varPsi} = \frac{\partial p^{c}(S)}{\partial S} \cdot \frac{\partial S}{\partial \varPsi}
+\end{eqnarray}
+\item{or by exploiting the Kelvin - Laplace equation (\ref{kelvinlapl})}
+\end{itemize}
+\begin{eqnarray}
+\frac{\partial p^{c}}{\partial \varPsi} = \frac{\partial p^{c}}{\partial h}\Big|_{T = {\rm const}} 
+\cdot \frac{\partial h}{\partial \varPsi},
+\quad {\rm where} \quad \frac{\partial p^{c}}{\partial h}\Big|_{T = {\rm const}} = -\frac{\rho^w R T}{M_w} 
+\frac{{\rm d}(\ln h)}{{\rm d} h} = 
+- \frac{\rho^w R T}{M_w} \frac{1}{h}
+\end{eqnarray}
+
+{\bf Mass balance equation for two-phase zone}\\
+
+The mass balance equation for the liquid phase reads 
+\begin{eqnarray}\label{masswater}
+\frac{\partial \big( n S_w \rho^w\big)}{\partial t} + {\rm div} \big[n S_w \rho^w \tenss{v}^w\big]
+ = -\dot{m}.
+\end{eqnarray}
+The effect of dry air can be neglected in the transition region for $S > S_{\rm irr}$ (two-phase zone). 
+Then $S_{gw} \doteq 1-S_{w} = 1-S$ and the mass balance equation for vapor assumes this form
+\begin{eqnarray}\label{massvapor_2}
+\frac{\partial \big[n(1- S_w) \rho^{gw}\big]}{\partial t} + {\rm div} \big[n (1-S_w)
+\rho^{gw} \tenss{v}^{gw}\big] = \dot{m}.
+\end{eqnarray}
+By adding Eqs. (\ref{masswater}) and (\ref{massvapor_2}) considering Eq. (\ref{w_S}) and substituting from 
+Eqs. (\ref{fick_2}) and (\ref{darcy_2}), 
+we arrive at the mass balance equation in two-phase zone of a porous material:
+\begin{eqnarray}\label{twophase}
+\rho_s \frac{\partial w}{\partial t} = \frac{\partial w(\varPsi)}{\partial \varPsi} 
+\cdot \frac{\partial \varPsi}{\partial t} = 
+{\rm div} \big( a_{\varPsi T}(\varPsi, T) {\rm grad} T + a_{\varPsi \varPsi}(\varPsi, T){\rm grad} \varPsi \big),
+\end{eqnarray}
+where $\rho_s = (1 - n)\rho^s$ (see Eq.~\eqref{av_dens}), $\varPsi = S, w, h$, and
+\begin{eqnarray}\label{a_phi}
+a_{\varPsi T}(\varPsi, T) &=& \Big[\Big( \delta^{gw}(\varPsi) + \frac{K^w(\varPsi)}{g} \Big) 
+\frac{\partial p^{gw}}{\partial T} - \frac{K^w(\varPsi)}{g} \frac{\partial p^{c}}{\partial T} \Big]_{\varPsi = 
+{\rm const}}\nonumber\\
+a_{\varPsi \varPsi}(\varPsi, T) &=& \Big[\Big( \delta^{gw}(\varPsi) + \frac{K^w(\varPsi)}{g} \Big) 
+\frac{\partial p^{gw}}{\partial \varPsi} - \frac{K^w(\varPsi)}{g} \frac{\partial p^{c}}{\partial \varPsi} \Big]_{T = 
+{\rm const}}\quad .
+\end{eqnarray}
+If water vapor diffusion is the only driving mechanism, the preceding equations (\ref{a_phi}) simplify as
+\begin{eqnarray}
+a_{\varPsi T}(\varPsi, T) &=& \delta^{gw}(\varPsi) \frac{\partial p^{gw}}{\partial T}\Big|_{\varPsi = 
+{\rm const}}\nonumber\\
+a_{\varPsi \varPsi}(\varPsi, T) &=& \delta^{gw}(\varPsi) \frac{\partial p^{gw}}{\partial \varPsi} \Big|_{T = 
+{\rm const}}\quad .
+\end{eqnarray}
+In the two-phase zone $S$ is always greater than $S_{\rm irr}$ (i.e. $h > 0.9$) and, in addition to Eqs. (\ref{region}), 
+$\partial p^{gw}/\partial S \rightarrow 0$.\\
+
+{\bf Energy balance equation}\\
+
+The complete set of equations describing the coupled moisture and heat transport in porous media comprises 
+the energy balance equation and the continuity equations for the liquid water and gas. 
+The {\it energy balance equation} has already been derived in Paragraph~\ref{keynote} (Eq. (\ref{heat})).
+
+The effect of evaporation (latent heat) is represented by the last term appearing on the right-hand 
+side of Eq. (\ref{heat}). Neglecting convective terms and assuming rigid porous matrix yields 
+the resulting form of the equation of energy conservation:
+\begin{eqnarray}\label{enrg_con_first}
+( \rho C)_{\rm eff} \frac{\partial T}{\partial t} &=& {\rm div} \Big\{ \Big(\chi_{\rm eff} (S, 
+T) + \Delta h_{\rm vap} \delta^{gw}(S) \frac{\partial p^{gw}}{\partial T} \Big) {\rm grad} T +\\ 
+& &\qquad \quad + \Delta h_{\rm vap} \delta^{gw}(S) \frac{\partial p^{gw}}{\partial S} {\rm grad} S \Big\} 
+- \frac{\partial}{\partial t}
+\Big[\Delta h_{\rm vap} n(1-S) \rho^{gw} \Big].\nonumber
+\end{eqnarray}
+Since $h = \rho^{gw}/\rho^{gws}$, the source term takes this form
+\begin{eqnarray}
+\frac{\partial}{\partial t} \Big[\Delta h_{\rm vap} n(1-S) \rho^{gw} \Big] &=& \Delta h_{\rm vap} n h \rho^{gws} 
+\frac{\partial S}{\partial t} + \Delta h_{\rm vap} n (1 - S)\rho^{gws} \frac{\partial h}{\partial t}\\
+&=& \Delta h_{\rm vap} n \rho^{gws} \Big(h + (1-S)\frac{\partial h}{\partial w} \frac{\partial w}{\partial S} \Big) 
+\frac{\partial S}{\partial t} = \Delta h_{\rm vap} b(S) \frac{\partial S}{\partial t}\nonumber.
+\end{eqnarray}
+When dealing with the coupled moisture and heat transfer, three quantities can be used to describe the moisture field. 
+Denote them by $\varPsi$; 
+$\varPsi = S, w, h$. 
+Eq. (\ref{enrg_con_first}) can be then rewritten into this contracted form
+\begin{eqnarray}
+( \rho C)_{\rm eff} \frac{\partial T}{\partial t} = {\rm div} \big\{ a_{T T} (T, \Psi) {\rm grad} T + 
+a_{T \Psi} (T, \Psi) {\rm grad} \Psi \big\} - \Delta h_{\rm vap} b(\Psi)\frac{\partial \Psi}{\partial t},
+\end{eqnarray}
+\begin{eqnarray}
+a_{T T} (T, \Psi) &=& \chi_{\rm eff} (\Psi,T) + \Delta h_{\rm vap} \delta^{gw}(\Psi) \frac{\partial p^{gw}}{\partial T},
+\nonumber\\
+a_{T S} (T, \Psi) &=& \Delta h_{\rm vap} \delta^{gw}(\Psi) \frac{\partial p^{gw}}{\partial \Psi}.\nonumber
+\end{eqnarray}
+
+{\bf FEM formulation for coupled moisture and heat transfer}\\
+
+The balance equation for moisture transfer $(\Psi = w(\tenss{x},t))$ reads.
+\begin{eqnarray}\label{couple}
+\rho_s \frac{\partial w}{\partial t} &=& - {\rm div} \big(\tenss{J}_s^{gw}+ \tenss{J}_s^w\big) \nonumber\\
+&=& {\rm div} \Big\{ \delta^{gw}(w) \Big[ \frac{\partial p^{gw}}{\partial T} {\rm grad} T 
++ \frac{\partial p^{gw}}{\partial w} {\rm grad} w \Big] + \nonumber\\ &+& \frac{K^w(w)}{g} \Big[\Big(
+\frac{\partial p^{gw}}{\partial T} - \frac{\partial p^{c}}{\partial T}\Big) {\rm grad} T
++ \Big(\frac{\partial p^{gw}}{\partial w} - \frac{\partial p^{c}}{\partial w}\Big) {\rm grad} w \Big]\Big\}.
+\end{eqnarray}
+The fluid is transferred across interfaces with the surrounding environment by means of convection 
+fluxes, $\tenss{\nu}^T\tenss{J}_c^{\alpha} \dots$ $\alpha = w, gw$. This phenomenon can be expressed 
+by the boundary conditions pertaining to Eq. (\ref{couple}):
+\begin{itemize}
+\item{either given values (an essential condition)}
+\begin{eqnarray}
+w=\overline{w} \qquad {\rm on} \quad \Gamma_w = \Gamma_{1w}
+\end{eqnarray}
+\item{or imposed fluxes (natural boundary conditions)}
+\begin{eqnarray}
+\tenss{\nu}^T \tenss{J}_c^{gw} = - \tenss{\nu}^T {\delta}^{gw}(w) \Big[ \frac{\partial 
+p^{gw}}{\partial T} {\rm grad} T + \frac{\partial p^{gw}}{\partial w} {\rm grad} w \Big]
+= \overline{q}^{gw} \quad \Gamma^{gw}
+\end{eqnarray}
+\end{itemize}
+and
+\begin{eqnarray}
+\tenss{\nu}^T \tenss{J}_c^{w} = - \tenss{\nu}^T \frac{K^w(w)}{g} \Big[\Big(
+\frac{\partial p^{gw}}{\partial T} - \frac{\partial p^{c}}{\partial T}\Big) {\rm grad} T
++ \Big(\frac{\partial p^{gw}}{\partial w} - \frac{\partial p^{c}}{\partial w}\Big) {\rm grad} w \Big]
+= \overline{q}^{w} \quad {\rm on} \quad \Gamma^{w}\nonumber.
+\end{eqnarray}
+\begin{eqnarray}
+{\Gamma^{gw} \cup \Gamma^w = \Gamma_{2w}}\nonumber
+\end{eqnarray}	
+The water vapor flux prescribed in the direction of the outward normal $\tenss{\nu}$ 
+on $\Gamma^{gw}$ 
+is obtained from the following formula \cite{ctu}
+\begin{eqnarray}
+\overline{q}^{gw} = \beta^{gw} (p_{\rm surf}^{gw} - p_{\rm air}).
+\end{eqnarray}
+
+The equation of energy conservation is of the form
+\begin{eqnarray}\label{enrg_con}
+( \rho C)_{\rm eff} \frac{\partial T}{\partial t} &=& {\rm div} \Big\{ \Big(\chi_{\rm eff} (w, 
+T) +  \Delta h_{\rm vap} \delta^{gw}(w) \frac{\partial p^{gw}}{\partial T} \Big) {\rm grad} T +\\
+&& \qquad  +\Delta h_{\rm vap} \delta^{gw}(w) \frac{\partial p^{gw}}{\partial w} {\rm grad} w \Big\} +  \Delta h_{\rm vap} b(w) 
+\frac{\partial}{\partial t}\nonumber
+\end{eqnarray}
+where
+\begin{eqnarray}
+ \Delta h_{\rm vap} b(w) =  \Delta h_{\rm vap} n \rho^{gws} \Big( h(w) + (1-S)\frac{{\rm d} h}{{\rm d} w}\Big )
+\overline{q}^{gw} = \beta^{gw} (p_{\rm surf}^{gw} - p_{\rm air}).
+\end{eqnarray}
+The boundary conditions belonging to Eq. (\ref{enrg_con}) are
+\begin{itemize}
+\item{either the given values}
+\begin{eqnarray}
+T = \overline{T} \qquad {\rm on} \quad \Gamma_{T} = \Gamma_{1 T}
+\end{eqnarray}
+\item{or imposed flux. It is given as the sum of three individual fluxes - a convection exchange 
+of heat between outer surfaces and the air, the absorption of a fraction of the sun radiation 
+heat, and the loss of heat due to latent heat of moisture vaporization. The result reads}
+\end{itemize}
+\begin{eqnarray}
+\tenss{\nu}^T q = - \tenss{\nu}^T \chi_{\rm eff}(w,T) {\rm grad} T  = 
+\big(\beta_c + \beta_r(T)\big) \big(T_{\rm surf} - T_{\rm air}\big) + \beta_c \tenss{\nu}^T 
+\tenss{J}_c^{gw}= \overline{q}_{T}\nonumber\\
+{\rm on} \quad \Gamma^{T} = \Gamma_{2 T}.
+\end{eqnarray}
+
+{\bf Numerical solution}\\
+
+Applying Galerkin's method (see Paragraph~\ref{secnonstationary}) we obtain a system of equations 
+for coupled moisture and heat transfer:
+\begin{eqnarray}\label{final_eq}
+\left[ \begin{array}{cc}
+\tenss{K}_{ww} & \tenss{K}_{wT} \\
+\tenss{K}_{Tw} & \tenss{K}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_w \\
+\tenss{r}_{T}
+\end{array} \right\} + 
+\left[ \begin{array}{cc}
+\tenss{C}_{ww} & \tenss{C}_{wT} \\
+\tenss{C}_{Tw} & \tenss{C}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_w \\
+\dot{\tenss{r}}_{T}
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{q}_{w} + \tenss{q}_{gw} \\
+\tenss{q}_{T}
+\end{array} \right\},
+\end{eqnarray}
+
+where
+\begin{eqnarray}
+\tenss{K}_{ww} = \int_{\Omega} \tenss{B}^T k_{ww} \tenss{B}{\rm d}\Omega,
+\qquad \tenss{K}_{wT} = \int_{\Omega} \tenss{B}^T k_{wT} \tenss{B}{\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{K}_{Tw} = \int_{\Omega} \tenss{B}^T k_{Tw} \tenss{B}{\rm d}\Omega,
+\qquad \tenss{K}_{TT} = \int_{\Omega} \tenss{B}^T k_{TT} \tenss{B}{\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{C}_{ww} = \int_{\Omega} \tenss{N}^T c_{ww}  \tenss{N} {\rm d}\Omega,\qquad
+\tenss{C}_{wT} = \int_{\Omega} \tenss{N}^T c_{wT}  \tenss{N} {\rm d}\Omega,\qquad
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{C}_{Tw} = \int_{\Omega} \tenss{N}^T c_{Tw}  \tenss{N} {\rm d}\Omega,\qquad
+\tenss{C}_{TT} = \int_{\Omega} \tenss{N}^T c_{TT}  \tenss{N} {\rm d}\Omega,\qquad
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{q}_w = \int_{\Gamma_2} \tenss{N}^T  \overline{q}^{w}{\rm d}\Gamma,\qquad
+\tenss{q}_{gw} = \int_{\Gamma_2} \tenss{N}^T  \overline{q}^{gw}{\rm d}\Gamma,\qquad
+\tenss{q}_T = \int_{\Gamma_2} \tenss{N}^T  \overline{q}_{T}{\rm d}\Gamma,\qquad
+\end{eqnarray}
+
+where
+\begin{eqnarray}
+ k_{ww} &=& \delta^{gw}(w)\frac{\partial p^{gw}}{\partial w} + \frac{K^w(w)}{g}\Big(\frac{\partial p^{gw}}{\partial w} - \frac{\partial p^{c}}{\partial w}\Big),\\
+ k_{wT} &=& \delta^{gw}(w)\frac{\partial p^{gw}}{\partial T} + \frac{K^w(w)}{g}\Big(\frac{\partial p^{gw}}{\partial T} - \frac{\partial p^{c}}{\partial T}\Big),
+\end{eqnarray}
+\begin{eqnarray}
+ k_{Tw} &=& \Delta h_{\rm vap} \delta^{gw}(w) \frac{\partial p^{gw}}{\partial w},\\
+ k_{TT} &=& \chi_{\rm eff} (w,T) +  \Delta h_{\rm vap} \delta^{gw}(w) \frac{\partial p^{gw}}{\partial T},
+\end{eqnarray}
+\begin{eqnarray}
+ c_{ww} = \rho_s,
+\qquad c_{wT} = 0,
+\end{eqnarray}
+\begin{eqnarray}
+ c_{Tw} = \Delta h_{\rm vap} n \rho^{gws} \Big( h(w) + (1-S)\frac{{\rm d} h}{{\rm d} w}\Big)\overline{q}^{gw} ,
+\qquad c_{TT} = (\rho C)_{\rm eff},
+\end{eqnarray}

@@ -1,0 +1,90 @@
+\documentclass[12pt]{book}
+\newcommand{\mbf}[1]{\mbox{\boldmath$#1$}}
+% definice zlomku
+\newcommand{\del}[2]{\mbox{$\displaystyle\frac{#1}{#2}$}}
+% definice prvni parcialni derivace funkce
+\newcommand{\ppd}[2]{\del{\partial{#1}}{\partial{#2}}}
+% definice druhe parcialni derivace funkce podle x a y
+\newcommand{\dpd}[3]{\del{\partial^{2}\>\!\!{#1}}{\partial{#2}\ \partial{#3}}}
+% definice n-te parcialni derivace funkce
+\newcommand{\npd}[3]{\del{\partial^{#1}\>\!\!{#2}}{\partial{#3}^{#1}}}
+% definice prvni derivace funkce
+\newcommand{\od}[2]{\del{{\rm d}\>\!{#1}}{{\rm d}{#2}}}
+% definice n-te obycejne derivace funkce
+\newcommand{\nod}[3]{\del{{\rm d}^{#1}\>\!\!{#2}}{{\rm d}{#3}^{#1}}}
+\usepackage{makeidx}
+\usepackage{epsfig}
+
+
+\makeindex
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+%\setcounter{totalnumber}{6}
+\oddsidemargin=5mm
+\evensidemargin=5mm
+\textwidth=160mm
+\topmargin=-2.0cm
+\textheight=230mm
+\headheight=1.5cm
+
+%\pagestyle{myheadings}
+%\begin{filecontents}{s.ind}
+%\usepackage{bibunits}
+%\bibliographyunit[\chapter]
+%\newcommand{\bibdir}{.}
+
+\bibliographystyle{plain}
+
+\begin{document}
+%\tableofcontents
+
+\chapter{Introduction}
+%MEFEL is part of SIFEL (SImple Finite ELement) system dealing with
+%mechanical problems.
+
+\part{Theoretical part}
+\input{plast.tex}
+\input{tprobtypes.tex}
+\input{telem.tex}
+\input{tmater.tex}
+%\input{nonlinsolver.tex}
+\part{Computer implementation}
+\input{hangingnodes.tex}
+\input{iapplication.tex}
+\input{idescrip.tex}
+\input{iexpansion.tex}
+\input{iinputfile.tex}
+\input{icodedescr.tex}
+\input{part2.tex}
+\input{biblio.tex}
+\bibliography{ref}
+%\printindex
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+long            i;
+data type    variable
+
+class matrix
+
+matrix a - a is an instance of the class matrix
+
+
+probtype           tp
+sifel data type   attribute of class matrix
+
+tp is attribute of class matrix and its type is probtype
+
+tp is a probtype
+
+****************
+\tt    vypisy z programu
+
+\sf    jmena trid, typu, metod, funkci, lokalnich promennych, atributu
+
+\it    promenne, objekty

@@ -1,0 +1,153 @@
+####################################################################
+#
+#  Makefile for hybrid parallel transport code HPARAL
+#
+####################################################################
+
+
+
+# the following variable indicates the makefile as the parallel part of code
+PARSIFEL = yes
+
+
+
+################################################################### 
+#  Include default part of Makefile - 
+#  compiler definitions, flags, libraries ...
+#
+include ../../Makefile.in
+
+
+
+################################################################### 
+#  List of include directories
+#
+INCLUDES         = ../../GEFEL/:../../GEFEL/PARSER/:../../GEFEL/OPTIM:../../GEFEL/RANDY:../../GEFEL/CMLFILE:../../PARGEF/:../../HPARAL/SRC:../../TRFEL/SRC/:../../MEFEL/SRC/
+
+
+
+################################################################### 
+#  List of libraries
+#
+
+# list of local libraries
+LOC_LIBS        =   -ltrf -lgef -lpargef
+
+
+
+
+####################################################################
+# List of source files
+#
+SRCS = hpnnpsolvert.cpp hpnpsolvert.cpp hpsolvert.cpp hptrfelinit.cpp hptrftiles.cpp hptrfel.cpp
+
+
+
+####################################################################
+# List of object files
+#
+OBJS     = $(SRCS:%.cpp=$(OUTPUTPATH)%.o)
+MOBJS    = $(OUTPUTPATH)hptrfel.o
+HPTRFEL  = $(OUTPUTPATH)hptrfel
+LIBHPTRF = $(OUTPUTPATH)libhptrf.a
+
+
+
+####################################################################
+#  List of lib files
+#
+
+# list of dependent libraries
+LIBDEPS  = $(SIFEL_ROOT)$(BIN_ROOT)GEFEL/$(OUTPUTDIR)libgef.a
+LIBDEPS += $(SIFEL_ROOT)$(BIN_ROOT)TRFEL/SRC/$(OUTPUTDIR)libtrf.a
+LIBDEPS += $(SIFEL_ROOT)$(BIN_ROOT)PARGEF/$(OUTPUTDIR)libpargef.a
+
+# list of paths for dependent libraries
+DIR_LIBS  = -L$(SIFEL_ROOT)$(BIN_ROOT)TRFEL/SRC/$(OUTPUTDIR)
+DIR_LIBS += -L$(SIFEL_ROOT)$(BIN_ROOT)PARGEF/$(OUTPUTDIR)
+DIR_LIBS += -L$(SIFEL_ROOT)$(BIN_ROOT)GEFEL/$(OUTPUTDIR)
+
+#list of all necessary libraries
+LIBS	 = $(DIR_LIBS) $(LOC_LIBS) $(SYS_LIBS) #${PETSC_C_SH_LIB_PATH} ${PETSC_LIB}
+
+
+
+###########################################################################################
+#  Following targets will be made regardless of whether there are files with the same names
+#
+.PHONY : all opt deb optdeb testoutdir clean cleandeb cleanopt cleanoptdeb cleandeb
+
+
+
+#########################################################################
+#  Targets
+#
+
+all: $(HPTRFEL)
+
+$(HPTRFEL): $(LIBDEPS) $(MOBJS) $(OBJS)
+	@($(RM) $@)
+	@(echo "##### Creating HPTRFEL library . . .")
+	@(echo $(AR) $(ARFLAGS) $(OUTPUTPATH)libhptrf.a $(SRCS:%.cpp=$(OUTPUTDIR)%.o))
+	$(AR) $(ARFLAGS) $(OUTPUTPATH)libhptrf.a $(OBJS)
+	@(echo "##### HPTRFEL library was successfully created")
+	@(echo "##### Creating hptrfel executable . . .")
+	$(PCC) -o $@ $(MOBJS) $(EXECFLAGS) -L$(OUTPUTPATH) -lhptrf $(LIBS)
+	@(echo "##### hptrfel was successfully created")
+
+$(MOBJS): | $(OUTPUTPATH)
+$(OBJS):  | $(OUTPUTPATH)
+
+$(OUTPUTPATH):
+	@(mkdir -p $(OUTPUTPATH))
+
+$(LIBDEPS) : trfel pargef;
+
+clean:    
+	@($(RM)  $(HPTRFEL) $(LIBHPTRF) $(OBJS) *~ core)
+	@(echo " hptrfel was successfully cleaned")
+
+cleanall: $(LIBDEPS)
+	@($(RM) -r -f $(addprefix $(SIFEL_ROOT)$(BIN_ROOT)$(MODULE_PATH),$(REMOVEDIR)))
+	@(echo " hptrfel was successfully cleaned")
+
+cleandepall: $(LIBDEPS)
+	@($(RM) -r -f $(SIFEL_ROOT)$(BIN_ROOT)$(MODULE_PATH))
+	@(echo " hptrfel was successfully cleaned")
+
+
+################################################################
+trfel:
+	+@(cd ../../TRFEL/SRC; $(MAKE) $(MAKECMDGOALS))
+
+pargef: |trfel;
+	+@(cd ../../PARGEF; $(MAKE) $(MAKECMDGOALS))
+
+
+
+####################################################################
+#  Suffix rules
+#
+$(OUTPUTPATH)%.o : %.cpp
+	@export CPATH=$(INCLUDES); \
+	echo $(PCC) $(CFLAGS) -c $(<D)/$(<F); \
+	$(PCC) $(CFLAGS) $(COMPATFLAGS) $(DEFS) -c $(<D)/$(<F) -o $(@D)/$(@F)
+
+
+
+################################################################
+# Dependencies
+
+depend: $(LIBDEPS)
+	$(DEPEND) -DMAKEDEPEND $(SRCS)
+#	$(DEPEND) -DMAKEDEPEND $(DEFS) $(INCLUDES) $(SRCS)
+
+dependclean: $(LIBDEPS)
+	(t="/tmp/t_$$" ; sed 1,/"DO\ NOT\ DELETE"/p Makefile -n > t ; mv t Makefile)
+
+
+
+
+
+####################################################################
+# DO NOT DELETE

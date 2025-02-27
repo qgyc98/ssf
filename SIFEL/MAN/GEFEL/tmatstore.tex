@@ -1,0 +1,260 @@
+\chapter{Matrix storage}
+There are many various types of matrices which are used in numerical
+mathematics and appropriate matrix storage is important for efficient
+algorithms. There several possibilities of sorting matrices.
+Especially two main properties of matrices are extremely important
+in computer manipulation, symmetry and density/sparsity of matrices. Many
+matrices in numerical mathematics are symmetric and therefore only
+half of the matrix is stored (skyline, symmetric compressed rows).
+The second important property is the density/sparsity of matrix. There is no
+exact definition of dense or sparse matrix. But it is known fact in
+numerical solution of ordinary or partial differential equations that
+matrices arisen from finite element method, finite difference method and
+finite volume method are sparse, because there are only tens of nonzero entries
+in one row what is small number in comparison with the total number of rows.
+
+\noindent
+The most important storage types of matrices are:
+\begin{itemize}
+\item{dense matrix}\index{matrix storage!dense}
+\item{skyline}\index{matrix storage!skyline}
+\item{double skyline}\index{matrix storage!double skyline}
+\item{compressed rows}\index{matrix storage!compressed rows}
+\item{symmetrix compressed rows}\index{matrix storage!symm. comp. rows}
+\end{itemize}
+
+Following matrix will be used as an example of storage systems.
+\begin{equation}\label{prmat}
+A=\left(
+\begin{tabular}{rrrrrrrrrrrr}
+  15 &   0 &  -4 &   3 &  -2 &   1 &   0 &   0 &   0 &   0 &  -4 &  0
+\\
+   0 &  23 &   3 &  -6 &  -1 &   4 &   0 &   0 &   0 &   0 &   0 & -19
+\\
+  -4 &   3 &  15 &   0 &  -4 &   0 &  -2 &  -1 &  -4 &  -3 &  -2 &   1
+\\
+   3 &  -6 &   0 &  23 &   0 & -19 &   1 &   4 &  -3 &  -6 &  -1 &   4
+\\
+  -2 &  -1 &  -4 &   0 &  15 &   0 &  -4 &   3 &  -2 &   1 &  -4 &  -3
+\\
+   1 &   4 &   0 & -19 &   0 &  23 &   3 &  -6 &  -1 &   4 &  -3 &  -6
+\\
+   0 &   0 &  -2 &   1 &  -4 &   3 &   7 &  -3 &  -2 &  -1 &   0 &   0
+\\
+   0 &   0 &  -1 &   4 &   3 &  -6 &  -3 &  11 &   1 &  -9 &   0 &   0
+\\
+   0 &   0 &  -4 &  -3 &  -2 &  -1 &  -2 &   1 &   7 &   3 &   0 &   0
+\\
+   0 &   0 &  -3 &  -6 &   1 &   4 &  -1 &  -9 &   3 &  11 &   0 &   0
+\\
+  -4 &   0 &  -2 &  -1 &  -4 &  -3 &   0 &   0 &   0 &   0 &  15 &   0
+\\
+  0 & -19 &   1 &   4 &  -3 &  -6 &   0 &   0 &   0 &   0 &   0 &  23
+\end{tabular}
+\right)
+\end{equation}
+
+
+\section{Dense matrix storage}
+\index{matrix storage!dense}
+\label{sectdensematstor}
+Dense matrix storage is very simple technique and no special comments are necessary.
+All matrix entries are stored and no additional informations are necessary.
+
+\section{Skyline}
+\index{matrix storage!skyline}
+\label{sectskylinestor}
+
+Skyline storage is applicable for symmetric matrices with reasonable bandwidth.
+For each column, the diagonal element is stored and then all matrix entries in the
+column up to the farthest nonzero offdiagonal entry are stored into one array
+of type double. It is clear that the upper triangular elements and the diagonal
+elements will be stored for really dense matrix. Conversly, only the diagonal
+entries will be stored for diagonal matrix. The skyline storage is efficient for
+matrices with narrow bandwidth. It is default matrix storage for mechanical
+problems.
+
+\begin{table}[tbh]
+\begin{center}
+Array A contains matrix entries
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ {\bf 15} & {\bf 23} &  {\bf 15} &   3 &  -4 & {\bf 23} &   0 &  -6 &   3 & {\bf 15}
+\\ \hline
+   0 &  -4 &  -1 &  -2 & {\bf 23} &   0 & -19 &   0 &   4 &   1 
+\\ \hline
+ {\bf 7} &   3 &  -4 &   1 &  -2 & {\bf 11} &  -3 &  -6 &   3 &   4 
+\\ \hline
+  -1 &  {\bf 7} &   1 &  -2 &  -1 &  -2 &  -3 &  -4 & {\bf 11} &   3 
+\\ \hline
+  -9 &  -1 &   4 &   1 &  -6 &  -3 & {\bf 15} &   0 &   0 &   0 
+\\ \hline
+   0 &  -3 &  -4 &  -1 &  -2 &   0 &  -4 & {\bf 23} &   0 &   0 
+\\ \hline
+   0 &   0 &   0 &  -6 &  -3 &   4 &   1 & -19 & \multicolumn{2}{c}{}
+\\ \cline{1-8}
+\end{tabular}
+\\[5mm]
+Array ADR contains addresses of the diagonal elements
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+0 & 1 & 2 & 5 & 9 & 14 & 20 & 25 & 31 & 38 & 46 & 57 & 68
+\\ \hline
+\end{tabular}
+\caption{Skyline storage of matrix}
+\label{tabskymat}
+\end{center}
+\end{table}
+
+\section{Double skyline}
+\index{matrix storage!double skyline}
+\label{sectdoubleskylinestor}
+
+Double skyline is generalization of the simple skyline for nonsymmetric matrices.
+Diagonal entries are stored and then all row either column entries up to farthest
+nonzero offdiagonal entries are stored.
+
+\section{Compressed rows}
+\index{storage!compressed rows}
+\label{sectcrstor}
+
+Storage of all matrix entries does not respect the sparsity of stored matrix. Skyline storage
+respects envelope of the stored matrix but it stores many zero entries which are inside of the envelope.
+If some iterative method will be used for solution of equation system, only nonzero entries are required
+because iterative methods are usually based on matrix-vector multiplication. Therefore compressed rows
+storage was introduced many years ago. Only nonzero matrix entries are stored row after row into
+one-dimensional array. Appropriate column indices are stored into one-dimensional integer array. Third
+and last necessary integer array contains addresses of first numbers in rows.
+
+The sizes of arrays are not known in advance and should be computed to avoid dynamic allocation.
+In connection with finite element method, the sizes of array can be computed as follows. Nonzero
+matrix entry can be placed only on position where matrix of one finite element has nonzero entry.
+Positions of entries in the matrix of the system is defined by unknowns ordering and therefore
+list of adjacent nodes (unknowns) must be created. Lists of all adjacent finite elements to each node
+are assembled first. Lists of adjacent nodes of each node are created from lists of adjacent finite
+elements. Number of nonzero entries in one row of the matrix is defined by the list of adjacent nodes
+of node where the required unknown is defined.
+
+The illustration matrix is stored in compressed rows format and three basic arrays are summarized
+in Table \ref{tabcrmat}. The diagonal entries are characterized by bold letters.
+
+\begin{table}[tbh]
+\begin{center}
+Array K contains matrix entries,
+\\
+array CI contains column indices.
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+{\bf 15} &  -4 &   3 &  -2 &   1 &  -4 & {\bf 23} &   3 &  -6 &  -1 &   4 & -19
+\\ \hline
+1 & 3 & 4 & 5 & 6 & 11 & 2 & 3 & 4 & 5 & 6 & 12
+\\ \hline \hline
+  -4 &   3 & {\bf 15} &  -4 &  -2 &  -1 &  -4 &  -3 &  -2 &   1 &   3 &  -6
+\\ \hline
+1 & 2 & 3 & 5 & 7 & 8 & 9 & 10 & 11 & 12 & 1 & 2
+\\ \hline \hline
+ {\bf 23} & -19 &   1 &   4 &  -3 &  -6 &  -1 &   4 &  -2 &  -1 &  -4 & {\bf 15}
+\\ \hline
+4 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 1 & 2 & 3 & 5
+\\ \hline \hline
+  -4 &   3 &  -2 &   1 &  -4 &  -3 &   1 &   4 & -19 & {\bf 23} &   3 &  -6
+\\ \hline
+7 & 8 & 9 & 10 & 11 & 12 & 1 & 2 & 4 & 6 & 7 & 8
+\\ \hline \hline
+  -1 &   4 &  -3 &  -6 &  -2 &   1 &  -4 &   3 &  {\bf 7} &  -3 &  -2 &  -1
+\\ \hline
+9 & 10 & 11 & 12 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10
+\\ \hline \hline
+  -1 &   4 &   3 &  -6 &  -3 & {\bf 11} &   1 &  -9 &  -4 &  -3 &  -2 &  -1
+\\ \hline
+3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 3 & 4 & 5 & 6
+\\ \hline \hline
+  -2 &   1 &  {\bf 7} &   3 &  -3 &  -6 &   1 &   4 &  -1 &  -9 &   3 & {\bf 11}
+\\ \hline
+7 & 8 & 9 & 10 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10
+\\ \hline \hline
+  -4 &  -2 &  -1 &  -4 &  -3 & {\bf 15} & -19 &   1 &   4 &  -3 &  -6 & {\bf 23}
+\\ \hline
+1 & 3 & 4 & 5 & 6 & 11 & 2 & 3 & 4 & 5 & 6 & 12
+\\ \hline
+\end{tabular}
+\\[5mm]
+Array ADR contains addresses of the first nonzero entries in rows.
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+0 & 6 & 12 & 22 & 32 & 42 & 52 & 60 & 68 & 76 & 84 & 90 & 96
+\\ \hline
+\end{tabular}
+\caption{Compressed rows storage of test matrix.}
+\label{tabcrmat}
+\end{center}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Symmetric compressed rows}
+\index{storage!symmetric compressed rows}
+\label{sectscrstor}
+
+Compressed rows storage is the most efficient storage for general matrices. Numerical methods used
+in engineering and scientific problems lead usually to symmetric matrices which deserve special attention.
+In case of symmetric matrices, it is not necessary to store all row entries but only entries from the first
+one in the row up to the diagonal entry. This is modification of compressed rows storage which is called
+symmetric compressed rows. Three arrays are necessary for this storage. Only nonzero entries from the
+lower part including diagonal of the matrix are stored into one-dimensional array. Appropriate column indices
+are stored into integer array and third integer array contains addresses of the first entries in the rows.
+
+Similarly as in compressed rows storage, the sizes of three array should be computed in advance.
+The strategy is the same as for compressed rows but only nonzero entries of lower triangular part of the matrix
+are considered. The illustration matrix is stored in compressed rows storage and necessary arrays are
+summarized in Table \ref{tabscrmat}. Diagonal entries are once again characterized by bold letters.
+
+\begin{table}[tbh]
+\begin{center}
+K contains matrix entries
+\\
+CI contains column indices
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+{\bf 15} & {\bf 23} &  -4 &   3 & {\bf 15} &   3 &  -6 & {\bf 23} &  -2 &  -1 
+\\ \hline
+1 & 2 & 1 & 2 & 3 & 1 & 2 & 4 & 1 & 2
+\\ \hline \hline
+  -4 & {\bf 15} &   1 &   4 & -19 & {\bf 23} &  -2 &   1 &  -4 &   3 
+\\ \hline
+3 & 5 & 1 & 2 & 4 & 6 & 3 & 4 & 5 & 6
+\\ \hline \hline
+{\bf 7} &  -1 &   4 &   3 &  -6 &  -3 & {\bf 11} &  -4 &  -3 &  -2 
+\\ \hline
+7 & 3 & 4 & 5 & 6 & 7 & 8 & 3 & 4 & 5
+\\ \hline \hline
+  -1 &  -2 &   1 &  {\bf 7} &  -3 &  -6 &   1 &   4 &  -1 &  -9 
+\\ \hline
+6 & 7 & 8 & 9 & 3 & 4 & 5 & 6 & 7 & 8
+\\ \hline \hline
+   3 & {\bf 11} &  -4 &  -2 &  -1 &  -4 &  -3 & {\bf 15} & -19 &   1 
+\\ \hline
+9 & 10 & 1 & 3 & 4 & 5 & 6 & 11 & 2 & 3
+\\ \hline \cline{1-4}
+   4 &  -3 &  -6 & {\bf 23} & \multicolumn{6}{c}{}
+\\ \cline{1-4}
+4 & 5 & 6 & 12 & \multicolumn{6}{c}{}
+\\ \cline{1-4}
+\end{tabular}
+\\[5mm]
+ADR contains addresses of the first entries in rows.
+\\[3mm]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+0 & 1 & 2 & 5 & 8 & 12 & 16 & 21 & 27 & 34 & 42 & 48 & 54
+\\ \hline
+\end{tabular}
+\caption{Symmetric compressed rows storage of test matrix.}
+\label{tabscrmat}
+\end{center}
+\end{table}

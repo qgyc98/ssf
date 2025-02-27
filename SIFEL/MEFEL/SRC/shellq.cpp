@@ -1,0 +1,820 @@
+#include "shellq.h"
+#include "global.h"
+#include "probdesc.h"
+#include "mechtop.h"
+#include "mechmat.h"
+#include "mechbclc.h"
+#include "mechcrsec.h"
+#include "globmat.h"
+#include "node.h"
+#include "element.h"
+#include "plelemrotlq.h"
+#include "dkq.h"
+#include "intpoints.h"
+#include <math.h>
+
+shellq::shellq (void)
+{
+  long i,j;
+  
+  if (Perlq==NULL)   Perlq = new planeelemrotlq;
+  if (Dkqelem==NULL)  Dkqelem = new dkq;
+  
+  // ******
+  //  NNE
+  // ******
+  //  number of nodes on element
+  nne=4;
+  //  number of edges on element
+  ned=4;
+  //  number of nodes on one edge
+  nned=2;
+  //  number of surfaces
+  nsurf=1;
+  //  number of nodes on surface
+  nnsurf=4;
+  
+  
+  // **********************
+  //  strain/stress state
+  // **********************
+  ssst=shell;
+  
+  // ********
+  //  NDOFE
+  // ********
+  //  number of DOFs on plane element
+  ndofes = Perlq->ndofe;
+  //  number of DOFs on plate element
+  ndofep = Dkqelem->ndofe;
+  
+  //  number of DOFs on shell element
+  ndofe=ndofes+ndofep;
+  
+  
+  // *********
+  //  NAPFUN
+  // *********
+  //  number of functions approximated
+  napfuns = Perlq->napfun;
+  napfunp = Dkqelem->napfun;
+  
+  napfun=napfuns+napfunp;
+  
+  // *******************
+  //  number of blocks
+  // *******************
+  nbs = Perlq->nb;
+  nbp = Dkqelem->nb;
+  
+  nb = nbs + nbp;
+  
+  // ***********************************************
+  //  number of components in strain/stress blocks
+  // ***********************************************
+  ncomps = new long [nbs];
+  ncomps[0]=Perlq->ncomp[0];  // =2
+  ncomps[1]=Perlq->ncomp[1];  // =1
+  
+  ncompp = new long [nbp];
+  ncompp[0]=Dkqelem->ncomp[0];  // =3
+  
+  // ************************************************
+  //  the number of integration points
+  // ************************************************
+  nip = new long* [nb];
+  for (i=0;i<nb;i++){
+    nip[i]=new long [nb];
+  }
+  for (i=0;i<nb;i++){
+    for (j=0;j<nb;j++){
+      nip[i][j]=0;
+    }
+
+  }
+
+  for (i=0;i<nbs;i++){
+    for (j=0;j<nbs;j++){
+      nip[i][j]=Perlq->nip[i][j];
+    }
+  }
+  for (i=0;i<nbp;i++){
+    for (j=0;j<nbp;j++){
+      nip[i+nbs][j+nbs]=Dkqelem->nip[i][j];
+    }
+  }
+
+  // *****************************************
+  //  the total number of integration points
+  // *****************************************
+  tnip=0;
+  for (i=0;i<nb;i++){
+    for (j=0;j<nb;j++){
+      tnip+=nip[i][j];
+    }
+  }
+
+  // ************************************************
+  //  the order of integration of stiffness matrix
+  // ************************************************
+  intordsm = new long* [nb];
+  for (i=0;i<nb;i++){
+    intordsm[i] = new long [nb];
+  }
+  for (i=0;i<nb;i++){
+    for (j=0;j<nb;j++){
+      intordsm[i][j]=0;
+    }
+  }
+
+  for (i=0;i<nbs;i++){
+    for (j=0;j<nbs;j++){
+      intordsm[i][j]=Perlq->intordsm[i][j];
+    }
+  }
+  for (i=0;i<nbp;i++){
+    for (j=0;j<nbp;j++){
+      intordsm[i+nbs][j+nbs]=Dkqelem->intordsm[i][j];
+    }
+  }
+  
+  // *******************************
+  //  the number of all components
+  // *******************************
+  tncomps=Perlq->tncomp;
+  tncompp=Dkqelem->tncomp;
+  
+  tncomp = tncomps+tncompp;
+  
+  // ********************************************
+  //  ordering of unknowns on the shell element
+  // ********************************************
+  
+  ordering = new long* [2];
+  ordering[0] = new long [ndofes];
+  ordering[1] = new long [ndofep];
+
+  //  unknowns in the first node
+  //  displacement in the x direction
+  ordering[0][0]=1;
+  //  displacement in the y direction
+  ordering[0][1]=2;
+  //  rotation around the z direction
+  ordering[0][2]=6;
+  
+  //  displacement in the z direction
+  ordering[1][0]=3;
+  //  rotation around the x axis
+  ordering[1][1]=4;
+  //  rotation around the y axis
+  ordering[1][2]=5;
+  
+
+  //  unknowns in the second node
+  //  displacement in the x direction
+  ordering[0][3]=7;
+  //  displacement in the y direction
+  ordering[0][4]=8;
+  //  rotation around the z direction
+  ordering[0][5]=12;
+  
+  //  displacement in the z direction
+  ordering[1][3]=9;
+  //  rotation around the x axis
+  ordering[1][4]=10;
+  //  rotation around the y axis
+  ordering[1][5]=11;
+  
+  
+  //  unknowns in the third node
+  //  displacement in the x direction
+  ordering[0][6]=13;
+  //  displacement in the y direction
+  ordering[0][7]=14;
+  //  rotation around the z direction
+  ordering[0][8]=18;
+  
+  //  displacement in the z direction
+  ordering[1][6]=15;
+  //  rotation around the x axis
+  ordering[1][7]=16;
+  //  rotation around the y axis
+  ordering[1][8]=17;
+  
+  
+  //  unknowns in the fourth node
+  //  displacement in the x direction
+  ordering[0][9]=19;
+  //  displacement in the y direction
+  ordering[0][10]=20;
+  //  rotation around the z direction
+  ordering[0][11]=24;
+  
+  //  displacement in the z direction
+  ordering[1][9]=21;
+  //  rotation around the x axis
+  ordering[1][10]=22;
+  //  rotation around the y axis
+  ordering[1][11]=23;
+
+}
+
+shellq::~shellq (void)
+{
+  long i;
+  
+  for (i=0;i<nb;i++){
+    delete [] nip[i];
+    delete [] intordsm[i];
+  }
+  delete [] intordsm;
+  delete [] nip;
+
+  delete [] ncomps;
+  delete [] ncompp;
+  
+  for (i=0;i<2;i++){
+    delete [] ordering[i];
+  }
+  delete [] ordering;
+  
+}
+
+/**
+   function assembles element code numbers
+   they are used for localization between all element unknowns and unknowns related to one subelement
+   
+   @param cn - array of code numbers
+   @param ri - subelement id
+   
+   JK, 24. 8. 2018
+*/
+void shellq::codnum (long *cn,long ri)
+{
+  long i;
+  
+  if (ri==0){
+    for (i=0;i<ndofes;i++){
+      cn[i]=ordering[0][i];
+    }
+  }
+  if (ri==1){
+    for (i=0;i<ndofep;i++){
+      cn[i]=ordering[1][i];
+    }
+  }
+}
+
+
+/**
+   function assembles transformation %matrix between coordinate system
+   defined on element and global coordinate system
+   transformation deals with coordinates
+   
+   transformation %matrix from local element system to global system
+   x_g = T x_e
+   
+   @param tran - transformation %matrix from local element system to the global coordinate system
+   @param gx,gy,gz - coordinates of nodes in the global coordinate system
+   @param zero - computer zero
+   
+   JK, 24. 8. 2018
+*/
+void shellq::coord_transf_matrix (matrix &tran, vector &gx, vector &gy, vector &gz, double zero)
+{
+  double norm,alpha;
+  vector bv(ASTCKVEC(3)),bv1(ASTCKVEC(3)),bv2(ASTCKVEC(3)),bv3(ASTCKVEC(3));
+  
+  //  first nonscaled basis vector (from the third node to the fourth node)
+  bv1[0] = gx[3]-gx[2];
+  bv1[1] = gy[3]-gy[2];
+  bv1[2] = gz[3]-gz[2];
+  
+  //  norm of the first basis vector
+  norm = sqrt(bv1[0]*bv1[0]+bv1[1]*bv1[1]+bv1[2]*bv1[2]);
+  
+  if (norm<zero){
+    print_err("nonpositive length of the first basis vector in quadrilateral shell element", __FILE__, __LINE__, __func__);
+  }
+  
+  //  first scaled basis vector (from the third node to the fourth node)
+  bv1[0] = bv1[0]/norm;
+  bv1[1] = bv1[1]/norm;
+  bv1[2] = bv1[2]/norm;
+  
+  
+  
+  //  second nonscaled basis vector (from the third node to the second node)
+  bv2[0] = gx[1]-gx[2];
+  bv2[1] = gy[1]-gy[2];
+  bv2[2] = gz[1]-gz[2];
+  
+  alpha = bv1[0]*bv2[0] + bv1[1]*bv2[1] + bv1[2]*bv2[2];
+  //  second vector orthogonal to the first vector
+  bv2[0] = bv2[0] - alpha*bv1[0];
+  bv2[1] = bv2[1] - alpha*bv1[1];
+  bv2[2] = bv2[2] - alpha*bv1[2];
+
+  //  norm of the second basis vector
+  norm = sqrt(bv2[0]*bv2[0]+bv2[1]*bv2[1]+bv2[2]*bv2[2]);
+  
+  if (norm<zero){
+    print_err("nonpositive length of the second basis vector in quadrilateral shell element", __FILE__, __LINE__, __func__);
+  }
+  
+  //  second scaled basis vector (from the third node to the fourth node)
+  bv2[0] = bv2[0]/norm;
+  bv2[1] = bv2[1]/norm;
+  bv2[2] = bv2[2]/norm;
+  
+
+  //  third basis vector
+  bv3[0] = bv1[1]*bv2[2] - bv1[2]*bv2[1];
+  bv3[1] = bv1[2]*bv2[0] - bv1[0]*bv2[2];
+  bv3[2] = bv1[0]*bv2[1] - bv1[1]*bv2[0];
+  
+  //  norm of the second basis vector
+  norm = sqrt(bv3[0]*bv3[0]+bv3[1]*bv3[1]+bv3[2]*bv3[2]);
+  if (fabs(norm-1.0)>zero){
+    print_err("the size of the third vector %le is not equal to 1 quadrilateral shell element", __FILE__, __LINE__, __func__,norm);
+  }
+  
+  //  transformation matrix from the element coordinate system to the global coordinate system
+  tran[0][0] = bv1[0];
+  tran[1][0] = bv1[1];
+  tran[2][0] = bv1[2];
+
+  tran[0][1] = bv2[0];
+  tran[1][1] = bv2[1];
+  tran[2][1] = bv2[2];
+
+  tran[0][2] = bv3[0];
+  tran[1][2] = bv3[1];
+  tran[2][2] = bv3[2];
+ 
+}
+
+/**
+   function transforms node coordinates from the global coordinate system to
+   the element coordinate system
+   
+   z coordinates have to be equal to zero after transformation
+   
+   @param gx, gy, gz - arrays with node coordinates in the global system
+   @param lx, ly - arrays with node coordinates in the element coordinate system
+   @param zero - computer zero
+
+   JK, 24. 8. 2018
+*/
+void shellq::local_coordinates (vector &gx,vector &gy,vector &gz,vector &lx,vector &ly,double zero)
+{
+  vector lv(ASTCKVEC(3)),gv(ASTCKVEC(3));
+  matrix tmat (ASTCKMAT(3,3));
+  
+  //  assembling of transformation matrix
+  coord_transf_matrix (tmat,gx,gy,gz,zero);
+
+  //  transformation of coordinates of the first node
+  gv[0]=gx[0]-gx[2];  gv[1]=gy[0]-gy[2];  gv[2]=gz[0]-gz[2];
+  mtxv (tmat,gv,lv);
+  lx[0]=lv[0];  ly[0]=lv[1];
+  if (fabs(lv[2])>1.0e-8)
+    print_err("Nonzero z coordinate of the first node in the element coordinate system.",__FILE__,__LINE__,__func__);
+
+  //  transformation of coordinates of the second node
+  gv[0]=gx[1]-gx[2];  gv[1]=gy[1]-gy[2];  gv[2]=gz[1]-gz[2];
+  mtxv (tmat,gv,lv);
+  lx[1]=lv[0];  ly[1]=lv[1];
+  if (fabs(lv[2])>1.0e-8)
+    print_err("Nonzero z coordinate of the second node in the element coordinate system.",__FILE__,__LINE__,__func__);
+
+  //  transformation of coordinates of the third node
+  //  the third node will be the origin of the coordinate system
+  //  the transformation matrix is therefore multiplied by zero vector
+  //  no transformation is needed
+  
+  
+  //  transformation of coordinates of the fourth node
+  gv[0]=gx[3]-gx[2];  gv[1]=gy[3]-gy[2];  gv[2]=gz[3]-gz[2];
+  mtxv (tmat,gv,lv);
+  lx[3]=lv[0];  ly[3]=lv[1];
+  if (fabs(lv[2])>1.0e-8)
+    print_err("Nonzero z coordinate of the fourth node in the element coordinate system.",__FILE__,__LINE__,__func__);
+  
+}
+
+/**
+   function assembles transformation %matrix between global coordinate system
+   and local nodal coordinate system
+   transformation deals with nodal forces
+
+   transformation %matrix x_g = T x_l
+   
+   @param nodes - array of nodes on element
+   @param tmat - transformation %matrix
+   
+   9.5.2002
+   JK, 24. 8. 2018
+*/
+void shellq::node_transf_matrix (ivector &nodes,matrix &tmat)
+{
+  long i,i6,n,m;
+  
+  fillm (0.0,tmat);
+  
+  //  the number of nodes
+  n=nodes.n;
+  //  the number of rows/columns of the transformation matrix
+  m=tmat.m;
+  for (i=0;i<m;i++){
+    tmat[i][i]=1.0;
+  }
+  
+  //  the following transformation is connected with Perlq and Dkqelem elements
+  for (i=0;i<n;i++){
+    if (Mt->nodes[nodes[i]].transf>0){
+      i6=i*6;
+      tmat[i6][i6]   = Mt->nodes[nodes[i]].e1[0];   tmat[i6][i6+1]   = Mt->nodes[nodes[i]].e2[0];   tmat[i6][i6+2]   = Mt->nodes[nodes[i]].e3[0];
+      tmat[i6+1][i6] = Mt->nodes[nodes[i]].e1[1];   tmat[i6+1][i6+1] = Mt->nodes[nodes[i]].e2[1];   tmat[i6+1][i6+2] = Mt->nodes[nodes[i]].e3[1];
+      tmat[i6+2][i6] = Mt->nodes[nodes[i]].e1[2];   tmat[i6+2][i6+1] = Mt->nodes[nodes[i]].e2[2];   tmat[i6+2][i6+2] = Mt->nodes[nodes[i]].e3[2];
+      i6=i*6+3;
+      tmat[i6][i6]   = Mt->nodes[nodes[i]].e1[0];   tmat[i6][i6+1]   = Mt->nodes[nodes[i]].e2[0];   tmat[i6][i6+2]   = Mt->nodes[nodes[i]].e3[0];
+      tmat[i6+1][i6] = Mt->nodes[nodes[i]].e1[1];   tmat[i6+1][i6+1] = Mt->nodes[nodes[i]].e2[1];   tmat[i6+1][i6+2] = Mt->nodes[nodes[i]].e3[1];
+      tmat[i6+2][i6] = Mt->nodes[nodes[i]].e1[2];   tmat[i6+2][i6+1] = Mt->nodes[nodes[i]].e2[2];   tmat[i6+2][i6+2] = Mt->nodes[nodes[i]].e3[2];
+    }
+  }
+  
+}
+
+/**
+   function assembles transformation %matrix for the whole vectors/matrices
+   from the local element coordinate system to the global coordinate system
+   
+   nodal unknowns - u, v, w, dw/dx, dw/dy, phi_z,
+   
+   @param gx, gy, gz - arrays of node coordinates in the global coordinate system
+   @param tran - transformation %matrix (it contains 32 components)
+   @param zero - computer zero
+   
+   JK, 24. 8. 2018
+*/
+void shellq::elem_transf_matrix (matrix &tran, vector &gx, vector &gy, vector &gz,double zero)
+{
+  long i,ri,ci;
+  matrix tm (ASTCKMAT(3,3));
+  
+  //  transformation matrix with 3 rows and columns
+  coord_transf_matrix (tm,gx,gy,gz,zero);
+  
+  //  all entries of the transformation matrix are set to zero
+  fillm (0.0,tran);
+  
+  //  diagonal entries of the transformation matrix are set to one
+  for (i=0;i<ndofe;i++){
+    tran[i][i]=1.0;
+  }
+  
+  //  the following transformation is connected with Perlq and Qkirch elements
+  for (i=0;i<nne;i++){
+    //  transformation of the displacements
+    ri=i*6;  ci=i*6;
+    tran[ri+0][ci+0]=tm[0][0];  tran[ri+0][ci+1]=tm[0][1];  tran[ri+0][ci+2]=tm[0][2];
+    tran[ri+1][ci+0]=tm[1][0];  tran[ri+1][ci+1]=tm[1][1];  tran[ri+1][ci+2]=tm[1][2];
+    tran[ri+2][ci+0]=tm[2][0];  tran[ri+2][ci+1]=tm[2][1];  tran[ri+2][ci+2]=tm[2][2];
+    
+    //  transformation of the rotations
+    ri=i*6+3;  ci=i*6+3;
+    tran[ri+0][ci+0]=tm[0][0];  tran[ri+0][ci+1]=tm[0][1];  tran[ri+0][ci+2]=tm[0][2];
+    tran[ri+1][ci+0]=tm[1][0];  tran[ri+1][ci+1]=tm[1][1];  tran[ri+1][ci+2]=tm[1][2];
+    tran[ri+2][ci+0]=tm[2][0];  tran[ri+2][ci+1]=tm[2][1];  tran[ri+2][ci+2]=tm[2][2];
+    
+  }
+}
+
+
+
+/**
+   function assembles stiffness %matrix of quadrilateral shell element
+   
+   @param eid - element id
+   @param sm - stiffness matrix
+   
+   JK, 24. 8. 2018
+*/
+void shellq::res_stiffness_matrix (long eid,matrix &sm)
+{
+  long *cn,transf;
+  vector gx(ASTCKVEC(nne)),gy(ASTCKVEC(nne)),gz(ASTCKVEC(nne)),x(ASTCKVEC(nne)),y(ASTCKVEC(nne));
+  ivector nodes(nne);
+  matrix lsm,tmat(ASTCKMAT(ndofe,ndofe)),auxsm(ASTCKMAT(ndofe,ndofe));
+
+  //  nodes on element
+  Mt->give_elemnodes (eid,nodes);
+  //  node coordinates in the global system
+  Mt->give_node_coord3d (gx,gy,gz,eid);
+  //  transformation of the node coordinates in the global system gx, gy, gz to the element coordinate system x, y
+  local_coordinates (gx,gy,gz,x,y,Mp->zero);
+  
+  fillm (0.0,sm);
+  
+  cn = new long [ndofes];
+  reallocm (ndofes,ndofes,lsm);
+  
+  //  contribution from quadrilateral plane element with rotational degrees of freedom
+  Perlq->stiffness_matrix (eid,0,0,lsm,x,y);
+  
+  //  code numbers for plane stress matrix localization to the shell matrix
+  codnum (cn,0);
+  
+  //  localization of the plane stress matrix into the shell matrix
+  mat_localize (sm,lsm,cn,cn);
+  
+  delete [] cn;
+  
+  cn = new long [ndofep];
+  reallocm (ndofep,ndofep,lsm);
+  
+  //  contribution from quadrilateral plate element
+  Dkqelem->stiffness_matrix (eid,2,2,lsm,x,y);
+  
+  fprintf (Out,"\n\n MATICE TUHOSTI \n");
+  for (long i=0;i<ndofep;i++){
+    fprintf (Out,"\n");
+    for (long j=0;j<ndofep;j++){
+      fprintf (Out,"%3ld %3ld  %15.12le\n",i+1,j+1,lsm[i][j]);
+    }
+  }
+
+  //  code numbers for plate matrix into the shell matrix
+  codnum (cn,1);
+  
+  //  localization of the plate matrix into the shell matrix
+  mat_localize (sm,lsm,cn,cn);
+  
+  delete [] cn;
+  
+  //  transformation of stiffness matrix from element coordinate system to the global system
+  //  transformation matrix
+  elem_transf_matrix (tmat,gx,gy,gz,Mp->zero);
+  mxm (tmat,sm,auxsm);
+  mxmt (auxsm,tmat,sm);
+  
+  
+  //  transformation of stiffness matrix to nodesystem
+  transf = Mt->locsystems (nodes);
+  if (transf>0){
+    matrix tmat (ASTCKMAT(ndofe,ndofe));
+    node_transf_matrix (nodes,tmat);
+    glmatrixtransf (sm,tmat);
+  }
+  
+}
+
+/**
+   function computes strains in integration points
+   
+   @param lcid - load case
+   @param eid - element id
+   
+   22. 7. 2019, JK
+*/
+void shellq::res_ip_strains (long lcid,long eid)
+{
+  vector aux(ASTCKVEC(ndofe));
+  vector gx(ASTCKVEC(nne)),gy(ASTCKVEC(nne)),gz(ASTCKVEC(nne)),x(ASTCKVEC(nne)),y(ASTCKVEC(nne)),r(ASTCKVEC(ndofe)),rs(ASTCKVEC(ndofes)),rp(ASTCKVEC(ndofep));
+  ivector cn,nodes(ASTCKIVEC(nne));
+  matrix tmat(ASTCKMAT(ndofe,ndofe));
+  
+  //  node coordinates in global system
+  Mt->give_node_coord3d (gx,gy,gz,eid);
+  //  node numbers
+  Mt->give_elemnodes (eid,nodes);
+  //  transformation of the node coordinates in the global system gx, gy, gz to the element coordinate system x, y
+  local_coordinates (gx,gy,gz,x,y,Mp->zero);
+
+  //  nodal displacements and rotations
+  eldispl (lcid,eid,r.a);
+  
+  //  transformation of displacement vector from nodal system to global system
+  long transf = Mt->locsystems (nodes);
+  if (transf>0){
+    node_transf_matrix (nodes,tmat);
+    lgvectortransf (aux,r,tmat);
+    copyv (aux,r);
+  }
+  
+  //  transformation of nodal values in global system to element system
+  elem_transf_matrix (tmat,gx,gy,gz,Mp->zero);
+  glvectortransf (r, aux, tmat);
+  copyv (aux,r);
+  
+  
+  reallocv (RSTCKIVEC(ndofes,cn));
+  //  code numbers for plane stress matrix localization to the shell matrix
+  codnum (cn.a,0);
+  
+  globloc (r.a,rs.a,cn.a,ndofes);
+
+  
+  //  contribution from plane stress element with rotational degrees of freedom
+  Perlq->ip_strains (lcid,eid,0,0,x,y,rs);
+  
+  
+  reallocv (RSTCKIVEC(ndofep,cn));
+  codnum (cn.a,1);
+  
+  globloc (r.a,rp.a,cn.a,ndofep);
+  
+  //  contribution from plate element
+  Dkqelem->ip_curvatures (lcid,eid,2,2,x,y,rp);
+  
+}
+
+void shellq::nod_strains_ip (long lcid,long eid)
+{
+  
+  //  contribution from triangular plane element with rotational degrees of freedom
+  Perlq->nod_strains_ip (lcid,eid,0,0);
+    
+  //  contribution from triangular plate element
+  //Q4pl->nod_strains_ip (lcid,eid,2,2);
+}
+ 
+void shellq::nod_stresses_ip (long lcid,long eid)
+{
+  
+  //  contribution from triangular plane element with rotational degrees of freedom
+  Perlq->nod_stresses_ip (lcid,eid,0,0);
+    
+  //  contribution from triangular plate element
+  //Q4pl->nod_stresses_ip (lcid,eid,2,2);
+}
+ 
+void shellq::res_ip_stresses (long lcid,long eid)
+{
+  long i;
+  ivector cn,nodes(ASTCKIVEC(nne));
+  vector gx(ASTCKVEC(nne)),gy(ASTCKVEC(nne)),gz(ASTCKVEC(nne)),x(ASTCKVEC(nne)),y(ASTCKVEC(nne)),r(ASTCKVEC(ndofe)),rs(ASTCKVEC(ndofes));
+  vector aux(ASTCKVEC(ndofe));
+  matrix tmat(ASTCKMAT(ndofe,ndofe));
+
+  //  contribution from plane element with rotational degrees of freedom
+  Perlq->res_ip_stresses (lcid,eid);
+  
+  
+
+  //  node coordinates in the global system
+  Mt->give_node_coord3d (gx,gy,gz,eid);
+  //  transformation of the node coordinates in the global system gx, gy, gz to the element coordinate system x, y
+  local_coordinates (gx,gy,gz,x,y,Mp->zero);
+  
+  //  contribution from plate element
+  Dkqelem->moments (lcid,eid,2,2);
+  
+    //  element nodes
+  Mt->give_elemnodes (eid,nodes);
+  
+  //  nodal values
+  eldispl (lcid,eid,r.a);
+  
+  //  transformation of displacement vector
+  long transf = Mt->locsystems (nodes);
+  if (transf>0){
+    reallocv (ndofe,aux);
+    reallocm (ndofe,ndofe,tmat);
+    node_transf_matrix (nodes,tmat);
+    lgvectortransf (aux,r,tmat);
+    copyv (aux,r);
+  }
+
+  //  transformation of nodal values in global system to element system
+  elem_transf_matrix (tmat,gx,gy,gz,Mp->zero);
+  glvectortransf (r, aux, tmat);
+  copyv (aux,r);
+  
+  reallocv (RSTCKIVEC(ndofep,cn));
+  codnum (cn.a,1);
+  
+  for (i=0;i<ndofes;i++){
+    if (cn[i]==0)  rs[i]=0.0;
+    else           rs[i]=r[cn[i]-1];
+  }
+  
+  //  internal shear forces
+  Dkqelem->forces (lcid,eid,2,2,x,y,rs);
+
+}
+ 
+/**
+   function coputes nodal forces caused by surface load
+   
+   @param eid - element id
+   @param nodvals - array of nodal values of the surface load
+   @param nf - %vector of nodal forces
+   
+   JK, 1. 12. 2019
+*/
+void shellq::node_forces_surf (long eid,double *nodvals,vector &nf)
+{
+  long *cn;
+  double *locnodvals;
+  vector gx(ASTCKVEC(nne)),gy(ASTCKVEC(nne)),gz(ASTCKVEC(nne)),x(ASTCKVEC(nne)),y(ASTCKVEC(nne));
+  vector lnf(ASTCKVEC(ndofep)),anf(ASTCKVEC(ndofe));
+  matrix tmat(ASTCKMAT(ndofe,ndofe));
+  
+  //  node coordinates in the global system
+  Mt->give_node_coord3d (gx,gy,gz,eid);
+  //  transformation of the node coordinates in the global system gx, gy, gz to the element coordinate system x, y
+  local_coordinates (gx,gy,gz,x,y,Mp->zero);
+  
+  locnodvals = new double [4];
+  
+  //  in every node
+  //  nodvals[0] - f_x
+  //  nodvals[1] - f_y
+  //  nodvals[2] - f_z
+  //  nodvals[3] - m_omega
+  
+  locnodvals[0]=nodvals[2];
+  locnodvals[1]=nodvals[6];
+  locnodvals[2]=nodvals[10];
+  locnodvals[3]=nodvals[14];
+  
+  //  nodal force caused by surface load
+  Dkqelem->surfload (eid,locnodvals,x,y,lnf);
+
+  cn = new long [ndofep];
+  //  code numbers for plate matrix into the shell matrix
+  codnum (cn,1);
+  //  localization of plate contributions to the shell vector
+  locglob (anf.a,lnf.a,cn,ndofep);
+  
+  delete [] locnodvals;
+  delete [] cn;
+  
+  //  transformation matrix
+  elem_transf_matrix (tmat,gx,gy,gz,Mp->zero);  
+  mxv (tmat,anf,nf);
+  
+}
+
+/**
+   function computes resulting internal forces
+   
+   @param lcid - load case id
+   @param eid - element id
+   @param ifor - %vector of internal forces
+   
+   JK, 26. 2. 2020
+*/
+void shellq::res_internal_forces (long lcid,long eid,vector &ifor)
+{
+  long *cn,transf;
+  ivector nodes (nne);
+  vector aux(ASTCKVEC(ndofe));
+  vector gx(ASTCKVEC(nne)),gy(ASTCKVEC(nne)),gz(ASTCKVEC(nne)),x(ASTCKVEC(nne)),y(ASTCKVEC(nne)),v;
+  matrix tmat(ASTCKMAT(ndofe,ndofe));
+  
+  //  node coordinates in the global system
+  Mt->give_node_coord3d (gx,gy,gz,eid);
+  //  transformation of the node coordinates in the global system gx, gy, gz to the element coordinate system x, y
+  local_coordinates (gx,gy,gz,x,y,Mp->zero);
+
+  reallocv (ndofes,v);
+  
+  Perlq->internal_forces (lcid,eid,0,0,v,x,y);
+  
+  cn = new long [ndofes];
+  //  code numbers for plane stress matrix localization to the shell matrix
+  codnum (cn,0);
+  locglob (ifor.a,v.a,cn,ndofes);
+
+  delete [] cn;
+  cn = new long [ndofep];
+  reallocv (ndofep,v);
+  
+  Dkqelem->internal_forces (lcid,eid,2,2,v,x,y);
+  
+  //  code numbers for plane stress matrix localization to the shell matrix
+  codnum (cn,1);
+  locglob (ifor.a,v.a,cn,ndofep);
+
+  delete [] cn;
+  
+  //  transformation of forces in element coordinate system into the global system
+  elem_transf_matrix (tmat,gx,gy,gz,Mp->zero);
+  lgvectortransf (aux, ifor, tmat);
+  copyv (aux,ifor);
+
+
+  //  transformation of nodal forces
+  //  (in the case of nodal coordinate systems)
+  Mt->give_elemnodes (eid,nodes);
+  transf = Mt->locsystems (nodes);
+  if (transf>0){
+    matrix tmat (ndofe,ndofe);
+    node_transf_matrix (nodes,tmat);
+    glvectortransf (ifor,v,tmat);
+    copyv (v,ifor);
+  }
+}

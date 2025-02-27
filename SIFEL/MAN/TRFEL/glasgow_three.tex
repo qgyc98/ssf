@@ -1,0 +1,37 @@
+If we assume that that the liquid and gas phases flow through a rigid porous 
+matrix, the fields of unknowns are without the displacement field ($\tenss{u}$), 
+describing volume changes in a deforming porous material. 
+The system of equations under this assumption leads to the following form
+
+\begin{eqnarray}
+\left[ \begin{array}{ccc}
+\tenss{K}_{VV} & \tenss{K}_{VP} & \tenss{K}_{VT} \\
+\tenss{K}_{PV} & \tenss{K}_{PP} & \tenss{K}_{PT} \\
+\tenss{K}_{TV} & \tenss{K}_{TP} & \tenss{K}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_c \\
+\tenss{r}_g \\
+\tenss{r}_T
+\end{array} \right\} + 
+\left[ \begin{array}{ccc}
+\tenss{C}_{VV} & \tenss{C}_{VP} & \tenss{C}_{VT} \\
+\tenss{C}_{PV} & \tenss{C}_{PP} & \tenss{C}_{PT} \\
+\tenss{C}_{TV} & \tenss{C}_{TP} & \tenss{C}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_V \\
+\dot{\tenss{r}}_P \\
+\dot{\tenss{r}}_T
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{F}_V \\
+\tenss{F}_P \\
+\tenss{F}_T
+\end{array} \right\},\nonumber\\
+\end{eqnarray}
+where index $V$ denotes mass concentration of water vapor $\widetilde{\rho_v}$ [kg/m$^3$], 
+$P$ denotes capillary gas pressure $p_g$ [Pa] and 
+$T$ denotes temperature $T$ [K].
+The whole theory and all of the sub-matrices are very precisely described in~\cite{glas}
+(\textsf {http://cml.fsv.cvut.cz/\~{}sifel}).

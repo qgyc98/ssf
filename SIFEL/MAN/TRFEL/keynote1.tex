@@ -1,0 +1,317 @@
+\subsection{Mass and heat transfer in deforming porous media \\- a review of Lewis' and Schrefler's theory}
+\label{keynote}
+{\bf Constitutive relations}
+
+Moisture in materials can be present as moist air, water and ice or in some intermediate state as adsorbed phase 
+on the pore walls, respectively. Since it is in general not possible to distinguish the different aggregate states, 
+the water content $w$ is defined as the ratio of the total moisture weight (kg/kg) to the dry weight of the material. 
+\begin{eqnarray}\label{w_S}
+(1-n) \rho^sw = nS_w\rho^w + nS_g\rho^g, \qquad S_w + S_g = 1,
+\end{eqnarray}
+The degree of saturation $S_w$ is a function of capillary pressure $p^c$ and temperature $T$, 
+which is determined experimentally
+\begin{equation}\label{Sw}
+S_w = S_w(p^c,T).
+\end{equation}
+The capillary pressure $p^c$ id defined as
+\begin{equation}\label{pc}
+p^c = p^g - p^w,
+\end{equation}
+where $p^w > 0$ is the pressure of the liquid phase (water). 
+
+The pressure of the moist air, $p^g > 0$, in the pore system is usually considered as the pressure in a perfect 
+mixture of two ideal gases - dry air, $p^{ga}$, and water vapor, $p^{gw}$, i.e.,
+\begin{equation}\label{ungas}
+p^g = p^{ga} + p^{gw}=\Big( \frac{\rho^{ga}}{M_a} + \frac{\rho^{gw}}{M_w} \Big)T 
+R = \frac{\rho^{g}}{M_g}T R.
+\end{equation}
+In this relation $\rho^{ga}, \rho^{gw}$ and $\rho^{g}$ stand for the respective intrinsic phase densities, $T$ 
+is the absolute temperature, and $R$ is the universal gas constant.
+ 
+Identity \eqref{ungas} defining the molar mass of the moist air, $M_g$, in terms of the molar masses of individual 
+constituents is known as Dalton's law. The capillary pressure is larger the smaller the capillary radius is. It is shown 
+thermodynamically that the capillary pressure can be expressed unambiguously by the relative humidity $RH$ using 
+the Kelvin-Laplace law
+\begin{equation}\label{kelvinlapl}
+RH = \frac{p^{gw}}{p^{gws}} = {\rm exp} \Big( - \frac{p^c M_w}{\rho^w R T} \Big).
+\end{equation}
+The water vapor saturation pressure, $p^{gws}$, is a function of the temperature only and can be expressed by the 
+Clausius-Clapeyron equation
+\begin{equation}\label{clausius}
+p^{gws}(T) = p^{gws}(T_0) {\rm exp} \Big[ - \frac{M_w \Delta h_{\rm vap}}{R} \Big(\frac{1}{T} - 
+\frac{1}{T_0} \Big) \Big],
+\end{equation}
+where $T_0$ is a reference temperature and $\Delta h_{\rm vap}$ is the specific enthalpy of saturation.
+
+Materials having heat capacities is the term deliberately used 
+to emphasize the similarity to the description of the moisture retention. It is simply expressed as
+\begin{equation}
+H =H(T),
+\end{equation}
+where $H$ is the mass specific enthalpy (J.kg$^{-1}$), $T$ - temperature (K).
+
+It is not common to write the enthalpy in an absolute way as here. Instead, changes of enthalpy are 
+described in a differential way, which leads to the definition of the specific heat capacity as the slope 
+of the $H - T$ curve, i.e.
+\begin{equation}\label{cap}
+C_p = \Big( \frac{\partial H}{\partial T}\Big)_{p={\rm const.}}.
+\end{equation}
+The heat capacity varies insignificantly with temperature. It is customary, however, to correct this term 
+for the presence of the fluid phases and to introduce the effective heat capacity as
+\begin{equation}
+\big( \rho C_p \big)_{\rm eff} = \rho_s C_{ps} + \rho_w C_{pw} + \rho_g C_{pg}.
+\end{equation}
+
+{\bf Transfer equations}
+
+The mass averaged relative velocities, $\tenss{v} ^{\alpha} - \tenss{v} ^s$, are expressed 
+by the generalized form of {\bs {Darcy's law}} \cite{lewis}
+\begin{equation}\label{darcy}
+n S_{\alpha} \big( \tenss{v} ^{\alpha} - \tenss{v} ^s \big) = \frac{k^{r\alpha} \tenss{k}_{sat}}
+{\mu^{\alpha}} \big( - {\rm grad} p^{\alpha} + \rho^{\alpha} \tenss{g} \big),
+\end{equation}
+where $\alpha = w$ for the liquid phase and $\alpha = g$ for the gaseous phase.
+
+Dimensionless relative permeabilities $k^{r\alpha} \in \langle 0,1 \rangle$ are functions of degree of~
+saturation
+\begin{equation}
+k^{r\alpha} = k^{r\alpha} (S_w)\qquad ({\rm m \cdot s}^{-1}).
+\end{equation}
+
+In Equation (\ref{darcy}), $\tenss{k}_{sat}$ (m$^2$) is the square (3x3) intrinsic permeability matrix 
+ and $\mu^{\alpha}$ is the dynamic viscosity (kg.m$^{-1}$.s$^{-1}$). The intrinsic mass densities $\rho^{\alpha}$ 
+are related to the volume averaged mass densities $\rho_{\alpha}$ through the relation
+\begin{equation}\label{av_dens}
+\rho_{\alpha} = n S_{\alpha} \rho^{\alpha}.
+\end{equation}
+The relative permeability $k^{rw}$ goes to zero, when water saturation $S_w$ approaches $S_{irr}$, 
+which is the limiting value of $S_w$ as the suction stress approaches infinity (\cite{fatt}).
+
+Diffusive-dispersive mass flux (kg.m$^{-2}$.s$^{-1}$) of the water vapor ($gw$) in the gas
+ ($g$) is the second driving mechanism. It is governed by {\bs {Fick's law}}
+\begin{equation}\label{fick}
+\tenss{J}^{gw}_g = n S_g \rho^{gw} \big( \tenss{v} ^{gw} - \tenss{v} ^g \big) = - \rho^g \tenss{D}^{gw}_g 
+{\rm grad} \Big( \frac{\rho^{gw}}{\rho^g} \Big),
+\end{equation}
+where $\tenss{D}^{gw}_g$ (m$^2$.s$^{-1}$) is the effective dispersion tensor. It can be shown \\ \cite{lewis} that
+\begin{equation}
+\tenss{J}^{gw}_g = - \rho^g \frac{M_a M_w}{M^2_g} \tenss{D}^{gw}_g {\rm grad} \Big( \frac{\rho^{gw}}{\rho^g} \Big)
+= \rho^g \frac{M_a M_w}{M^2_g} \tenss{D}^{ga}_g {\rm grad} \Big( \frac{\rho^{ga}}{\rho^g} \Big) = - \tenss{J}^{ga}_g.
+\end{equation}
+Recall that $\tenss{D}^{gw}_g = \tenss{D}^{ga}_g = \tenss{D}_g$.
+Here, $\tenss{J}_g^{ga}$ is the diffusive-dispersive mass flux of the dry air in the gas.
+
+Conduction of heat in normal sense comprises radiation as well as convective heat transfer on a 
+microscopic level. The generalized version of {\bs {Fourier's law}} is used to describe the conduction
+ heat transfer
+\begin{equation}\label{fourier}
+\tenss{q} = - \tenss{\chi}_{\rm eff} {\rm grad} T,
+\end{equation}
+where $\tenss{q}$ is the heat flux (W.m$^{-2}$), $\tenss{\chi}_{\rm eff}$ is the effective thermal conductivity matrix 
+(W.m$^{-1}$.K$^{-1}$).
+
+The thermal conductivity increases with increasing temperature due to the non-linear 
+behavior of the microscopic radiation, which depends on difference of temperatures raised to the 
+$4^{\rm{th}}$ power. Presence of water also increases the thermal conductivity. A suitable formula
+reflecting this effect can be found in \cite{lewis}.
+
+{\bf Deformation of solid skeleton. Concept of effective stress}
+
+The stresses in the grains, $\tenss{\sigma}^s$, can be expressed using a standard averaging technique 
+in terms of the stresses in the liquid phase, $\tenss{\sigma}^w$, the stresses in the gas, $\tenss{\sigma}^g$, 
+and the effective stresses between the grains, $\tenss{\sigma}^{ef}$. The equivalence conditions for the internal 
+stresses and for the total stress $\tenss{\sigma}$ lead to the expression~\cite{bitt}.
+\begin{equation}\label{d3}
+\tenss{\sigma} = \tenss{\sigma}^{ef} + S_w \tenss{\sigma}^w + S_g \tenss{\sigma}^g + \Delta \tenss{\tau}.
+\end{equation}
+Assuming that the shear stress $\tenss{\tau}$ in fluids is negligible converts the latter equation into the form
+\begin{equation}\label{d4}
+\tenss{\sigma} = \tenss{\sigma}^{ef} - p^s \tenss{m},
+\end{equation}
+where
+\begin{equation}\label{d5}
+\tenss{\sigma} = \big\{ \sigma_x,\sigma_y,\sigma_z,\tau_{yz},\tau_{zx},\tau_{xy}\big\}^{\rm T}, \quad
+\tenss{m} = \big\{ 1,1,1,0,0,0 \big\}^{\rm T},
+\end{equation}
+and
+\begin{equation}\label{d6}
+p^s = S_w p^w + S_g p^g.
+\end{equation}
+
+Deformation of a porous skeleton associated with the grain rearrangement can be expressed using 
+the constitutive equation written in the rate form
+\begin{equation}\label{d7}
+\dot{\tenss{\sigma}}^{ef} = \tenss{D}_{sk} \big(\dot{\tenss{\varepsilon}} - \dot{\tenss{\varepsilon}}_0 \big).
+\end{equation}
+The dots denote differentiation with respect to time, $\tenss{D}_{sk} = \tenss{D}_{sk}(\dot{\tenss{\varepsilon}}, 
+{\tenss{\sigma}}^{ef}, T) $ is the tangential matrix of the porous skeleton and $\dot{\tenss{\varepsilon}}_0$ 
+represents the strains that are not directly associated with stress changes (e.g., temperature effects, shrinkage, 
+swelling, creep). It also comprises the strains of the bulk material due to changes of the pore pressure
+\begin{equation}\label{d8}
+\dot{\tenss{\varepsilon}} =  -\tenss{m} \Big( \frac{\dot{p}^s}{3K_s} \Big),
+\end{equation}
+where $K_s$ is the bulk modulus of the solid material (matrix).
+
+When admitting only this effect and combining Equations (\ref{d4}), (\ref{d7}) and (\ref{d8}), we get
+\begin{equation}\label{d9}
+\dot{\tenss{\sigma}} = \dot{\tenss{\sigma}}^{ef} - \dot{p}^s \tenss{m} = \tenss{D}_{sk} \dot{\tenss{\varepsilon}}
+- \alpha \tenss{m} \dot{p}^s = \dot{\tenss{\sigma}}'' - \alpha \tenss{m} \dot{p}^s,
+\end{equation}
+where
+\begin{equation}\label{d10}
+\alpha = \frac{1}{3} \tenss{m}^{\rm T} \Big( \tenss{I} - \frac{\tenss{D}_{sk}}{3K_m} \Big) \tenss{m} = 1 - 
+\frac{K_{sk}}{K_s} < 1,
+\end{equation}
+and $K_{sk} = \tenss{m}^{\rm T} \tenss{D}_{sk} \tenss{m}/9$ is the bulk modulus of the porous skeleton. 
+For a material without any pores, $K_{sk} = K_s$. For cohesive soils, $K_{sk} << K_s$ and $\alpha = 1$. 
+The above formulas are also applicable to long-term deformation of rocks, for which  $\alpha \leq 0.5$, 
+and this fact strongly affects Equation (\ref{d9}) \cite{zienkiewicz83}.
+
+Changes of the effective stress along with temperature and pore pressure changes produce change of the solid density 
+$\dot{\rho}^s$. To derive the respective material relation for this quantity, we start from the mass conservation equation 
+for the solid phase. In the second step we introduce the constitutive relationship for the mean effective stress expressed 
+in terms of quantities describing the deformation of the porous skeleton. After some manipulations we arrive at the 
+searched formula
+\begin{equation}\label{d15}
+(1 - n)\frac {\dot{\rho}^s}{\rho^s} = (\alpha - n)\Big(\frac {\dot{p}^s}{K_s} - \beta_s \dot{T}\Big) + 
+(\alpha - 1){\rm div} \tenss{v}^s,
+\end{equation}
+where $\beta_s$ is the thermal expansion coefficient of the solid phase.
+
+Similar approach applied to the mass conservation equation of the liquid phase leads to the following constitutive equation
+\begin{equation}\label{d16}
+\frac {\dot{\rho}^w}{\rho^w} = \frac {\dot{p}^w}{K_w} - \beta_s \dot{T},
+\end{equation}
+where $K_w$ is the bulk modulus of water and $\beta_w$ is the thermal expansion coefficient of this phase.
+
+{\bf Set of governing equations}
+
+The complete set of equations describing the coupled moisture and heat transport in deforming porous media comprises 
+the linear balance (equilibrium) equation formulated for a multi-phase body, the energy balance equation and 
+the continuity equations for the liquid water and gas.
+
+{\it Continuity equation for the dry air}
+\begin{eqnarray}\label{air}
+\frac{\partial}{\partial t}\Big(\varphi(1-S_w)\rho^{ga}\Big) + \alpha(1-S_w)\rho^{ga} {\rm div} \tenss{\dot{u}} - 
+{\rm div} \Big( \rho^{ga}\frac{k^{rg}\tenss{k}_{sat}}{{\mu}^{g}} {\rm grad}p^g\Big) + \nonumber\\
++{\rm div} \Big( \rho^g \frac{M_a M_w}{M^2_g} \tenss{D}_{\rm eff} {\rm grad} \Big( \frac{p^{gw}}{p^g} \Big) \Big) = 0,
+\end{eqnarray}
+where $\tenss{\dot{u}}$ ($\tenss{\dot{u}} = \tenss{v}^s$) is the velocity of solid.
+
+{ \it Continuity equation for the water species}
+\begin{eqnarray}\label{water}
+\frac{\partial}{\partial t}\Big(\varphi(1-S_w)\rho^{gw}\Big) + \alpha(1-S_w)\rho^{gw} {\rm div} \tenss{\dot{u}} - 
+{\rm div} \Big( \rho^{gw}\frac{k^{rg}\tenss{k}_{sat}}{{\mu}^{g}} {\rm grad}p^g\Big) + \nonumber\\
+-{\rm div} \Big( \rho^g \frac{M_a M_w}{M^2_g} \tenss{D}_{\rm eff} {\rm grad} \Big( \frac{p^{gw}}{p^g} \Big) \Big) = \nonumber\\
+=-\frac{\partial}{\partial t}\Big(\varphi S_w\rho^{w}\Big) - \alpha S_w \rho^{w} {\rm div} \tenss{\dot{u}} + 
+{\rm div} \Big( \rho^{w}\frac{k^{rw}\tenss{k}_{sat}}{{\mu}^{w}} ({\rm grad}p^g - {\rm grad}p^c - \rho^w\tenss{g})\Big)
+\end{eqnarray}
+
+{ \it Energy balance equation}
+ \begin{eqnarray}\label{heat}
+\big( \rho C_p \big)_{\rm eff} \frac{\partial T}{\partial t} - {\rm div}\big(\lambda_{\rm eff}{\rm grad}T\big) + \nonumber\\
+- \Big(C_{pw} \rho^w \frac{k^{rw}\tenss{k}_{sat}}{{\mu}^{w}} ({\rm grad}p^g - {\rm grad}p^c - \rho^w\tenss{g}) + 
+C_{pg} \rho^{gw}  \frac{k^{rg}\tenss{k}_{sat}}{{\mu}^{g}} {\rm grad}p^g\Big) {\rm grad}T = \nonumber\\
+=\Delta h_{\rm vap} \Big[\frac{\partial}{\partial t}\Big(\varphi S_w\rho^{w}\Big) + \alpha S_w \rho^{w} {\rm div} \tenss{\dot{u}} -
+{\rm div} \Big( \rho^{w}\frac{k^{rw}\tenss{k}_{sat}}{{\mu}^{w}} ({\rm grad}p^g - {\rm grad}p^c - \rho^w\tenss{g})\Big)\Big]
+\end{eqnarray}
+
+The { \it equilibrium equation} (the linear balance equation) must yet be introduced to complete a set of governing 
+equations
+\begin{equation}\label{d19}
+{\rm div} \big(\tenss{\sigma} - \tenss{m}(p^g - S_w p^c)\big)+ \rho \tenss{g} = \tenss{\rm 0}
+\end{equation}
+with density of the multi-phase medium defined as
+\begin{equation}\label{d20}
+\rho = (1-n)\rho^s + nS_w\rho^w + nS_g\rho^g = \rho_s + \rho_w + \rho_g.
+\end{equation}
+
+{ \it Initial and boundary conditions}
+
+The initial conditions specify the full fields of gas pressure, capillary or water pressure, 
+temperature and displacement and velocities:
+\begin{equation}\label{init}
+p^g = p^g_0, \qquad p^c = p^c_0, \qquad T = T_0, \qquad \tenss{u} = \tenss{u}_0, 
+\quad {\rm and}  \quad \dot{\tenss{u}} = \dot{\tenss{u}}_0, \quad {\rm at}\quad t = 0. 
+\end{equation}
+The boundary conditions can be imposed values on $\Gamma^1_{\pi}$ or fluxes on $\Gamma^2_{\pi}$, where the boundary
+$\Gamma = \Gamma^1_{\pi} + \Gamma^2_{\pi}$.
+\begin{equation}\label{bound1}
+p^g = \overline{p}^g \quad {\rm on} \quad \Gamma^1_{g}, \quad p^c = \overline{p}^c \quad {\rm on} \quad \Gamma^1_{c},
+\quad T = \overline{T} \quad {\rm on} \quad \Gamma^1_{T}, \quad \tenss{u} = \overline{\tenss{u}}  \quad {\rm on} \quad \Gamma^1_{u}.
+\end{equation}
+The volume averaged flux boundary conditions for water species and dry air conservation equations 
+and energy equation to be imposed at the interface between the porous medium and the surrounding fluid are as follows
+\begin{eqnarray}\label{bound2}
+\big(\rho^{ga}\tenss{J}^{ga} - \rho^{g}\tenss{J}^{gw}\big)\cdot\tenss{n} &=& q_{ga} \quad {\rm on} \quad \Gamma^2_{g}\nonumber\\
+\big(\rho^{gw}\tenss{J}^{ga} + \rho^{w}\tenss{J}^{w} + \rho^{g}\tenss{J}^{gw}\big)\cdot\tenss{n} &=& 
+\beta_c(\rho^{gw} -\rho^{gw}_{\infty}) + q_{gw} + q_{w}\quad {\rm on} \quad \Gamma^2_{c}\\
+-\big(\rho^{w}\tenss{J}^{w}\Delta h_{\rm vap} - \lambda_{\rm eff}{\rm grad}T)\cdot\tenss{n} &=& 
+\alpha_c(T - T_{\infty}) + q_{T}\quad {\rm on} \quad \Gamma^2_{T}\nonumber
+\end{eqnarray}
+where $\tenss{n}$ is the unit normal vector of the surface of the porous medium, $\rho^{gw}_{\infty}$ and $T_{\infty}$ 
+are the mass concentration of water vapor and temperature in the undisturbed gas phase far away from the interface, 
+and $q_{ga}$, $q_{gw}$, $q_w$ and $q_T$ are the imposed air flux, the imposed vapor flux, the imposed liquid flux and 
+the imposed heat flux, respectively.
+
+The traction boundary conditions for displacement field are:
+\begin{equation}\label{bound3}
+\sigma\cdot\tenss{n} = \tenss{t} \quad {\rm on} \quad \Gamma^2_{u}
+\end{equation}
+where $\tenss{t}$ is the imposed traction.
+
+\subsubsection{Discretization of governing equations}
+
+A weak formulation of the governing equations \eqref{air} to \eqref{d19} is obtained by applying Galerkin's method
+of weighted residuals. For the numerical solution, the governing equations are discretized in space by means of the 
+finite element method, yielding a non-symmetric and non-linear system of partial differential equations:
+\begin{eqnarray}\label{final1}
+\tenss{K}_{uu}\tenss{u} + \tenss{K}_{ug}\tenss{p}_g + \tenss{K}_{uc}\tenss{p}_c + \tenss{K}_{ut}\tenss{T} &=& \tenss{F}_u,\nonumber\\
+\tenss{C}_{gg}\tenss{\dot{p}}_g + \tenss{C}_{gc}\tenss{\dot{p}}_c + \tenss{C}_{gt}\tenss{\dot{T}} +\tenss{C}_{gu}\tenss{\dot{u}} + 
+\tenss{K}_{gg}\tenss{p}_g + \tenss{K}_{gc}\tenss{p}_c + \tenss{K}_{gt}\tenss{T} &=& \tenss{F}_g,\nonumber\\
+\tenss{C}_{cg}\tenss{\dot{p}}_g + \tenss{C}_{cc}\tenss{\dot{p}}_c + \tenss{C}_{ct}\tenss{\dot{T}} + \tenss{C}_{cu}\tenss{\dot{u}} + 
+\tenss{K}_{cg}\tenss{p}_g + \tenss{K}_{cc}\tenss{p}_c + \tenss{K}_{ct}\tenss{T} &=& \tenss{F}_c,\\
+\tenss{C}_{tg}\tenss{\dot{p}}_g + \tenss{C}_{tc}\tenss{\dot{p}}_c + \tenss{C}_{tt}\tenss{\dot{T}} + \tenss{C}_{tu}\tenss{\dot{u}} + 
+\tenss{K}_{tg}\tenss{p}_g + \tenss{K}_{tc}\tenss{p}_c + \tenss{K}_{tt}\tenss{T} &=& \tenss{F}_t.\nonumber
+\end{eqnarray}
+The equations \eqref{final1} can be rewritten in concise form as
+\begin{equation}\label{final2}
+\tenss{K}(\tenss{X})\tenss{X} + \tenss{C}(\tenss{X})\tenss{\dot{X}} = \tenss{F}(\tenss{X}),
+\end{equation}
+where $\tenss{X}^{\rm T} = \{\tenss{p}^g,\tenss{p}^c,\tenss{T},\tenss{u}\}$, $\tenss{C}(\tenss{X})$ is ``the general capacity matrix'', 
+$\tenss{K}(\tenss{X})$ is ``the general conductivity matrix'' and are obtained together with $\tenss{F}(\tenss{X})$ 
+by assembling the sub-matrices indicated in equations \eqref{final1}. The dot denotes the time derivative.
+
+
+The matrices appearing in Equation \eqref{final1} are shown here in detail, using the notation of Lewis and Schrefler~\cite{lewis}.
+\begin{eqnarray}
+\tenss{K}_{uu} &=&\\
+\tenss{K}_{ug} &=&\\
+\tenss{K}_{uc} &=&\\
+\tenss{K}_{ut} &=&\\
+\tenss{F}_u &=&\\
+\tenss{C}_{gg} &=&\\
+\tenss{C}_{gc} &=&\\
+\tenss{C}_{gt} &=&\\
+\tenss{C}_{gu} &=&\\ 
+\tenss{K}_{gg} &=&\\
+\tenss{K}_{gc} &=&\\
+\tenss{K}_{gt} &=&\\
+\tenss{F}_g &=&\\
+\tenss{C}_{cg} &=&\\
+\tenss{C}_{cc} &=&\\
+\tenss{C}_{ct} &=&\\
+\tenss{C}_{cu} &=&\\ 
+\tenss{K}_{cg} &=&\\
+\tenss{K}_{cc} &=&\\
+\tenss{K}_{ct} &=&\\
+\tenss{F}_c &=&\\
+\tenss{C}_{tg} &=&\\
+\tenss{C}_{tc} &=&\\
+\tenss{C}_{tt} &=&\\
+\tenss{C}_{tu} &=&\\ 
+\tenss{K}_{tg} &=&\\
+\tenss{K}_{tc} &=&\\
+\tenss{K}_{tt} &=&\\
+\tenss{F}_t &=&
+\end{eqnarray}

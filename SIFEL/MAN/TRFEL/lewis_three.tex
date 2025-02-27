@@ -1,0 +1,36 @@
+If we assume that that the liquid and gas phases flow through a rigid porous 
+matrix, the fields of unknowns are without the displacement field ($\tenss{u}$), 
+describing volume changes in a deforming porous material. 
+The system of equations (\eqref{final1} and \eqref{final2}) under this assumption is simplified to the following form
+
+\begin{eqnarray}
+\left[ \begin{array}{ccc}
+\tenss{K}_{cc} & \tenss{K}_{cg} & \tenss{K}_{cT} \\
+\tenss{K}_{gc} & \tenss{K}_{gg} & \tenss{K}_{gT} \\
+\tenss{K}_{Tc} & \tenss{K}_{Tg} & \tenss{K}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_c \\
+\tenss{r}_g \\
+\tenss{r}_T
+\end{array} \right\} + 
+\left[ \begin{array}{ccc}
+\tenss{C}_{cc} & \tenss{C}_{cg} & \tenss{C}_{cT} \\
+\tenss{C}_{gc} & \tenss{C}_{gg} & \tenss{C}_{gT} \\
+\tenss{C}_{Tc} & \tenss{C}_{Tg} & \tenss{C}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_c \\
+\dot{\tenss{r}}_g \\
+\dot{\tenss{r}}_T
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{F}_c \\
+\tenss{F}_g \\
+\tenss{F}_T
+\end{array} \right\},\nonumber\\
+\end{eqnarray}
+where index $c$ denotes capillary pressure $p^c$ [Pa], $g$ denotes capillary gas pressure $p^g$ [Pa] and 
+$T$ denotes temperature $T$ [K].
+The whole theory and all of the sub-matrices are very precisely described in~\cite{pesavento}
+(\textsf {http://cml.fsv.cvut.cz/\~{}sifel}).

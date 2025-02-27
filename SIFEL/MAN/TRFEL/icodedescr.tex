@@ -1,0 +1,159 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Description of the code}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Boundary conditions}
+
+\begin{itemize}
+\item
+bc=0 - no boundary condition
+\item
+bc=1 - prescribed values (Dirichlet boundary condition)
+\item
+bc=2 - prescribed flux (Neumann boundary condition)
+\item
+bc=3 - climatic data condition, everything is defined by fluxes - Neumann condition
+\item
+bc=4 - climatic data condition ???
+\item
+bc=5 - climatic data condition, some boundary conditions are in the Neumann type, some of them in the Newton type
+\item
+bc=30 - transmission boundary condition (Newton/Cauchy boundary condition),
+boundary values are identical with values used in the problem
+\item
+bc=31 - relative humidity is used in problem while pressures are
+prescribed on boundary
+\item
+bc=32 - prestup, pri kterem se nebere v uvahu dodatecna matice vodivosti,
+vypada to jako predepsany tok
+\item
+bc=33 - Tomasova specialni okrajova podminka pro Karluv most
+\end{itemize}
+
+transmission indicator - indicator of boundary condition on element
+defined on elementt.cpp
+\begin{itemize}
+\item
+transi=0 - default value, no boundary conditions
+\item
+transi=2 - prescribed fluxes (defined directly or due to climatic conditions)
+\item
+transi=3 - prescribed transmission
+\item
+transi=4 - element contains prescribed fluxes as well as prescribed transmission (e.g. there is one edge with Neumann condition and one edge with Newton condition)
+\end{itemize}
+transi is defined in loadelt.cpp
+
+
+\section{Allocation and Initiation}
+
+The TRFEL starts with function trfel\_init, where all data are read
+from input file or files and many of objects and arrays are allocated.
+
+The main objects of the code are allocated at the beginning
+of the function trfel\_init.
+\begin{center}
+\begin{tabular}{ll}
+Tp  = new probdesct;  & problem description
+\\
+Gtt = new gtopology; & general topology
+\\
+Tt  = new transtop; & transport topology
+\\
+Tm  = new transmat; & transport materials
+\\
+Tc  = new transcrsec; & transport cross sections
+\\
+Tb  = new transbclc; & transport boundary conditions
+\\
+Outdt = new outdrivert; & description of output
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+\item
+Tp--$>$read (in); -  reads problem description
+
+\item
+Tt--$>$read (in); -  reads transport topology
+
+\item
+Ndoft = Gtt--$>$codenum\_generation (Outt); -  generates code numbers
+
+\item
+Tm--$>$read (in); - reads transport materials
+
+\item
+Tm--$>$intpointalloc (); - allocates array of integration points
+
+\item
+Tm--$>$intpointinit (); - initiates variables on integration points,
+it defines number of blocks, number of components, type of materials and material id
+
+\item
+Tc--$>$read (in); - reads transport cross sections
+
+\item
+Tb--$>$read (in); - reads transport boundary conditions, it means
+Dirichlet, Neumann and Newton
+
+\item
+Tt--$>$elemprescvalue(); - determines elements influenced by prescribed
+values, it is used for assembling of nodal fluxes
+
+\item
+Tb--$>$elemsource (); - determines elements with sources
+
+\item
+Lsrst--$>$alloc (); - allocates arrays lhs (array with solution),
+rhs (array with right hand side of the system of equations),
+
+\item
+Lsrst--$>$initcond (in); - reads initial conditions
+
+\item
+Outdt--$>$read(in); - reads description of output from the code, namely description
+of output to the output file, file for graphical postprocessors (e.g. GiD) and
+diagrams
+
+\item
+Tt--$>$alloc\_nodes (); - allocates arrays grad and flux
+
+\end{itemize}
+
+
+\section{Vector of right hand side}
+
+globmatt.cpp trfel\_right\_hand\_side (long lcid,double *rhs,long n)
+
+
+assemble\_init (rhs);
+
+Tb->lc[i].assemble(i,av);
+
+
+loadcaset.cpp assemble (long lcid,double *rhs)
+
+  source\_contrib (lcid,rhs);
+
+      elem\_neumann\_vector (lv,lcid,eid,i);
+
+
+
+      elem\_newton\_vector (lv,lcid,eid,i);
+
+     elem\_neumann\_vector (lv,lcid,eid,i); -> linbart::res\_convection\_vector -> linbart::convection\_vector ->   Tb->lc[lcid].elemload[leid].give\_nodval (lcid,nodval);
+-> loadelt::give\_nodval (long lcid,vector \&fe)
+
+
+v globmatu je smycka pres pocet promennych, 
+ve smycce se vola load case, kde je assemble,
+assemble obsahuje smycku pres prvky, na nichz je okrajova podminka,
+v kazdem volani se vleze do neumanna na prvku, jen jednou, protoze
+tok i-te veliciny je tam predepsan celou svou hodnotou
+v kazdem volani assemble se vleze do res\_transmission\_vector, kde
+je smycka pres promenne, protoze prestup se pocita jako soucet
+prispevku ze vsech promennych
+napr. $q_T = \kappa (T-T) + \beta (p-p) + ...$.

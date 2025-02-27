@@ -1,0 +1,103 @@
+# Generated Automatically From Makefile.In By Configure.
+################################################################
+#
+#  Makefile for parallel mechcode
+# 
+################################################################
+
+.NOEXPORT:
+SHELL = /bin/sh
+
+srcdir = .
+
+prefix = .
+exec_prefix = $(prefix)
+
+################################################################
+#  If you want to install, rename these variables appropriately
+################################################################
+incdir = $$HOME/include
+libdir = $$HOME/lib
+
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = install.sh
+INSTALL_DATA    = install.sh
+
+CC              = g++
+#CC              = CC
+
+DEFS            = 
+CFLAGS          = -g -Wall
+#CFLAGS          = -O3
+#CFLAGS          = -g
+LDFLAGS         =
+LDOPTIONS       = $(CDEBUGFLAGS) $(LDFLAGS)
+
+LIBS            =  -lm
+X_LIBS          =
+#LOC_LIBS        = -L../../MEFEL/SRC -lmef -L../../PARGEF/ -lpargef -L../../GEFEL/ -lgef
+LOC_LIBS        = -L/usr/local/mpi/lib -lpmpich -lmpich -L../../MEFEL/SRC -lmef -L../../PARGEF/ -lpargef -L../../GEFEL/ -lgef
+#LOC_LIBS        = -L/export/share/linux/mpi/ch_shmem/lib -lmpich  -lpmpich++  -lpmpich   -L../../MEFEL/SRC -lmef -L../../PARGEF/ -lpargef -L../../GEFEL/ -lgef
+SYS_LIBS        = -lm
+
+INCLUDES         = -I/usr/local/mpi/include
+#INCLUDES         = -I/export/share/linux/mpi/ch_shmem/include
+
+AR              = ar
+AR_FLAGS        = rc
+RANLIB          = ranlib
+
+RM              = rm -f
+DEPEND          = makedepend
+
+.SUFFIXES:      .o .cpp
+
+####################################################################
+# List of object files
+
+OBJS = plssolver.o pprobdesc.o psolker.o
+
+
+####################################################################
+# List of source files
+#
+
+SRCS = plssolver.cpp pprobdesc.cpp psolker.cpp
+
+
+#########################################################################
+#  Targets
+#
+
+all: pmefel
+
+pmefel: $(OBJS)
+	$(RM) $@
+	$(AR) -rsv libpmef.a $(OBJS)
+	$(AR) -d libpmef.a psolker.o
+	$(CC) -o ../$@ $(OBJS) $(LOC_LIBS) $(SYS_LIBS)
+
+clean:
+	$(RM) pmefel *.o core
+
+distclean: clean
+	$(RM) makefile config.status config.cache config.log
+
+################################################################
+
+makefile: makefile.in configure
+	cd $(srcdir);
+	./configure
+
+configure: configure.in
+	cd $(srcdir);
+	autoconf
+
+################################################################
+# Dependencies
+
+.cpp.o:
+	$(CC) -c $(CFLAGS) $(DEFS) $(INCLUDES) $<
+
+depend: $(SRCS)
+	$(DEPEND) -DMAKEDEPEND $(DEFS) $(INCLUDES) $(SRCS)

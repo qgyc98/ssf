@@ -1,0 +1,19 @@
+\chapter{Numerical integration}
+
+The code uses several types of integration. Finite elements require
+integration with respect to their dimension, it means one-dimensional
+finite elements require one-dimensional integration, etc. Two-dimensional
+elements require except of the two-dimensional integration over their
+area also integration over their edges. This is the case of various
+boundary conditions. Three-dimensional finite elements require
+except of the three-dimensional integration over their volume also
+integration over their surfaces (two-dimensional integration)
+and integration over their edges (one-dimensional integration).
+
+Almost all integration performed in the code have to be computed
+numerically because an analytical integration is difficult or
+awkward. Therefore, this chapter is devoted to the numerical
+integration.
+
+
+\section{Integration over edges of two-dimensional elements}
