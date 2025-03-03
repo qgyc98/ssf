@@ -1,0 +1,285 @@
+\chapter{Topology}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Schur complement method}
+
+in the input file
+\begin{tabular}{ll}
+internal nodes & ltg=0
+\\
+boundary nodes & ltg>0
+\\
+internal nodes & top--$>$gnodes[i].ai=ltg[i]=0
+\\
+boundary nodes & top--$>$gnodes[i].ai=ltg[i]>0;
+\end{tabular}
+
+
+in the code
+\begin{tabular}{ll}
+internal nodes & ltg=-1
+\\
+boundary nodes & ltg>-1
+\\
+internal nodes & top--$>$gnodes[i].ai=0
+\\
+boundary nodes & top--$>$gnodes[i].ai>0
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{FETI-DP method}
+
+in the input file
+\begin{tabular}{ll}
+internal nodes & ltg=0
+\\
+boundary nodes & ltg>0
+\\
+corner nodes   & ltg<0
+\\
+internal nodes & top--$>$gnodes[i].ai=ltg[i]=0
+\\
+boundary nodes & top--$>$gnodes[i].ai=ltg[i]=0
+\\
+corner nodes   & top--$>$gnodes[i].ai=0-ltg[i]>0
+\end{tabular}
+
+
+in the code
+\begin{tabular}{ll}
+internal nodes & ltg=-1
+\\
+boundary nodes & ltg>-1
+\\
+corner nodes   & ltg<-2
+\\
+internal nodes & top--$>$gnodes[i].ai=0
+\\
+boundary nodes & top--$>$gnodes[i].ai=0
+\\
+corner nodes   & top--$>$gnodes[i].ai>0
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Partop}
+
+description of the class partop
+
+   class deals with topology in parallel computations
+   it is superior class to the class gtopology which is used
+   for particular subdomains
+   the class partop manages several classes gtopology
+   
+   
+   notation:
+
+   node multiplicity - number of subdomains which share the node
+
+   internal node - node with multiplicity 1, (node inside a subdomain,
+		   node not lying on inter-subdomain boundary)
+
+   boundary node - node with multiplicity at least 2, (node lying
+                   on inter-subdomain boundary)
+
+   coarse node - artificial node defined on master which collects appropriate
+                 boundary nodes
+
+   
+   global ordering - node ordering before mesh partitioning
+   global node numbers - node numbers used in undecomposed mesh
+                        (node numbers used before decomposition/partitioning)
+
+   local ordering - ordering of subdomains (without respect to remaining subdomains)
+   local node numbers - node numbers used in decomposed mesh
+                        (node numbers used after decomposition/partitioning)
+
+   coarse ordering - ordering of boundary (interface) nodes only
+   coarse node number - node numbers of boundary nodes only, ordering
+                        of all boundary nodes in coarse problem
+
+   group ordering - ordering of selected nodes only
+   group node number - only selected nodes are ordered on the whole problem, it is similar to
+                       the coarse ordering
+
+
+   mesh description:
+   md = 1 - all nodes have their global node number
+   md = 2 - only boundary nodes have coarse number, internal nodes are denoted by -1
+   md = 3 - all nodes have their global node number, boundary nodes have their global number multiplied by -1
+
+
+\section{Schur complement method}
+
+\begin{itemize}
+\item
+ptop--$>$initiation (top,ltg)
+\newline
+auxiliary variable ai on gnodes are set up with respect to the array ltg
+top--$>$gnodes[i].ai = ltg[i];
+
+\item
+ptop--$>$numbers\_of\_all\_nodes\_on\_subdomains (domproc,out);
+\newline
+function establishes maximum number of nodes on one subdomain maxnn and a list
+of nodes on particular subdomains nnsd which is located on the master processor
+nnsd[i]=j - j nodes are defined on the i-th subdomain
+
+\item
+ptop--$>$coupled\_dofs (top,domproc,out);
+\newline
+   ncdof - the number of coupled DOFs
+   coupdof - (M) array containing number of coupled DOFs on subdomains
+   coupdofmas - (M) array containing suspicious indicators of coupled DOFs
+   nbcdof - the number of boundary/interface coupled DOFs
+
+\item
+ptop--$>$assemble_multip (ltg,domproc,out,proc_name);
+   maxnbn - maximum number of boundary/interface nodes on subdomain
+   nbn - number of boundary/interface nodes
+   tnbn - total number of boundary/interface nodes in the problem
+   bnodes - (M)
+   bmultip - (M)
+   maxnbn - maximum number of boundary/interface nodes on subdomain
+   tnnp - (M) total number of nodes in the problem
+   allnodes - (M)
+   amultip - (M) 
+
+
+
+
+
+
+
+\item
+ptop--$>$compute\_multiplicity (ltg,domproc,out);
+\newline
+tnnp - total number of nodes in the problem
+maxnbn - maximum number of boundary nodes
+nbn - number of boundary nodes on each subdomain
+tnbn - total number of boundary nodes
+nbnd - array containing numbers of boundary nodes on subdomains
+tnnp - total number of nodes in problem
+multip - array of boundary node multiplicity (on the master)
+nodmultip - array of node multiplicity (on all processors)
+
+multip[i]=j - the i-th node belongs to j subdomains
+allnodes[i][j]=k - the j-th node on the i-th subdomain has global number k
+nodmultip[i]=j - the i-th node belong to j subdomains
+nbnd[i]=j - the i-th domain contains j boundary nodes
+
+
+\item
+ptop--$>$find\_boundary\_nodes (ltg,domproc,out);
+\newline
+lgnbn - global numbers of boundary nodes
+lnbn - local numbers of boundary nodes
+nin - number of interanl nodes
+lnin - local numbers of internal nodes
+
+lgnbn[i]=j - the i-th boundary node has global number k
+lnbn[i]=j - the i-th boundary node has local number j
+lnin[i]=j - the i-th internal node has local number j
+
+
+\item
+ptop--$>$rewrite\_ltg (ltg);
+
+\item
+selnodschur = new selnodes (nproc,myrank,ndom,top--$>$nn,schurnodes,md,out,mespr);
+nsn - number of selected nodes
+lsnl - list of selected nodes (local numbers)
+lsng - list of selected nodes (global numbers)
+
+\item
+selnodschur--$>$number\_of\_selected\_nodes (domproc,out);
+
+maxnsn - maximum number of selected nodes
+nsndom - number of selected nodes on subdomains
+nsndom[i]=j - j nodes are selected on the i-th subdomain
+
+\item
+selnodschur--$>$nodes\_on\_master (domproc,out);
+
+gnn - group node numbers (see partop.h)
+gnn[i][j]=k - the j-th selected node on the i-th subdomain has group number k
+
+\item
+selnodschur--$>$node\_multiplicity (out);
+
+nodmultip - node multiplicity
+nodmultip[i]=j - the i-th selected node is shared by j subdomains
+
+\item
+selnodschur--$>$number\_all\_dofs (top,domproc,out);
+
+maxndof
+ndofdom
+ndofdom[i]=j - the i-th subdomain contains j DOFs
+
+\item
+selnodschur--$>$ndofn\_on\_master (top,domproc,out);
+ndofnmas
+ndofnmas[i][j]=k - the j-th node on the i-th subdomain contains k DOFs
+ 
+
+\item
+selnodschur--$>$dof\_indicators (top,domproc,out);
+dofmas
+dofmas[i][j][k]=l - the k-th DOF at the j-th selected node on the i-th subdomain has value l
+
+\item
+selnodschur--$>$schur\_ordering (top,out);
+tndof - total number of DOFs in reduced problem
+ndof - number of DOFs which contribute to the reduced problem
+cndom - code numbers on master
+cndom[i][j]=k - the j-th DOF on the i-th subdomain has group code number k
+
+nedodelano:
+ldof - list of code numbers which contribute to the coarse problem
+
+
+
+
+\end{itemize}
+
+
+\section{FETI Method}
+
+all previous functions are called in the same order as in the Schur complement method
+
+\begin{itemize}
+\item
+selnodfeti--$>$group\_local\_nodes (out);
+ljn - list of joint nodes to selected nodes assumed as coarse nodes
+ljn[i][j]=k - the j-th node connected to the i-th coarse node has local number k
+ljn contains tnsn rows and nodmultip columns
+lsn - list of subdomain numbers which contain connected nodes to coarse nodes
+lsn[i][j]=k - the j-th node connected to the i-th coarse node belongs to the k-th subdomain
+lsn contains tnsn rows and nodmultip columns
+
+\item
+selnodfeti--$>$dof\_feti (out);
+doffeti - code numbers / indicators for FETI method
+doffeti[i][j][k]=l - the k-th DOF on the j-th connected node to the i-th coarse node has code number / indicator l
+ 
+\item
+selnodfeti--$>$number\_contrib (domproc,out);
+ncn, ncndom - 
+number of contributing nodes in the FETI method
+ncndom[i]=j - the i-th subdomain contributes to the coarse problem by j nodes
+
+
+\item
+selnodfeti--$>$contrib\_dofs (top,domproc,out);
+???
+
+\end{itemize}

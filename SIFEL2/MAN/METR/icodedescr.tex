@@ -1,0 +1,323 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Description of the code}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Allocation and Initiation}
+
+The METR starts with function metr\_init, where all data are read
+from input file or files and many of objects and arrays are allocated.
+
+The main objects of the code are allocated at the beginning
+of the function metr\_init.
+\begin{center}
+\begin{tabular}{ll}
+Cp = new probdescc;  & problem description
+\\
+Mp  = new probdesc;  & problem description
+\\
+Tp  = new probdesct;  & problem description
+\\
+Gtm = new gtopology; & general topology for mechanics
+\\
+Gtt = new gtopology; & general topology for transport
+\\
+Gtu = new gtopology; & general topology for unified mesh
+\\
+Mt  = new mechtop; & mechanical topology
+\\
+Tt  = new transtop; & transport topology
+\\
+Ct = new couptop; & coupled topology
+\\
+Mm  = new mechmat; & mechamical materials
+\\
+Tm  = new transmat; & transport materials
+\\
+Cmu = new coupmatu; & coupled materials
+\\
+Cml = new coupmatl; & coupled materials
+\\
+Mc  = new mechcrsec; & mechanical cross sections
+\\
+Tc  = new transcrsec; & transport cross sections
+\\
+Cb = new coupbclc; & coupled cross sections
+\\
+Mb  = new mechbclc; & mechanical boundary conditions
+\\
+Tb  = new transbclc; & transport boundary conditions
+\\
+Outdm = new outdriverm; & description of output
+\\
+Outdt = new outdrivert; & description of output
+\\
+Outdc = new outdriverc; & description of output
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+\item
+Cp--$>$read (in); - reads coupled problem description
+
+\item
+Mp--$>$read (in); - reads mechanical problem description
+
+\item
+Tp--$>$read (in); -  reads transport problem description
+
+
+\item
+Mt--$>$read (in); - reads mechanical topology
+\item
+Tt--$>$read (in); -  reads transport topology
+\item
+Ct--$>$read (in); -  reads coupled topology
+
+
+\item
+Ndofm = Gtm--$>$codenum\_generation (Out); - generates code numbers for mechanical problem
+
+\item
+Ndoft = Gtt--$>$codenum\_generation (Outt); - generates code numbers for transport problem
+
+\item
+Mm--$>$read (in); - reads mechanical materials
+
+\item
+Tm--$>$read (in); - reads transport materials
+
+\item
+Tm--$>$intpointalloc (); - allocates array of integration points
+
+\item
+Tm--$>$intpointinit (); - initiates variables on integration points,
+it defines number of blocks, number of components, type of materials and material id
+
+\item
+Mm--$>$init\_ip\_1 (); - initiates variables on integration points, namely, stress/strain state,
+number of strain/stress components
+
+\item
+Mc--$>$read (in); - reads mechanical cross sections
+
+\item
+Tc--$>$read (in); - reads transport cross sections
+
+\item
+Mb--$>$read (in); - reads mechanical boundary conditions, it means
+prescribed displacements, forces, moments
+
+\item
+Tb--$>$read (in); - reads transport boundary conditions, it means
+Dirichlet, Neumann and Newton
+
+\item
+Tt--$>$elemprescvalue(); - determines elements influenced by prescribed
+values, it is used for assembling of nodal fluxes
+
+\item
+Tb--$>$elemsource (); - determines elements with sources
+
+
+\item
+Lsrs--$>$alloc (); - allocates arrays lhs (array with solution),
+rhs (array with right hand side of the system of equations),
+w (array containing eigenvalues)
+ 
+\item
+Lsrs--$>$initcond (in); - reads initial conditions
+
+\item
+Lsrst--$>$alloc (); - allocates arrays lhs (array with solution),
+rhs (array with right hand side of the system of equations),
+
+\item
+Lsrst--$>$initcond (in); - reads initial conditions
+
+\item
+Outdc--$>$read(in); - reads description of output from the code, namely description
+of output to the output file, file for graphical postprocessors (e.g. GiD) and
+diagrams
+
+\item
+Outdm--$>$read(in); - reads description of output from the code, namely description
+of output to the output file, file for graphical postprocessors (e.g. GiD) and
+diagrams
+
+\item
+Outdt--$>$read(in); - reads description of output from the code, namely description
+of output to the output file, file for graphical postprocessors (e.g. GiD) and
+diagrams
+
+\item
+Mm--$>$init\_ip\_2 (); - allocates arrays on integration points, namely array
+for strains, stresses, other values, nonlocal values;
+function also allocates the array tempr for storage of temperatures
+
+\item
+Mt--$>$alloc\_nodes\_arrays (); - allocates arrays on nodes for
+strains, stresses, other values
+
+\item
+Tt--$>$alloc\_nodes (); - allocates arrays grad and flux
+
+\item
+Mt--$>$give\_maxncompstr(Mm--$>$max\_ncompstrn, Mm--$>$max\_ncompstre); - determines
+maximum number of strain/stress components on integration points
+it is used for output
+
+\item
+Mt--$>$give\_maxncompo(Mm--$>$max\_nncompo, Mm--$>$max\_encompo); - determines
+maximum number of components in array other on integration points
+it is used for output
+
+\item
+Mt--$>$elemprescdisp (); - determines elements influenced by prescribed
+displacements, it is used for assembling of nodal forces
+
+\item
+Mm--$>$alloceigstrains (); - allocates array eigstrains 
+
+\item
+Mm--$>$alloctempstrains (); - allocates array tempstrains
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{data transfer between TRFEL and MEFEL}
+Transfer on the solver level is provided by copy_data function
+where two principal procedures are called:
+\begin{itemize}
+\item {\tt mefel\_trfel()} - transfer of mechanical (non-transport) quantities from MEFEL to TRFEL
+\item {\tt trfel\_mefel()} - transfer of transport (non-mechanical) quantities from TRFEL to MEFEL 
+\end{itemize}
+The names (aliases) of transfered quantities are given in GEFEL header file by
+{\tt galias.h} enumerated types {\tt nonmechquant} and {\tt nontransquant}.
+They must be stored in GEFEL in order to preserve access to these data types both from 
+TRFEL and MEFEL.
+
+
+\subsection {{\tt mefel\_trfel()}}
+There is a loop over all non-transport quantities required by TRFEL whose number is given
+by {\tt transmat::nntq} and names (aliases) are defined by {\tt transmat::ntqo}.
+In this loop, the nodal values of required non-transport (mechanical) quantity are obtained for 
+each TRFEL element by the call of MEFELs {\tt elem\_mechq\_nodval}. The nodal values
+of required quantity are on the given element recalculated into integration points by
+TRFEL {\tt elem\_intpointvalt} and int. point values are stored in {\tt transmat::nontranq} array
+with help of {\tt mehcmat::storenontransq}.
+
+Scheme of {\tt mefel\_trfel()}
+{\tt
+for(i=0; i<nntq; i++)
+{
+  for(j=0; j<Tt->ne; j++)
+  {
+    // j je index prvku TRFELovske site => MEFEL musi mit stejnou sit (max. jine nasady)
+    elem_mechq_nodval(j, nodval, ntqo[i]) // elemswitch.cpp  MEFEL
+      Element[j]::mechq_nodval(j, nodval, ntqo[i])
+        for(k=0; k<Element[j]::nne; k++)
+          mechmat::givemechq(ntqo[i], ipp)
+ 
+    elem_intpointvalt (j, nodval, ipval) // elemswitcht.cpp TRFEL
+      Elementt[j]::intpointval(j, nodval, ipval)
+        #### linbart::intpointval - k cemu je cyklus k ???
+
+    transmat::storenontransq(ntqo[i], ipp, ipval);
+      transmat::nontransq[transmat::ntqid[transmat::ntqo[i]-1]][ipp] = ipval
+  }
+}
+}
+
+Scheme of {\tt trfel\_mefel()}
+{\tt
+for(i=0; i<nnmq; i++)
+{
+  // vytahne danou neznamou z TRFELu na vsech uzlech
+  // gnodv ma mechtop::nn slozek => TRFEL musi mit stejne uzly jako MEFEL
+  nodal_nodal_values(gnodv, nmqo[i])
+  {
+    nnt = transtop::nnt
+    give_transq_nodval(gnodv, nnt, nmqo[i]) // elemswitcht.cpp TRFEL
+    {
+      for(j=0; j<Tt->ne; j++)
+      {
+        // j je index prvku MEFELovske site => TRFEL musi mit stejnou sit (max. jine nasady)
+        elem_transq_nodval(j, nodval, nmqo[i]) // elemswitcht.cpp TRFEL
+          Elementt[j]::transq_nodval(j, nodval, nmqo[i])
+            for(k=0; k<Elementt[j]::nne; k++)
+              nodval[j] = transmat::givetransq(nmqo[i], ipp)
+            
+        for(k=0; k<Elementt[j]::nne; k++)
+          gnodval[Elementt::nodes[j]] = nodval[k]
+      }
+    }
+  }
+
+  if (Cp->lbb==quad_lin)
+    intpointval2 (gnodv, nmqo[i]); // elemswitch.cpp MEFEL
+  else
+    intpointval (gnodv, nmqo[i], 1.0); // elemswitch.cpp MEFEL
+
+}
+}
+
+
+
+
+\section{Partially coupled problems}
+
+\subsection{mechanical part}
+
+\begin{itemize}
+\item
+approximation\_temper (); - (METR/SRC/globmatc.cpp) - approximates nodal temperatures computed in TRFEL
+to integration points of MEFEL, temperatures are stored in array Mm-$>$tempr
+\item
+nodal_nodal_temper_values (gv);
+\item
+intpointval () or intpointval2 () - (MEFEL/SRC/elemswitch.cpp) - calls 
+elem\_intpointval (MEFEL/SRC/elemswitch.cpp) calls Pelq--$>$intpointval (eid,nodval,ipval) (MEFEL/SRC/plelemlq.cpp)
+\end{itemize}
+
+humidity is approximated in a similar manner
+
+Mm--$>$updateipval(); - function updates values stored at integration
+points, usually it copies array other to the array eqother, in the case
+of creep models, it computes some necessary data
+
+mefel_right_hand_side (lcid,f); - computes the right hand side
+in this approach, it calls function Mb->dlc[lcid].assemble (lcid,rhs+lcid*Ndofm,Ndofm,Mp->time);
+This function uses one of the implemented version of load definition. The load is defined
+by time independent load case (loadcase.cpp), where all components are multiplied by
+scale factor which depends on time. The load can be defined also by fully time
+dependent load case (dloadcase.cpp), where particular components have its own time
+function
+
+If the loadcase.cpp is used, it assembles contributions from nodal load, element load,
+prescribed displacements and defined temperature changes. Contributions from temperature are
+calculated by the function loadcase::tempercontrib (long lcid,double *rhs,double scale)
+
+\item
+Mm->temprstrains (lcid) (MEFEL/SRC/loadcase.cpp) - computes temperature
+strains, in the case of time independent problem, it computes directly
+strain caused by given temperature increment (it is read from input
+file). In the case of time
+dependent problems, it computes strains caused by temperature
+increment which is calculated as a difference of actual temperature
+and temperature at the beginning of computation. Increment
+of forces caused by temperature is computed in solver,
+where prescribed forces from previous time step are subtracted
+from actual prescribed forces. Function stores temperature
+strains in array Mm--$>$tempstrains.
+
+
+
+
+
+
+\end{itemize}

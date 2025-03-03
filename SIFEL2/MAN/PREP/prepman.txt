@@ -1,0 +1,407 @@
+Each preprocessor program is based on assigning properties
+to nodes (ndof, local coord. system, load, ...) or elements
+(load, material, element type, ....) by the property number
+generated in the mesh generator (T3D or JKTK). The way how
+the generators assign property numbers to each node or each
+element or element edges is described in their manuals.
+User may use # character for comments. Some sections would
+be enclosed with begin - end keywords as shown in the preprocessor
+file template.
+
+Template of preprocessor file :
+
+# section with description of input files for preprocessor
+
+begin
+ # section with problem description
+end
+
+ # number of load cases
+
+begin
+ # section which assigns nodal property
+end
+
+begin
+ # section which assigns element property
+end
+
+
+SECTION WITH DESCRIPTION OF INPUT FILES FOR PREPROCESSOR
+1) topology file name - preprocessor accepts topology in JKTK format and
+   T3D format
+2) file name of material database       (file format is described later)
+3) file name of cross-section database  (file format is described later)
+4) indicator of topology file format - 0 = JKTK, 1 = T3D
+5) indicator whether edge numbers are present in the topology file.
+   0 = without edge numbers
+   1 = with edge numbers
+
+
+SECTION WITH PROBLEM DESCRIPTION
+This section is introduced with begin keyword and finished with end keyword.
+It contains data about problem description in same format as in the ??FEL
+(MEFEL,TRFEL,...). Data format can be found in the file probdesc?.cpp, function
+read.
+
+
+NUMBER OF LOAD CASES
+A number of load cases should be after keyword end of previous section. In case
+ of
+TRFEL preprocessor there would be number of transported medias.
+
+
+
+SECTION WHICH ASSIGNS NODAL PROPERTY
+The section is introduced with begin keyword and finished with end keyword.
+List of keywords could be found in the file GEFEL/intools.cpp - variable Propkw
+at the begining of file. Line in this section looks like this one :
+
+i kwd kwdpar
+
+Where :
+i      = property number of nodes which user wants assign given parameters
+kwd    = keyword which denotes type of assigned parameters
+kwdpar = parameters of given keyword
+
+For nodes it is possible to use following keywords for MEFEL preprocessor:
+ndofn = number of dof in the node.
+        Keyword parameters : integer number which means number of dofn
+bocon = boundary condition in the node.
+        Keyword parameters :
+        nbc dir_1 con_1 . . . dir_nbc con_nbc
+        Where :
+        nbc = number of condition (integer number)
+        dir = direction of condition (dof in which the condition is prescribed)
+              (positive int. number for static condition,
+               negative int. number for dynamic condition)
+        con = condition
+              dir > 0 -> condition is real number
+                         (zero for support, nonzero for prescribed displacement)
+              dir < 0 ->condition is string with function for parser
+        Number of dofn have to be assigned before user use this keyword.
+nload = nodal load.
+        Keyword parameters :
+        nlc f_1 f_2 . . . f_ndofn
+        Where :
+        nlc = load case number
+        f   = load values for each dofn
+        Number of dofn have to be assigned before user use this keyword.
+crsec = cross-section in the node.
+        Keyword parameters :
+        ct ci
+        Where :
+        ct = cross-section type number by the alias.h
+        ci = cross-section index number which denotes index of
+             cross-section parameters in the cross-section database file.
+lcsys = local coordinate system in the node.
+        Keyword parameters :
+        nv base_vec_1 . . . base_vec_nv
+        Where :
+        nv = number of base vectors
+        base_vec = values of base vectors
+dloadn = dynamic nodal load.
+         Keyword parameters :
+         nlc func_1 . . . func_ndofn
+         Where :
+         nlc  = load case number
+         func = strings with function for parser, which returns
+                load value depending on time. This string should be
+                prescribed in the each dof.
+         Number of dofn have to be assigned before user use this keyword.
+inicon = initial condition in the nodes. It is used esspecially for
+         dynamics and nonlinear statics.
+         Keyword parameters :
+         nlc con_1 . . . con_ndofn
+         Where :
+         nlc  = load case number
+         con  = condition values for each dofn
+         Number of dofn have to be assigned before user use this keyword.
+comcn = common code numbers in the nodes.
+        Keyword parameters :
+        ndir dir_1 . . .  dir_ndir
+        Where :
+        ndir = number of direction in which the common code numbers
+               will be prescribed.
+        dir  = integer number which denotes direction in which code number
+               will be same for given nodes.
+        Number of dofn have to be assigned before user use this keyword.
+ntemp = Temperature load in the node
+        Keyword parameters :
+        nlc val
+        Where :
+        nlc = load case number
+        val = temperature value.
+
+For nodes it is possible to use following keywords for TRFEL preprocessor:
+bocon = boundary condition in the node.
+        Keyword parameters :
+        ndir dir_1 tf_1 con_1 . . . dir_ndir tf_ndir con_ndir
+        Where :
+        ndir = number of condition (integer number)
+        dir  = direction of condition (dof in which the condition is prescribed)
+        tf   = type of time function for condition by the GEFEL/galias.h
+               It is possible to use static func, parser funct table func. or
+               set of parser func.
+        con  = condition.
+               tf = stat -> con = real number.
+               tf = pars -> con = string with function for parser
+               tf = tab  -> con = table of function values. See GEFEL/tablefunct.h|cpp
+                    con = size ityp x_1 y1 . . . x_size y_size
+                    Where :
+                    size = number of values in the table
+                    ityp = integer which defines type interpolation of function
+                           See tablefunct.h
+                    x, y = values for each point in the table.
+               tf = par_set -> con = several strings for parser.See GEFEL/gfunct.h|cpp
+               con = neq x_1 func_1
+                         .
+                         .
+                         x_neq func_neq
+               Where :
+               neq = number of function
+               x   = limit values
+               func = string with function for parser. Note that each string
+                      have to be
+                      on extra line.
+crsec = cross-section in the node.
+        Keyword parameters :
+        ct ci
+        Where :
+        ct = cross-section type number by the aliast.h
+        ci = cross-section index number which denotes index of
+             cross-section parameters in the cross-section database file.
+inicon = initial condition in the nodes. It is used esspecially for
+         Keyword parameters :
+         nlc con_1 . . . con_ndofn
+         Where :
+         nlc  = load case number
+         con  = condition values for each dofn
+         Number of dofn have to be assigned before user use this keyword.
+comcn = common code numbers in the nodes.
+        Keyword parameters :
+        ndir dir_1 . . .  dir_ndir
+        Where :
+        ndir = number of direction in which the common code numbers
+               will be prescribed.
+        dir  = integer number which denotes direction in which code number
+               will be same for given nodes.
+        Number of dofn have to be assigned before user use this keyword.
+ntemp = source in the node
+        Keyword parameters :
+        nlc tf val
+        Where :
+        nlc = load case number
+        tf  = type of time function for condition by the GEFEL/galias.h
+               It is possible to use static func, parser funct table func. or
+               set of parser func.
+        val  = source value.
+               tf = stat -> val = real number.
+               tf = pars -> val = string with function for parser
+               tf = tab  -> val = table of function values. See GEFEL/tablefunct.h|cpp
+                    val = size ityp x_1 y1 . . . x_size y_size
+                    Where :
+                    size = number of values in the table
+                    ityp = integer which defines type interpolation of function
+                           See tablefunct.h
+                    x, y = values for each point in the table.
+               tf = par_set -> val = several strings for parser.See
+               val = neq x_1 func_1
+                         .
+                         .
+                         .
+                         x_neq func_neq
+
+               Where :
+               neq = number of function
+               x   = limit values
+               func = string with function for parser. Note that each string
+                      have to be
+                      on extra line.
+
+
+SECTION WHICH ASSIGNS ELEMENT PROPERTY
+The section is introduced with begin keyword and finished with end keyword.
+List of keywords could be found in the file GEFEL/intools.cpp - variable Propkw
+at the beginig of file. Line in this section looks like this one :
+
+i kwd kwdpar
+
+Where :
+i      = property number of elements which user wants assign given parameters
+         In some cases this number means edge number, as will be described
+ later.
+kwd    = keyword which denotes type of assigned parameters
+kwdpar = parameters of given keyword
+
+For elements it is possible to use following keywords for MEFEL:
+eltype = element type number by the alias.h
+         Keyword parameters :
+         sel tel [sss]
+         Where :
+         sel = shape element number which is defined in the file
+               GEFEL/siftop_element_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         tel = element type number by the alias.h
+         sss = this parameter defines planestress/planestrain state
+               for plane elements by the alias.h . THIS PARAMETER IS
+               USED ONLY FOR PLANE ELEMENTS so the square brackets in the
+               keyword parameters record is used in this manual to emphasize
+               optionallity.
+crsec  = cross-section in the element.
+         Keyword parameters :
+         ct ci
+         Where :
+         ct = cross-section type number by the alias.h
+         ci = cross-section index number which denotes index of
+              cross-section parameters in the cross-section database file.
+mater = material in the element.
+        Keyword parameters :
+        ct ci
+        Where :
+        ct = material type number by the alias.h
+        ci = material index number which denotes index of
+             material parameters in the material database file.
+eload =  plane/volume load of element.
+         Keyword parameters :
+         nlc ndl f_1_1 . . . f_1_ndl . . . . . . f_nne_1 . . . f_nne_ndl
+         Where :
+         nlc = load case number
+         ndl = number of load direction
+         f   = load value for each direction in the each element node.
+loadedge = static load of element edge. In this case the property number
+           means edge number.
+           Keyword parameters :
+           nlc ndir xa ya za fa_1 . . . fa_ndir xb yb zb fb_1 . . . fb_ndir
+           Where :
+           nlc = load case number.
+           ndir = number of load direction.
+           xa, ya, za = x,y,z coordinates of the first point of the loaded edge.
+           fa  = load values in the each direction for the first point.
+           xb, yb, zb = x,y,z coordinates of the second point of the loaded
+                        edge.
+           fb  = load values in the each direction for the second point.
+sscomp = stress/strain computation. This keyword defines where the stress/strains
+         should be computed.
+         Keyword parameters :
+         sel ep [ps]
+         Where :
+         sel = shape element number which is defined in the file
+               GEFEL/siftop_element_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         ep = integer number which defines wher the laues are computed. See alias.h
+               ep = 0 - nowher
+               ep = 1 - integration points
+               ep = 2 - nodes
+               ep = 3 - user defined point set
+         ps = set of user defined points. This value is required ONLY when ep = 3,
+              so the square brackets in the keyword parameters record is used in
+              this manual to emphasize optionallity.
+              See pointset.cpp for format of point set data - function read.
+dloadel = dynamic element load. Not implemented yet.
+
+For elements it is possible to use following keywords for TRFEL:
+eltype = element type number by the aliast.h
+         Keyword parameters :
+         sel tel
+         Where :
+         sel = shape element number which is defined in the file
+               GEFEL/siftop_element_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         tel = element type number by the aliast.h
+crsec  = cross-section in the element.
+         Keyword parameters :
+         ct ci
+         Where :
+         ct = cross-section type number by the aliast.h
+         ci = cross-section index number which denotes index of
+              cross-section parameters in the cross-section database file.
+mater = material in the element.
+        Keyword parameters :
+        ct ci
+        Where :
+        ct = material type number by the aliast.h
+        ci = material index number which denotes index of
+             material parameters in the material database file.
+loadedge = boundary condition on element edge. In this case the property number
+           means edge number.
+           Keyword parameters :
+           nlc tc tf xa ya za fa xb yb zb fb [ktr]
+           Where :
+           nlc = load case number.
+           tc  = type of condition
+                 tc = 2  - condition means prescribed flux
+                 tc = 3  - condition means prescribed transmition
+           tf  = type of time function for condition by the GEFEL/galias.h
+                 It is possible to use static func, parser funct table func. or
+                 set of parser func.
+           xa, ya, za = x,y,z coordinates of the first point of the loaded edge.
+           fa  = condition value.
+                 tf = stat -> fa = real number.
+                 tf = pars -> fa = string with function for parser
+                 tf = tab  -> fa = table of function values. See GEFEL/tablefunct.h|cpp
+                      fa = size ityp x_1 y1 . . . x_size y_size
+                      Where :
+                      size = number of values in the table
+                      ityp = integer which defines type interpolation of
+                             function
+                             See tablefunct.h
+                      x, y = values for each point in the table.
+                 tf = par_set -> fa = several strings for parser.See GEFEL/gfunct.h|cpp
+                 fa = neq x_1 func_1
+                           .
+                           .
+                           .
+                          x_neq func_neq
+                 Where :
+                 neq = number of function
+                 x   = limit values
+                 func = string with function for parser. Note that each string
+                        have to be on extra line.
+           xb, yb, zb = x,y,z coordinates of the second point of the loaded edge.
+           fb  = condition values for the second point. Syntax is same as for
+                 fa.
+           ktr = coefficient of transmition. This parameter is need only
+                 in case that tc = 3. so the square brackets in the
+                 keyword parameters record is used in this manual to emphasize
+                 optionallity.
+
+
+MATERIAL DATABASE FILE FORMAT
+This file contains information about material properties. It can be used one
+file of material database for different task but only for one type of problem i.e user
+should have one file for mechanics and one file for transport problems.
+User may use # character for comments.
+File format :
+
+ntm
+tm_1 ni_1
+line_1
+line_2
+.
+.
+line_ni_1
+.
+.
+
+.
+tm_ntm ni_ntm
+line_1
+line_2
+.
+.
+line_ni_ntm
+
+Where :
+ntm  = number of different type of materials
+tm   = number which denotes type of material by the alias?.h
+ni   = number of different sets of material parameters for given material
+       type
+line = line with material parameters
+
+CROSS-SECTION DATABASE FILE FORMAT
+File format is same as in the material database. Only lines contains data about
+cross-section instead of material.

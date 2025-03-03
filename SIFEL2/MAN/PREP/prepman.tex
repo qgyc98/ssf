@@ -1,0 +1,528 @@
+\documentclass[12pt]{book}
+\newcommand{\mbf}[1]{\mbox{\boldmath$#1$}}
+% definice zlomku
+\newcommand{\del}[2]{\mbox{$\displaystyle\frac{#1}{#2}$}}
+% definice prvni parcialni derivace funkce
+\newcommand{\ppd}[2]{\del{\partial{#1}}{\partial{#2}}}
+% definice druhe parcialni derivace funkce podle x a y
+\newcommand{\dpd}[3]{\del{\partial^{2}\>\!\!{#1}}{\partial{#2}\ \partial{#3}}}
+% definice n-te parcialni derivace funkce
+\newcommand{\npd}[3]{\del{\partial^{#1}\>\!\!{#2}}{\partial{#3}^{#1}}}
+% definice prvni derivace funkce
+\newcommand{\od}[2]{\del{{\rm d}\>\!{#1}}{{\rm d}{#2}}}
+% definice n-te obycejne derivace funkce
+\newcommand{\nod}[3]{\del{{\rm d}^{#1}\>\!\!{#2}}{{\rm d}{#3}^{#1}}}
+\usepackage{makeidx}
+\makeindex
+
+\setcounter{secnumdepth}{4}
+\setcounter{totalnumber}{4}
+\oddsidemargin=5mm
+\evensidemargin=5mm
+\textwidth=160mm
+\topmargin=-2.0cm
+\textheight=250mm
+\headheight=1.5cm
+
+
+\begin{document}
+\tableofcontents
+\chapter {PREPROCESSOR MANUAL}
+
+\section{INTRODUCTION}
+
+Each preprocessor program is based on assigning properties
+to nodes (ndof, local coord. system, load, ...) or elements
+(load, material, element type, ....) by the property number
+generated in the mesh generator (T3D or JKTK). The way how
+the generators assign property numbers to each node or each
+element or element edges is described in their manual.
+User may use \# character for comments. Some sections would
+be enclosed with begin - end keywords as shown in the preprocessor
+file template.
+\\
+\\
+Template of preprocessor file :\\ \\
+{\it
+\# section with description of input files for the preprocessor\\
+\\
+begin\\
+ \# section with a problem description \\
+end\\
+\\ 
+ \# number of load cases \\
+\\ 
+begin \\
+ \# section which assigns nodal properties \\
+end \\
+\\
+begin \\
+ \# section which assigns element properties\\
+end\\
+\\
+begin\\
+ \# section with a output description \\
+end\\
+}
+
+\section {THE SECTION WITH DESCRIPTION OF INPUT FILES FOR PREPROCESSOR}
+This section of the input file should contain following data :
+\begin{itemize}
+\item topology file name - preprocessor accepts topology in JKTK format and
+   T3D format
+\item file name of material database       (file format is described later)
+\item file name of cross-section database  (file format is described later)
+\item indicator of topology file format - 0 = JKTK, 1 = T3D
+\item indicator whether edge numbers are present in the topology file.
+   0 = without edge numbers,
+   1 = with edge numbers
+\end{itemize}
+
+\section{THE SECTION WITH PROBLEM DESCRIPTION}
+This section is introduced with begin keyword and finished with end keyword.
+It contains data with problem description in same format as in the ??FEL
+(MEFEL,TRFEL,...). Data format can be found in the file probdesc?.cpp, function
+read.
+
+
+\section{THE NUMBER OF LOAD CASES}
+The number of load cases should be after the keyword end of the previous section. In case
+ of the TRFEL preprocessor, there would be number of transported medias.
+
+
+
+\section{THE SECTION WHICH ASSIGNS NODAL PROPERTIES}
+The section is introduced with the begin keyword and finished with the end keyword.
+The list of keywords could be found in the file GEFEL/intools.cpp - variable Propkw
+at the begining of file. Line in this section looks like this one : \\
+\\
+$i$ $kwd$ $kwdpar$\\
+\\
+Where :
+\begin{itemize}
+\item i      = property number of nodes which user wants to assign given parameters
+\item kwd    = keyword which denotes type of assigned parameters
+\item kwdpar = parameters of given keyword\\ \\
+\end{itemize}
+
+For nodes it is possible to use following keywords at the {\bf MEFEL} preprocessor:
+\begin{itemize}
+\item ndofn = number of dofs in the node.
+        Keyword parameters : integer number which means number of dofn
+\item bocon = boundary condition in the node.\\
+        Keyword parameters :\\
+        $nbc$ $dir_1$ $con_1$ . . . $dir_{nbc}$ $con_{nbc}$\\
+        Where :
+        \begin{itemize}
+        \item nbc = number of conditions (integer number)
+        \item dir = direction of condition (that means a dof in which the condition is prescribed)
+              (positive int. number for static condition,
+               negative int. number for dynamic condition)
+        \item con = condition\\
+              dir $>$ 0 - condition is real number
+                         (zero means a support, nonzero means a prescribed displacement)\\
+              dir $<$ 0 - condition is string with function for the parser\\
+        \end{itemize}
+        The number of nodal dofs have to be assigned before the user use this keyword.        
+\item nload = nodal load.\\
+        Keyword parameters :\\
+        $nlc$ $f_1$ $f_2$ . . . $f_{ndofn}$\\
+        Where :
+        \begin {itemize}
+        \item nlc = load case number
+        \item f   = load values for each dofn
+        \end{itemize}
+        The number of nodal dofs have to be assigned before user use this keyword.
+\item crsec = cross-section in the node.\\
+        Keyword parameters :\\
+        $ct$ $ci$\\
+        Where :
+        \begin{itemize}
+        \item ct = cross-section type number by the alias.h
+        \item ci = cross-section index number which denotes index of
+             cross-section parameters in the cross-section database file.
+        \end{itemize}
+\item lcsys = local coordinate system in the node.\\
+        Keyword parameters :\\
+        $nv$ $base\_vec_1$ . . . $base\_vec_{nv}$\\
+        Where :
+        \begin{itemize}
+        \item nv = number of base vectors
+        \item base\_vec = values of base vectors
+        \end{itemize}
+\item dloadn = dynamic nodal load.\\
+         Keyword parameters :\\
+         $nlc$ $func_1$ . . . $func_{ndofn}$\\
+         Where :
+         \begin{itemize}
+         \item nlc  = load case number
+         \item func = strings with function for parser, which returns
+                load value depending on time. This string should be
+                prescribed in the each dof.
+         \end{itemize}
+         Number of dofn have to be assigned before user use this keyword.
+
+\item inicon = initial condition in the nodes. It is used esspecially for
+         dynamics and nonlinear statics.\\
+         Keyword parameters :\\
+         $nlc$ $con_1$ . . . $con_{ndofn}$\\
+         Where :
+         \begin{itemize}
+         \item nlc  = load case number
+         \item con  = condition values for each dofn
+         \end{itemize}
+         Number of dofn have to be assigned before user use this keyword.
+\item comcn = common code numbers in the nodes.\\
+        Keyword parameters :\\
+        $ndir$ $dir_1$ . . .  $dir_{ndir}$\\
+        Where :
+        \begin{itemize}
+        \item ndir = number of direction in which the common code numbers
+               will be prescribed.
+        \item dir  = integer number which denotes direction in which code number
+               will be same for given nodes.
+        \end{itemize}
+        Number of dofn have to be assigned before user use this keyword.
+\item ntemp = Temperature load in the node.\\
+        Keyword parameters :\\
+        $nlc$ $val$\\
+        Where :
+        \begin{itemize}
+        \item nlc = load case number
+        \item val = temperature value.\\ \\
+        \end{itemize} 
+\end{itemize} %end of MEFEL nodal properties keywords items
+
+
+For nodes it is possible to use following keywords for {\bf TRFEL} preprocessor:
+\begin{itemize}
+\item bocon = boundary condition in the node.\\
+        Keyword parameters :\\
+        $ndir$ $dir_1$ $tf_1$ $con_1$ . . . $dir_{ndir}$ $tf_{ndir}$ $con_{ndir}$\\
+        Where :\\
+        \begin{itemize}
+        \item ndir = number of condition (integer number)
+        \item dir  = direction of condition (dof in which the condition is prescribed)
+        \item tf   = type of time function for condition by the GEFEL/galias.h
+               It is possible to use static func, parser funct table func. or
+               set of parser func.
+        \item con  = condition.
+               \begin {itemize}
+               \item tf = stat $\to$ con = real number.
+               \item tf = pars $\to$ con = string with function for parser
+               \item tf = tab  $\to$ con = table of function values. See GEFEL/tablefunct.h$\mid$cpp\\
+                    con = $size$ $ityp$ $x_1$ $y_1$ . . . $x_{size}$ $y_{size}$\\
+                    Where :
+                    \begin{itemize}
+                    \item size = number of values in the table
+                    \item ityp = integer which defines type interpolation of function
+                           See tablefunct.h
+                    \item x, y = values for each point in the table.
+                    \end{itemize}
+               \item tf = $par\_set$ $\to$ con = several strings for parser.See GEFEL/gfunct.h$\mid$cpp\\
+               con = $neq$ $x_1$ $func_1$\\
+                         .\\
+                         .\\
+                         $x_{neq}$ $func_{neq}$\\
+               Where :
+               \begin{itemize}
+               \item neq = number of function
+               \item x   = limit values
+               \item func = string with function for parser. Note that each string
+                      have to be on extra line.
+               \end{itemize}
+              \end{itemize} %end of con item
+        \end{itemize} % end of bocon item
+\item crsec = cross-section in the node.\\
+        Keyword parameters :\\
+        $ct$ $ci$\\
+        Where :
+        \begin{itemize}
+        \item ct = cross-section type number by the aliast.h
+        \item ci = cross-section index number which denotes index of
+             cross-section parameters in the cross-section database file.
+        \end{itemize}
+\item inicon = initial condition in the nodes. It is used esspecially for\\
+         Keyword parameters :\\
+         $nlc$ $con_1$ . . . $con_{ndofn}$\\
+         Where :
+         \begin{itemize}
+         \item nlc  = load case number
+         \item con  = condition values for each dofn
+         \end{itemize}
+         Number of dofn have to be assigned before user use this keyword.
+\item comcn = common code numbers in the nodes.\\
+        Keyword parameters :\\
+        $ndir$ $dir_1$ . . .  $dir_{ndir}$\\
+        Where :
+        \begin{itemize}
+        \item ndir = number of direction in which the common code numbers
+               will be prescribed.
+        \item dir  = integer number which denotes direction in which code number
+               will be same for given nodes.
+        \end{itemize}
+        Number of dofn have to be assigned before user use this keyword.
+\item ntemp = source in the node\\
+        Keyword parameters :\\
+        $nlc$ $tf$ $val$\\
+        Where :
+        \begin{itemize}
+        \item nlc = load case number
+        \item tf  = type of time function for condition by the GEFEL/galias.h
+               It is possible to use static func, parser funct table func. or
+               set of parser func.
+        \item val  = source value.
+               \begin{itemize}
+               \item tf = stat $\to$ val = real number.
+               \item tf = pars $\to$ val = string with function for parser
+               \item tf = tab  $\to$ val = table of function values. See GEFEL/tablefunct.h$\mid$cpp\\
+                    val = $size$ $ityp$ $x_1$ $y_1$ . . . $x_{size}$ $y_{size}$\\
+                    Where :
+                    \begin {itemize}
+                    \item size = number of values in the table
+                    \item ityp = integer which defines type interpolation of function
+                           See tablefunct.h
+                    \item x, y = values for each point in the table.
+                    \end{itemize} 
+               \item tf = $par_{set}$ $\to$ val = several strings for parser.\\
+                     val = $neq$ $x_1$ $func_1$\\
+                         .\\
+                         .\\
+                         .\\
+                         $x_{neq}$ $func_{neq}$\\
+               Where :
+                 \begin{itemize}
+                 \item neq = number of function
+                 \item x   = limit values
+                 \item func = string with function for parser. Note that each string
+                        have to be on extra line.
+                 \end{itemize}
+               \end{itemize} %end of tf items
+           \end{itemize} %end of ntemp items
+\end{itemize} %end of nodal properties keywords items for TRFEL
+
+
+\section {SECTION WHICH ASSIGNS ELEMENT PROPERTIES}
+The section is introduced with begin keyword and finished with end keyword.
+List of keywords could be found in the file GEFEL/intools.cpp - variable Propkw
+at the beginig of file. Line in this section looks like this one :\\
+
+$i$ $kwd$ $kwdpar$\\
+
+Where :\\
+\begin{itemize}
+\item i = property number of elements which user wants to assign given parameters
+          In some cases this number means edge number, as will be described latter.
+\item kwd    = keyword which denotes type of assigned parameters
+\item kwdpar = parameters of given keyword\\ \\
+\end{itemize}
+
+For elements it is possible to use following keywords for {\bf MEFEL}:
+\begin{itemize}
+\item eltype = element type number by the alias.h\\
+         Keyword parameters :\\
+         $sel$ $tel$ $[sss]$\\
+         Where :
+         \begin{itemize}
+         \item sel = shape element number which is defined in the file
+               GEFEL/siftop\_element\_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         \item tel = element type number by the alias.h
+         \item sss = this parameter defines planestress/planestrain state
+               for plane elements by the alias.h . THIS PARAMETER IS
+               USED ONLY FOR PLANE ELEMENTS so the square brackets in the
+               keyword parameters record is used in this manual to emphasize
+               optionallity.
+         \end{itemize}
+\item crsec  = cross-section in the element.\\
+         Keyword parameters :\\
+         $ct$ $ci$\\
+         Where :
+         \begin {itemize}
+         \item ct = cross-section type number by the alias.h
+         \item ci = cross-section index number which denotes index of
+              cross-section parameters in the cross-section database file.
+         \end{itemize}
+\item mater = material in the element.\\
+        Keyword parameters :\\
+        $ct$ $ci$\\
+        Where :
+        \begin{itemize}
+        \item ct = material type number by the alias.h
+        \item ci = material index number which denotes index of
+             material parameters in the material database file.
+        \end{itemize}
+\item eload =  plane/volume load of element.\\
+         Keyword parameters :\\
+         $nlc$ $ndl$ $f_{1,1}$ . . . $f_{1,ndl}$ . . . . . . $f_{nne,1}$ . . . $f_{nne,ndl}$\\
+         Where :
+         \begin{itemize}
+         \item nlc = load case number
+         \item ndl = number of load direction
+         \item f   = load value for each direction in the each element node.
+         \end{itemize}
+\item loadedge = static load of element edge. In this case the property number
+           means edge number.\\
+           Keyword parameters :\\
+           $nlc$ $ndir$ $xa$ $ya$ $za$ $fa_1$ . . . $fa_{ndir}$ $xb$ $yb$ $zb$ $fb_1$ . . . $fb_{ndir}$\\
+           Where :
+           \begin{itemize}
+           \item nlc = load case number.
+           \item ndir = number of load direction.
+           \item xa, ya, za = x,y,z coordinates of the first point of the loaded edge.
+           \item fa  = load values in the each direction for the first point.
+           \item xb, yb, zb = x,y,z coordinates of the second point of the loaded
+                        edge.
+           \item fb  = load values in the each direction for the second point.
+           \end{itemize}
+\item sscomp = stress/strain computation. This keyword defines where the stress/strains
+         should be computed.\\
+         Keyword parameters :\\
+         $sel$ $ep$ $[ps]$
+         Where :
+         \begin{itemize}
+         \item sel = shape element number which is defined in the file
+               GEFEL/siftop\_element\_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         \item ep = integer number which defines wher the laues are computed. See alias.h\\
+               \begin{itemize}  
+               \item ep = 0 - nowher
+               \item ep = 1 - integration points
+               \item ep = 2 - nodes
+               \item ep = 3 - user defined point set
+               \end{itemize}
+         \item ps = set of user defined points. This value is required ONLY when ep = 3,
+              so the square brackets in the keyword parameters record is used in
+              this manual to emphasize optionallity.
+              See pointset.cpp for format of point set data - function read.
+         \end{itemize}
+\item dloadel = dynamic element load. Not implemented yet.\\ \\
+\end{itemize}
+For elements it is possible to use following keywords for {\bf TRFEL}:
+\begin{itemize}
+\item eltype = element type number by the aliast.h\\
+         Keyword parameters :\\
+         $sel$ $tel$\\
+         Where :
+         \begin{itemize}
+         \item sel = shape element number which is defined in the file
+               GEFEL/siftop\_element\_types.h . This number has been defined
+               due to mixed meshs where different types of elements
+               have the same property number.
+         \item tel = element type number by the aliast.h
+         \end{itemize}
+\item crsec  = cross-section in the element.\\
+         Keyword parameters :\\
+         $ct$ $ci$\\
+         Where :
+         \begin{itemize}
+         \item ct = cross-section type number by the aliast.h
+         \item ci = cross-section index number which denotes index of
+              cross-section parameters in the cross-section database file.
+         \end{itemize}
+\item mater = material in the element.\\
+        Keyword parameters :\\
+        $ct$ $ci$\\
+        Where :
+        \begin{itemize}
+        \item ct = material type number by the aliast.h
+        \item ci = material index number which denotes index of
+             material parameters in the material database file.
+        \end{itemize}
+\item loadedge = boundary condition on element edge. In this case the property number
+           means edge number.\\
+           Keyword parameters :\\
+           $nlc$ $tc$ $tf$ $xa$ $ya$ $za$ $fa$ $xb$ $yb$ $zb$ $fb$ $[ktr]$\\
+           Where :
+           \begin{itemize}
+           \item nlc = load case number.
+           \item tc  = type of condition
+                 \begin{itemize}
+                 \item tc = 2  - condition means prescribed flux
+                 \item tc = 3  - condition means prescribed transmition
+                 \end{itemize}
+           \item tf  = type of time function for condition by the GEFEL/galias.h
+                 It is possible to use static func, parser funct table func. or
+                 set of parser func.
+           \item xa, ya, za = x,y,z coordinates of the first point of the loaded edge.
+           \item fa  = condition value.
+                 \begin{itemize}
+                 \item tf = stat $\to$ fa = real number.
+                 \item tf = pars $\to$ fa = string with function for parser
+                 \item tf = tab  $\to$ fa = table of function values. See GEFEL/tablefunct.h$\mid$cpp\\
+                      fa = $size$ $ityp$ $x_1$ $y_1$ . . . $x_{size}$ $y_{size}$\\
+                      Where :
+                      \begin{itemize}
+                      \item size = number of values in the table
+                      \item ityp = integer which defines type interpolation of
+                             function. See tablefunct.h
+                      \item x, y = values for each point in the table.
+                      \end{itemize}
+                 \item tf = $par\_set$ $\to$ fa = several strings for parser.See GEFEL/gfunct.h$\mid$cpp\\
+                 fa = $neq$ $x_1$ $func_1$\\
+                           .\\
+                           .\\
+                           .\\
+                          $x_{neq}$ $func_{neq}$\\
+                 Where :
+                 \begin{itemize}
+                 \item neq = number of function
+                 \item x   = limit values
+                 \item func = string with function for parser. Note that each string
+                        have to be on extra line.
+                 \end{itemize}
+                \end{itemize}%end of tf items
+           \item xb, yb, zb = x,y,z coordinates of the second point of the loaded edge.
+           \item fb  = condition values for the second point. Syntax is same as for fa.
+           \item ktr = coefficient of transmition. This parameter is need only
+                 in case that tc = 3. so the square brackets in the
+                 keyword parameters record is used in this manual to emphasize
+                 optionallity.
+          \end{itemize}%end of loadedge items
+\end{itemize}%end of TRFEL element properties keywords
+
+\section{THE SECTION WITH OUTPUT DESCRIPTION}
+This section is introduced with begin keyword and finished with end keyword.
+It contains data with output description in same format as in the ??FEL
+(MEFEL,TRFEL,...). Data format can be found in the file outdriver?.cpp, function
+read.
+
+\section {MATERIAL DATABASE FILE FORMAT}
+This file contains information about material properties. It can be used one
+file of material database for different task but only for one type of problem i.e user
+should have one file for mechanics and one file for transport problems.
+User may use \# character for comments.
+File format :\\
+{\it
+ntm\\
+$tm_1$ $ni_1$\\
+$line_1$\\
+$line_2$\\
+.\\
+.\\
+$line_{ni,1}$\\
+.\\
+.\\ \\
+
+.\\
+$tm_{ntm}$ $ni_{ntm}$\\
+$line_1$\\
+$line_2$\\
+.\\
+.\\
+$line_{ni,ntm}$\\\\
+}
+Where :
+\begin{itemize}
+\item ntm  = number of different type of materials
+\item tm   = number which denotes type of material by the alias?.h
+\item ni   = number of different sets of material parameters for given material type
+\item line = line with material parameters
+\end{itemize}
+
+\section {CROSS-SECTION DATABASE FILE FORMAT}
+File format is same as in the material database. Only lines contains data about
+cross-section instead of material.
+\end{document}

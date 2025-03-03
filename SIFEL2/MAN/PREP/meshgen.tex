@@ -1,0 +1,1013 @@
+\documentclass[12pt]{book}
+\newcommand{\mbf}[1]{\mbox{\boldmath$#1$}}
+% definice zlomku
+\newcommand{\del}[2]{\mbox{$\displaystyle\frac{#1}{#2}$}}
+% definice prvni parcialni derivace funkce
+\newcommand{\ppd}[2]{\del{\partial{#1}}{\partial{#2}}}
+% definice druhe parcialni derivace funkce podle x a y
+\newcommand{\dpd}[3]{\del{\partial^{2}\>\!\!{#1}}{\partial{#2}\ \partial{#3}}}
+% definice n-te parcialni derivace funkce
+\newcommand{\npd}[3]{\del{\partial^{#1}\>\!\!{#2}}{\partial{#3}^{#1}}}
+% definice prvni derivace funkce
+\newcommand{\od}[2]{\del{{\rm d}\>\!{#1}}{{\rm d}{#2}}}
+% definice n-te obycejne derivace funkce
+\newcommand{\nod}[3]{\del{{\rm d}^{#1}\>\!\!{#2}}{{\rm d}{#3}^{#1}}}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\makeindex
+
+\setcounter{secnumdepth}{4}
+\setcounter{totalnumber}{4}
+\oddsidemargin=5mm
+\evensidemargin=5mm
+\textwidth=160mm
+\topmargin=-2.0cm
+\textheight=250mm
+\headheight=1.5cm
+
+
+\begin{document}
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{MESH GENERATION}
+
+This chapter describes available simple mesh generators especially for the SIFEL code.
+The mesh generators are not comparable with real mesh generators because they have
+strongly limited branch of application but they are very comfortable for simple domain shapes
+and simple boundary conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{SIFEL mesh file format}
+
+SIFEL Mesh format has the following form
+
+\noindent
+{\tt
+nn\\
+x y z np\\
+:\\
+x y z np\\
+ne et\\
+m n1 n2 ... nm ep\\
+:\\
+m n1 n2 ... nm ep\\
+}
+
+\noindent
+Notation:
+
+\noindent
+\begin{tabular}{ll}
+nn & number of nodes
+\\
+x,y,z & node coordinates
+\\
+np & property of the node
+\\
+ne & number of elements
+\\
+et & type of element
+\\
+m & number of nodes on one element
+\\
+n1, ..., nm & node numbers on element
+\end{tabular}
+
+\noindent
+Example of file with mesh in the SIFEL mesh format. The length of the
+rectangle in the $x$-direction is 4 m, in the $y$-direction is 3 m.
+There are 2 elements along both directions. The mesh contains 9 nodes
+and 4 quadrilateral elements.
+\noindent
+{\tt
+9\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0 \\
+0.0000000000e+00 1.5000000000e+00 0.0000000000e+00 0 \\
+0.0000000000e+00 3.0000000000e+00 0.0000000000e+00 0 \\
+2.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3 \\
+2.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4 \\
+2.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1 \\
+4.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2 \\
+4.0000000000e+00 1.5000000000e+00 0.0000000000e+00 2 \\
+4.0000000000e+00 3.0000000000e+00 0.0000000000e+00 2 \\
+4 5\\
+4 5 2 1 4 0\\
+4 6 3 2 5 0\\
+4 8 5 4 7 0\\
+4 9 6 5 8 0\\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Two dimensional mesh generation}
+
+For simple code testing of two dimensional problems, several simple mesh generators on rectangular
+domain have been developed. Namely, generators of quadrilaterals with four nodes, quadrilaterals
+with eight nodes, triangles with three nodes and triangles with 6 nodes have been implemented.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of rectangles with four nodes}
+
+The mesh generator of rectangles with four nodes on rectangular domain is in the file gensifquad.cpp.
+Executable file is denoted {\tt gquad}. The code generates rectangular elements on a rectangular domain
+in the $xy$ plane. The length of the domain in the $x$ direction is lx while the length in the $y$ direction
+is ly. All $z$ coordinates are equal to zero. Nodes on left edge ($x$=0.0) of the rectangle
+are denoted by property 0. Nodes on top edge ($y$=ly) of the rectangle are denoted by property 1.
+Nodes on right edge ($x$=lx) of the rectangle are denoted by property 2. Nodes on bottom edge ($y$=0.0)
+of the rectangle are denoted property 3. All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt gquad file\_name lx ly nx ny write\_edge\_num}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+lx & length of the rectangle in the $x$ direction
+\\
+ly & length of the rectangle in the $y$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+write\_edge\_num & switch for edge number output
+\\
+\end{tabular}
+\end{center}
+
+\noindent
+Switch for edge number output is 0 or 1. 0 means no edge number output
+while 1 means write edge numbers.
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Rectangular domain with the length in the $x$ direction is 4 m and in the
+$y$ direction is 3 m. Two elements are required along both sides.
+
+\noindent
+Command
+
+{\tt gquad quad.top 4 3 2 2 0}
+
+\noindent
+Output
+
+\noindent
+{\tt
+9\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0 \\
+0.0000000000e+00 1.5000000000e+00 0.0000000000e+00 0 \\
+0.0000000000e+00 3.0000000000e+00 0.0000000000e+00 0 \\
+2.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3 \\
+2.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4 \\
+2.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1 \\
+4.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2 \\
+4.0000000000e+00 1.5000000000e+00 0.0000000000e+00 2 \\
+4.0000000000e+00 3.0000000000e+00 0.0000000000e+00 2 \\
+4 5\\
+4 5 2 1 4 0\\
+4 6 3 2 5 0\\
+4 8 5 4 7 0\\
+4 9 6 5 8 0\\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of rectangles with eight nodes}
+
+The mesh generator of rectangles with eight nodes on rectangular domain is in the file gensifquadq.cpp.
+Executable file is denoted {\tt gquadq}. The code generates rectangular elements on a rectangular domain
+in the $xy$ plane. The length of the domain in the $x$ direction is lx while the length in the $y$ direction
+is ly. All $z$ coordinates are equal to zero. Nodes on left edge ($x$=0.0) of the rectangle
+are denoted by property 0. Nodes on top edge ($y$=ly) of the rectangle are denoted by property 1.
+Nodes on right edge ($x$=lx) of the rectangle are denoted by property 2. Nodes on bottom edge ($y$=0.0)
+of the rectangle are denoted property 3. All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt gquadq file\_name lx ly nx ny write\_edge\_num}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+lx & length of the rectangle in the $x$ direction
+\\
+ly & length of the rectangle in the $y$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+write\_edge\_num & switch for edge number output
+\\
+\end{tabular}
+\end{center}
+
+\noindent
+Switch for edge number output is 0 or 1. 0 means no edge number output
+while 1 means write edge numbers.
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Rectangular domain with the length in the $x$ direction is 4 m and in the
+$y$ direction is 3 m. Two elements are required along both sides.
+
+\noindent
+Command
+
+{\tt gquadq quadq.top 4 3 2 2 0}
+
+\noindent
+Output
+
+\noindent
+{\tt
+21\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 7.5000000000e-01 0.0000000000e+00 0\\
+0.0000000000e+00 1.5000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 2.2500000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 3.0000000000e+00 0.0000000000e+00 0\\
+1.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+1.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4\\
+1.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+2.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+2.0000000000e+00 7.5000000000e-01 0.0000000000e+00 4\\
+2.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4\\
+2.0000000000e+00 2.2500000000e+00 0.0000000000e+00 4\\
+2.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+3.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+3.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4\\
+3.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+4.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2\\
+4.0000000000e+00 7.5000000000e-01 0.0000000000e+00 2\\
+4.0000000000e+00 1.5000000000e+00 0.0000000000e+00 2\\
+4.0000000000e+00 2.2500000000e+00 0.0000000000e+00 2\\
+4.0000000000e+00 3.0000000000e+00 0.0000000000e+00 2\\
+4 6\\
+8 11 3 1 9 7 2 6 10 0\\
+8 13 5 3 11 8 4 7 12 0\\
+8 19 11 9 17 15 10 14 18 0\\
+8 21 13 11 19 16 12 15 20 0\\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of triangles with three nodes}
+
+The mesh generator of triangles with three nodes on rectangular domain is in the file gensiftria.cpp.
+Executable file is denoted {\tt gtria}. The code generates triangular elements on a rectangular domain
+in the $xy$ plane. The length of the domain in the $x$ direction is lx while the length in the $y$ direction
+is ly. All $z$ coordinates are equal to zero. Nodes on left edge ($x$=0.0) of the rectangle
+are denoted by property 0. Nodes on top edge ($y$=ly) of the rectangle are denoted by property 1.
+Nodes on right edge ($x$=lx) of the rectangle are denoted by property 2. Nodes on bottom edge ($y$=0.0)
+of the rectangle are denoted property 3. All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt gtria file\_name lx ly nx ny write\_edge\_num}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+lx & length of the rectangle in the $x$ direction
+\\
+ly & length of the rectangle in the $y$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+write\_edge\_num & switch for edge number output
+\\
+\end{tabular}
+\end{center}
+
+\noindent
+Switch for edge number output is 0 or 1. 0 means no edge number output
+while 1 means write edge numbers.
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Rectangular domain with the length in the $x$ direction is 4 m and in the
+$y$ direction is 3 m. Two elements are required along both sides.
+
+\noindent
+Command
+
+{\tt gtria tria.top 4 3 2 2 0}
+
+\noindent
+Output
+
+\noindent
+{\tt
+9\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 1.5000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 3.0000000000e+00 0.0000000000e+00 0\\
+2.0000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+2.0000000000e+00 1.5000000000e+00 0.0000000000e+00 4\\
+2.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+4.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2\\
+4.0000000000e+00 1.5000000000e+00 0.0000000000e+00 2\\
+4.0000000000e+00 3.0000000000e+00 0.0000000000e+00 2\\
+8 3\\
+3 5 1 4 0\\
+3 5 2 1 0\\
+3 6 2 5 0\\
+3 6 3 2 0\\
+3 8 4 7 0\\
+3 8 5 4 0\\
+3 9 5 8 0\\
+3 9 6 5 0\\
+}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of hexahedra with eight nodes}
+
+The mesh generator of hexahedra with eight nodes on hexahedral domain (regular rectangular prism) is in the file gensifhex.cpp.
+Executable file is denoted {\tt ghex}. The code generates hexahedral elements on a hexahedral domain.
+The length of the rectangular prism in the $x$ direction is lx, the length in the $y$ direction is ly and
+the length in the $z$ direction is lz. Nodes on surface $x$=0.0 of the brick domain are denoted by property 0.
+Nodes on surface $z$=lz of the rectangular prism are denoted by property 1.
+Nodes on surface $x$=lx of the rectangular prism are denoted by property 2.
+Nodes on surface $z$=0.0 of the rectangular prism are denoted property 3.
+All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt ghex file\_name lx ly lz nx ny nz}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+lx & length of the prism in the $x$ direction
+\\
+ly & length of the prism in the $y$ direction
+\\
+lz & length of the prism in the $z$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+nz & number of elements along the $z$ direction
+\end{tabular}
+\end{center}
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Regular quadrangular prism domain with the length in the $x$ direction equal to 5 m, in the
+$y$ direction equal to 4 m and in the $z$ direction equal to 3 m. Two elements are required along each side.
+
+\noindent
+Command
+
+{\tt ghex hex.top 5 4 3 2 2 2}
+
+\noindent
+Output
+
+\noindent
+{\tt
+27\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 3.0000000000e+00 0\\
+2.5000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 0.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 2.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 4.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 0.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 0.0000000000e+00 3.0000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 3.0000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 3.0000000000e+00 2\\
+8 13\\
+8 14 5 2 11 13 4 1 10 0\\
+8 15 6 3 12 14 5 2 11 0\\
+8 17 8 5 14 16 7 4 13 0\\
+8 18 9 6 15 17 8 5 14 0\\
+8 23 14 11 20 22 13 10 19 0\\
+8 24 15 12 21 23 14 11 20 0\\
+8 26 17 14 23 25 16 13 22 0\\
+8 27 18 15 24 26 17 14 23 0\\
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of hexahedra with twenty nodes}
+
+The mesh generator of hexahedra with twenty nodes on hexahedral domain (regular rectangular prism)
+or on a tube segment is in the file gensifhexq.cpp.
+Executable file is denoted {\tt ghexq}. The code generates hexahedral elements on a rectangular prism
+or on a tube segment.
+In the case of prism, the following informations are required.
+The length of the rectangular prism in the $x$ direction is lx, the length in the $y$ direction is ly and
+the length in the $z$ direction is lz. Nodes on surface $x$=0.0 of the brick domain are denoted by property 0.
+All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+In the case of tube segment, the following informations are required.
+The radius of the tube $r$, the length of the segment $l$, the thickness of the tube $t$ and
+the angle $\alpha$.
+
+
+\vspace{2mm}
+\noindent
+In the case of prism, the command has the form
+
+{\tt ghexq file\_name  1  lx ly lz nx ny nz}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+1 & indicates a prism domain
+\\
+lx & length of the prism in the $x$ direction
+\\
+ly & length of the prism in the $y$ direction
+\\
+lz & length of the prism in the $z$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+nz & number of elements along the $z$ direction
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+\noindent
+In the case of tube segment, the command has the form
+
+{\tt ghexq 2 file\_name r l t nr nl nt alpha}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+2 & indicates a tube segment
+\\
+r & radius of the tube segment
+\\
+l & length of the tube segment
+\\
+t & thisckness of the tube segment
+\\
+nr & number of elements along the $r$ direction
+\\
+nl & number of elements along the $l$ direction
+\\
+nt & number of elements along the thickness
+\\
+alpha & angle of the segment
+\\
+\end{tabular}
+\end{center}
+
+\vspace{3mm}
+\noindent
+{\bf Example 1}
+
+\noindent
+Regular quadrangular prism domain with the length in the $x$ direction equal to 5 m, in the
+$y$ direction equal to 4 m and in the $z$ direction equal to 3 m. Two elements are required along each side.
+
+\noindent
+Command
+
+{\tt ghexq prism.top  1  5 4 3 2 2 2}
+
+\noindent
+Output
+
+\noindent
+{\tt
+81\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 7.5000000000e-01 0\\
+0.0000000000e+00 0.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 2.2500000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 1.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 1.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 1.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 7.5000000000e-01 0\\
+0.0000000000e+00 2.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 2.2500000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 3.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 3.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 3.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 7.5000000000e-01 0\\
+0.0000000000e+00 4.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 2.2500000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 3.0000000000e+00 0\\
+1.2500000000e+00 0.0000000000e+00 0.0000000000e+00 1\\
+1.2500000000e+00 0.0000000000e+00 1.5000000000e+00 1\\
+1.2500000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+1.2500000000e+00 2.0000000000e+00 0.0000000000e+00 1\\
+1.2500000000e+00 2.0000000000e+00 1.5000000000e+00 1\\
+1.2500000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+1.2500000000e+00 4.0000000000e+00 0.0000000000e+00 1\\
+1.2500000000e+00 4.0000000000e+00 1.5000000000e+00 1\\
+1.2500000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 0.0000000000e+00 0.0000000000e+00 1\\
+2.5000000000e+00 0.0000000000e+00 7.5000000000e-01 1\\
+2.5000000000e+00 0.0000000000e+00 1.5000000000e+00 1\\
+2.5000000000e+00 0.0000000000e+00 2.2500000000e+00 1\\
+2.5000000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 1.0000000000e+00 0.0000000000e+00 1\\
+2.5000000000e+00 1.0000000000e+00 1.5000000000e+00 1\\
+2.5000000000e+00 1.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 0.0000000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 7.5000000000e-01 1\\
+2.5000000000e+00 2.0000000000e+00 1.5000000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 2.2500000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+2.5000000000e+00 3.0000000000e+00 1.5000000000e+00 1\\
+2.5000000000e+00 3.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 0.0000000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 7.5000000000e-01 1\\
+2.5000000000e+00 4.0000000000e+00 1.5000000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 2.2500000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+3.7500000000e+00 0.0000000000e+00 0.0000000000e+00 1\\
+3.7500000000e+00 0.0000000000e+00 1.5000000000e+00 1\\
+3.7500000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+3.7500000000e+00 2.0000000000e+00 0.0000000000e+00 1\\
+3.7500000000e+00 2.0000000000e+00 1.5000000000e+00 1\\
+3.7500000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+3.7500000000e+00 4.0000000000e+00 0.0000000000e+00 1\\
+3.7500000000e+00 4.0000000000e+00 1.5000000000e+00 1\\
+3.7500000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 0.0000000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 7.5000000000e-01 1\\
+5.0000000000e+00 0.0000000000e+00 1.5000000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 2.2500000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 1.0000000000e+00 0.0000000000e+00 1\\
+5.0000000000e+00 1.0000000000e+00 1.5000000000e+00 1\\
+5.0000000000e+00 1.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 2.0000000000e+00 0.0000000000e+00 1\\
+5.0000000000e+00 2.0000000000e+00 7.5000000000e-01 1\\
+5.0000000000e+00 2.0000000000e+00 1.5000000000e+00 1\\
+5.0000000000e+00 2.0000000000e+00 2.2500000000e+00 1\\
+5.0000000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 3.0000000000e+00 0.0000000000e+00 1\\
+5.0000000000e+00 3.0000000000e+00 1.5000000000e+00 1\\
+5.0000000000e+00 3.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 4.0000000000e+00 0.0000000000e+00 1\\
+5.0000000000e+00 4.0000000000e+00 7.5000000000e-01 1\\
+5.0000000000e+00 4.0000000000e+00 1.5000000000e+00 1\\
+5.0000000000e+00 4.0000000000e+00 2.2500000000e+00 1\\
+5.0000000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+8 14\\
+20 41 11 3 33 39 9 1 31 26 7 23 37 40 10 2 32 25 6 22 36   0\\
+20 43 13 5 35 41 11 3 33 27 8 24 38 42 12 4 34 26 7 23 37   0\\
+20 49 19 11 41 47 17 9 39 29 15 26 45 48 18 10 40 28 14 25 44   0\\
+20 51 21 13 43 49 19 11 41 30 16 27 46 50 20 12 42 29 15 26 45   0\\
+20 71 41 33 63 69 39 31 61 56 37 53 67 70 40 32 62 55 36 52 66   0\\
+20 73 43 35 65 71 41 33 63 57 38 54 68 72 42 34 64 56 37 53 67   0\\
+20 79 49 41 71 77 47 39 69 59 45 56 75 78 48 40 70 58 44 55 74   0\\
+20 81 51 43 73 79 49 41 71 60 46 57 76 80 50 42 72 59 45 56 75   0\\
+}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generation of tetrahedra with four nodes}
+
+The mesh generator of tetrahedra with four nodes on hexahedral domain (regular quadrangular prism) is in the file gensiftetras.cpp.
+Executable file is denoted {\tt gtetra}. The code generates tetrahedral elements on a hexahedral domain.
+The length of the domain in the $x$ direction is lx, the length in the $y$ direction is ly and
+the length in the $z$ direction is lz. Nodes on surface $x$=0.0 of the brick domain are denoted by property 0.
+Nodes on surface $z$=lz of the brick domain are denoted by property 1.
+Nodes on surface $x$=lx of the brick domain are denoted by property 2.
+Nodes on surface $z$=0.0 of the brick domain are denoted property 3.
+All remaining nodes are denoted by property 4.
+All elements are denoted by property 0.
+A mesh of hexahedral elements is created first and then each element is divided to 6 tetrahedra.
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt gtetra file\_name lx ly lz nx ny nz}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+file\_name & name of file with mesh data
+\\
+lx & length of the prism in the $x$ direction
+\\
+ly & length of the prism in the $y$ direction
+\\
+lz & length of the prism in the $z$ direction
+\\
+nx & number of elements along the $x$ direction
+\\
+ny & number of elements along the $y$ direction
+\\
+nz & number of elements along the $z$ direction
+\end{tabular}
+\end{center}
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Regular quadrangular prism domain with the length in the $x$ direction equal to 5 m, in the
+$y$ direction equal to 4 m and in the $z$ direction equal to 3 m. Two rows of elements are required along each side.
+
+\noindent
+Command
+
+{\tt gtetra tetra.top 5 4 3 2 2 2}
+
+\noindent
+Output
+
+\noindent
+{\tt
+27\\
+0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 0.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 2.0000000000e+00 3.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 0.0000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 1.5000000000e+00 0\\
+0.0000000000e+00 4.0000000000e+00 3.0000000000e+00 0\\
+2.5000000000e+00 0.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 0.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 0.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 2.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 2.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 2.0000000000e+00 3.0000000000e+00 1\\
+2.5000000000e+00 4.0000000000e+00 0.0000000000e+00 3\\
+2.5000000000e+00 4.0000000000e+00 1.5000000000e+00 4\\
+2.5000000000e+00 4.0000000000e+00 3.0000000000e+00 1\\
+5.0000000000e+00 0.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 0.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 0.0000000000e+00 3.0000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 2.0000000000e+00 3.0000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 0.0000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 1.5000000000e+00 2\\
+5.0000000000e+00 4.0000000000e+00 3.0000000000e+00 2\\
+ 48 7\\
+ 4  14 5 11 10  0\\
+ 4  14 5 13 10  0\\
+ 4  5 2 11 10  0\\
+ 4  5 2 1 10  0\\
+ 4  5 4 13 10  0\\
+ 4  5 1 4 10  0\\
+ 4  15 6 12 11  0\\
+ 4  15 6 14 11  0\\
+ 4  6 3 12 11  0\\
+ 4  6 3 2 11  0\\
+ 4  6 5 14 11  0\\
+ 4  6 2 5 11  0\\
+ 4  17 8 14 13  0\\
+ 4  17 8 16 13  0\\
+ 4  8 5 14 13  0\\
+ 4  8 5 4 13  0\\
+ 4  8 7 16 13  0\\
+ 4  8 4 7 13  0\\
+ 4  18 9 15 14  0\\
+ 4  18 9 17 14  0\\
+ 4  9 6 15 14  0\\
+ 4  9 6 5 14  0\\
+ 4  9 8 17 14  0\\
+ 4  9 5 8 14  0\\
+ 4  23 14 20 19  0\\
+ 4  23 14 22 19  0\\
+ 4  14 11 20 19  0\\
+ 4  14 11 10 19  0\\
+ 4  14 13 22 19  0\\
+ 4  14 10 13 19  0\\
+ 4  24 15 21 20  0\\
+ 4  24 15 23 20  0\\
+ 4  15 12 21 20  0\\
+ 4  15 12 11 20  0\\
+ 4  15 14 23 20  0\\
+ 4  15 11 14 20  0\\
+ 4  26 17 23 22  0\\
+ 4  26 17 25 22  0\\
+ 4  17 14 23 22  0\\
+ 4  17 14 13 22  0\\
+ 4  17 16 25 22  0\\
+ 4  17 13 16 22  0\\
+ 4  27 18 24 23  0\\
+ 4  27 18 26 23  0\\
+ 4  18 15 24 23  0\\
+ 4  18 15 14 23  0\\
+ 4  18 17 26 23  0\\
+ 4  18 14 17 23  0\\
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{SPECIAL MESH TOOLS}
+
+Extensive number of possible problems solvable in the SIFEL led to development of several
+special mesh tools. The tools are described in this chapter.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem of floating subdomains}
+
+Floating subdomains are used in problems of interaction between fibres and composite
+matrix. The composite matrix is represented by one subdomain which is properly constrained.
+It means, that there are no rigid body motions. Fibres are represented by additional
+subdomains which may be or may not be constrained. Generally, fibres may contain
+rigid body motions.
+
+The problem of floating subdomain requires merging of at least two files with meshes.
+For this purpose, the code flsubmesh.cpp has been developed. Auxiliary steps have to be
+performed before application of the code flsubmesh. The meshes of composite matrix
+and fibres have to be stored in the files with an identical name. The name has to be
+provided by a number. The file containing the mesh of the composite matrix has to be
+provided by zero. The files containing the meshes of the fibres have to be provided
+by increasing numbers. 
+
+\vspace{2mm}
+\noindent
+The command has the form
+
+{\tt flsubmesh meshes n finmesh.top}
+
+\vspace{2mm}
+\noindent
+where
+
+\vspace{2mm}
+\noindent
+\begin{center}
+\begin{tabular}{ll}
+flsubmesh & executable file
+\\
+meshes & name of files with meshes without suffixes
+\\
+n & number of fibres
+\\
+finmesh.top & name of the file with final mesh
+\\
+\end{tabular}
+\end{center}
+
+
+\vspace{3mm}
+\noindent
+{\bf Example}
+
+\noindent
+Let a composite matrix contains 3 fibres. Mesh of the composite matrix is stored
+in the file mesh0.top. Mesh of the first fibre is stored in the file mesh1.top,
+second fibre in the file mesh2.top and the third fibre in the file mesh3.top.
+Final file with meshes is denoted by finalmesh.top. The command has the form
+
+
+{\tt flsubmesh mesh 3 finalmesh.top}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{MESH PARTITIONING}
+
+Parallel computing based on domain decomposition requires mesh partitioning. This
+chapter describes mesh partitioning by METIS library, especially by the code partdmesh.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Application of the code partdmesh}
+
+Mesh partitioning of an original finite element mesh consists of several steps
+described in this section.
+
+\begin{itemize}
+\item
+generation of original finite element mesh
+\item
+generation of file for the code partdmesh
+\item
+generation of files based on output of partdmesh
+\end{itemize}
+
+\subsection{Generation of original finite element mesh}
+Generation of the original finite element mesh may be done in various ways.
+Application of the simple mesh generators described in ??? is one
+possibility. The result of this step is a file with original finite
+element mesh in the SIFEL mesh format described in ???
+
+\subsection{Generation of file for the code partdmesh}
+
+The code partdmesh requires an input file in exactly given form. The form is the following:
+
+\noindent
+{\tt
+ne mt
+n1 n2 ... nm
+:
+n1 n2 ... nm
+}
+
+\begin{tabular}{ll}
+ne & number of elements
+\\
+mt & type of elements with respect to METIS
+\\
+n1, n2, ..., nm & node numbers on elements
+\end{tabular}
+
+
+\subsection{Generation of files based on output of partdmesh}
+The code partdmesh generates output file where for all elements the number of subdomain, which contains them, is indicated.
+This is enough description of the mesh partitioning. The code metispost generates nd files with meshes, where
+nd is the number of subdomains. 
+
+
+
+
+
+\end{document}
+

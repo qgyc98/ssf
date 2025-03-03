@@ -1,0 +1,302 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "GEFEL",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "GEFEL",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "HPARAL",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "HPARAL",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "MAN",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "MAN"
+				},
+				{
+					"build" : "MEFEL",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "MEFEL",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "METR",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "METR",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "PARGEF",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "PARGEF",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "PARMEF",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "PARMEF",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "PARMETR",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "PARMETR",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "PARTRF",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "PARTRF",
+					"targetIndexes" : 
+					[
+						7
+					]
+				},
+				{
+					"build" : "PREP",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "PREP",
+					"targetIndexes" : 
+					[
+						8
+					]
+				},
+				{
+					"build" : "TRFEL",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "TRFEL",
+					"targetIndexes" : 
+					[
+						9
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"name" : "SIFEL",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "gefel::@07ac8ce5abbb757cdaab",
+					"jsonFile" : "target-gefel-Debug-d16fdd13e2ab637668fd.json",
+					"name" : "gefel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "hparal::@6cb47e1dcb508880f2a5",
+					"jsonFile" : "target-hparal-Debug-33700ffc5fbafbfdad4f.json",
+					"name" : "hparal",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "mefel::@ed10d82c19a76b269fb8",
+					"jsonFile" : "target-mefel-Debug-077c1654cec12d308e7f.json",
+					"name" : "mefel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "metr::@2bcd55a3532fc381d048",
+					"jsonFile" : "target-metr-Debug-09fb27a53815f9d7e78a.json",
+					"name" : "metr",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "pargef::@53076ad4fec4b15a143b",
+					"jsonFile" : "target-pargef-Debug-247ec6f81e7c66b91e1e.json",
+					"name" : "pargef",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "parmef::@02fcf0c5592da86949fe",
+					"jsonFile" : "target-parmef-Debug-6dd65073e55b1d01f457.json",
+					"name" : "parmef",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "parmetr::@e92983fe76e70d31393e",
+					"jsonFile" : "target-parmetr-Debug-e1975a9b7ad44f77c00f.json",
+					"name" : "parmetr",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "partrf::@cd615c3e74fede10cac1",
+					"jsonFile" : "target-partrf-Debug-592d43173bc43f2deab7.json",
+					"name" : "partrf",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "prep::@80514e0699852cd7da2c",
+					"jsonFile" : "target-prep-Debug-07f0d61aa646f2336ff9.json",
+					"name" : "prep",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "trfel::@c408de838338eefc59b7",
+					"jsonFile" : "target-trfel-Debug-3f166939951017840c9b.json",
+					"name" : "trfel",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/work-bbefem/gongzuowenjian/SIFEL/svn-SIFEL/websvn2/ceshi/hh/SIFEL/out/build/windows-default",
+		"source" : "D:/work-bbefem/gongzuowenjian/SIFEL/svn-SIFEL/websvn2/ceshi/hh/SIFEL"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

@@ -1,0 +1,549 @@
+#
+#  DEFAULT MAKEFILE 
+#  ----------------
+#  This file is included by all Makefiles of SIFEL.
+#  Every modification or new definition influence make process of all SIFEL parts.
+#
+
+
+
+###############################################
+#                                             #
+# Definition of compiler and compiler options #
+#                                             #
+###############################################
+
+.SUFFIXES:      .cpp
+
+# C/C++ compiler tool
+CC              = g++
+# for debugging OpenMP us the following compiler
+#CC               = /usr/local/bin/g++
+
+# no compiler macros are defined by default
+DEFS            = 
+
+#
+# detect Fortran compiler
+# and define corresponding compiler macro FC_DEF in case of success
+# 
+ifndef FC_DEF
+  export FC_DEF :=  $(shell gfortran -v 2>/dev/null && echo "enabled" || echo "disabled")
+endif
+
+# FORTRAN compiler tool
+ifeq ($(FC_DEF), enabled)
+  DEFS          += -D FCC_DEF
+  FC             = gfortran
+  FCFLAGS        = -Wno-unused-dummy-argument -Wno-unused
+endif
+
+# PGi c++
+#CC              = pgi++
+
+# default compiler flags, they are used for the creating of object files
+CFLAGS          = -g -Wall
+
+# default compiler flags, they are used for the creating of executables
+# by default there are no flags for executables
+EXECFLAGS          = 
+
+# compiler flags for debug version
+DEBCFLAGS       = -g -Wall -Wextra -ansi -pedantic -std=c++11
+
+# compiler flags for optimized version
+OPTCFLAGS       = -O3
+#OPTCFLAGS       = -O3  -fno-alias -pc64 -tpp6 -xK -ipo -restrict -align -Zp16
+
+# compiler flags for optimized version with debug informations
+OPTDEBCFLAGS    = -O3 -g
+
+# compiler flags which suppress some annoying repeated warnings
+# these options are not printed during compilation process by default
+COMPATFLAGS	= -std=c++11 -Wno-write-strings -Wno-unused-but-set-variable -Wno-unused-result -MMD
+# setup for tracing line coverage with the help of gcov
+#COMPATFLAGS	= -Wno-write-strings -Wno-unused-but-set-variable -Wno-unused-result --coverage -fprofile-arcs -ftest-coverage -pg
+
+# compiler flags for compatibility with library for tracing source files used for optimized version
+# these options are not printed during compilation process by default
+
+#COMPATOPTFLAGS	= -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftree-vectorizer-verbose=2
+#COMPATOPTFLAGS	= -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftree-vectorizer-verbose=1 -funsafe-math-optimizations
+
+COMPATOPTFLAGS	= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+
+
+
+###############################################
+#                                             #
+# Definition of compiler and compiler options #
+# for parallel parts of the code              #
+#                                             #
+###############################################
+
+ifdef PARSIFEL
+
+# parallel compiler tool - not used in the sequential parts of the code
+PCC             = mpic++
+
+# default compiler macro for mpiCC
+DEFS           += -D MPICH_IGNORE_CXX_SEEK
+
+endif
+
+
+
+##########################################
+#                                        #
+# Auxiliary uitlities and their switches #
+#                                        #
+##########################################
+
+# shell tool
+SHELL           = /bin/sh
+# library manager
+AR              = ar
+# library manager options
+ARFLAGS         = -rucs
+# delete command
+RM              = rm -f
+# copy command
+CP		= cp
+# tool for merging of several static library files
+MERGELIB	= ../mergelib
+# command for making of dependencies
+DEPEND          = makedepend
+#OLD_SHELL     := $(SHELL) 
+#SHELL          = $(warning [$@ ($^) ($?)])$(OLD_SHELL)
+
+
+
+###########################
+#                         #
+# Definition of libraries #
+#                         #
+###########################
+
+# local libraries needed by all targets (actually no such library), 
+# in particular targets will be redefined (e.g. LOC_LIBS =  libgef.a)
+LOC_LIBS	= 
+
+#  add default system libraries needed by all targets 
+# (-lm = math library; -rdynamic = enforce including all symbol tables (stacktrace support); -ldl = default shared libary support)
+SYS_LIBS       = -lm -rdynamic -ldl 
+# setup for the tracing of line coverage with the help of gcov
+# SYS_LIBS       = -lm -rdynamic -ldl -lgcov --coverage
+
+
+ifeq ($(FC_DEF), enabled)
+  SYS_LIBS += -lgfortran
+endif
+
+
+
+#######################################
+#                                     #
+#  Detection of additional libraries  #
+#                                     #
+#######################################
+
+#
+# detect library for tracing source files - libbfd.{a|so}
+# and define corresponding compiler macro TRACE_SOURCE_FILES in case of success
+# comment out following line with export TRACE_SRC_F to disable bfd library
+# 
+ifndef TRACE_SRC_F
+  export TRACE_SRC_F    :=  $(shell ld -o /dev/null -lbfd 2>/dev/null && echo "enabled" || echo "disabled")
+endif
+
+ifeq ($(TRACE_SRC_F), enabled)
+  EMPTY :=
+  SPACE := $(EMPTY) $(EMPTY)
+# get version number of BFD library
+  export BFD_VERSION := $(shell ld -v)
+  BFD_VERSION  := $(lastword $(BFD_VERSION))
+# replace '.' from version number by ' '
+  BFD_VERSION := $(subst ., ,$(BFD_VERSION))
+# take major and minor version
+  BFD_VERSION := $(wordlist 1, 2, $(BFD_VERSION))
+# remove ' ' from version numbers
+  BFD_VERSION := $(subst $(SPACE),,$(BFD_VERSION))
+  $(info BFD library detected, condensed version number: $(BFD_VERSION)) 
+  DEFS     += -D TRACE_SOURCE_FILES
+  DEFS     += -D BFD_VER=$(BFD_VERSION)
+  SYS_LIBS += -lbfd
+endif
+
+
+
+####################################
+#                                  #
+# Detection of SuiteSparse library #
+#                                  #
+####################################
+# comment out the following line if the CHOLMOD library should BE included
+#export INC_CHMD := no
+
+# if the CHOLMOD library is required then the CHOLMOD subdirectories/links with/to actual versions must be
+# included in the GEFEL directory
+ifndef INC_CHMD
+  #
+  # CHOLMOD subdirectory should be found in GEFEL
+  #
+  ifneq ($(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/CHOLMOD/),)
+    export INC_CHMD := yes
+    # CHOLMOD subdirectory was found
+  else
+    export INC_CHMD := no
+  endif
+  $(info CHOLMOD subdirectory found: $(INC_CHMD))
+
+  ifeq ($(INC_CHMD), yes)
+    export CHMD_DIR := $(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/CHOLMOD)
+#    ifeq ($(MAKECMDGOALS),opt)
+#      export CHMD_ARCH := arch-linux-c-opt
+#    else
+#      export CHMD_ARCH := arch-linux-c-debug
+#    endif
+    $(info CHOLMOD directory: $(CHMD_DIR))
+#    $(info CHOLMOD arch. subdirectory: $(CHMD_ARCH))
+  else
+    $(info No CHOLMOD support)
+  endif
+endif
+ifeq ($(INC_CHMD), yes)
+ DEFS  += -D INC_CHMD
+ SYS_LIBS += -lumfpack -lcholmod -lopenblas -Wl,-rpath,/usr/local/lib
+# -Wl,-rpath,/usr/local/lib means runtime search path for dynamicaly linked libraries
+#  SYS_LIBS += -lumfpack -lcholmod -lamd -lcolamd -lcamd -lccolamd -lopenblas -lblas -llapack -Wl,-rpath,/usr/local/lib
+  $(info CHOLMOD found at subdirectory '$(CHMD_DIR)')
+#  export CPATH = $CPATH:$(CHMD_DIR)/Include:$(CHMD_DIR)/../SuiteSparse_config
+#  $(info CPATH set to :$(CPATH))
+#  SYS_LIBS += -L$(CHMD_DIR)/$(CHMD_ARCH)/lib -lcholmod -Wl,-rpath,$(CHMD_DIR)/$(CHMD_ARCH)/lib
+endif
+
+
+
+
+###############################
+#                             #
+# Detection of PERMON library #
+#                             #
+###############################
+
+# comment out the following line if the PERMON library should BE included
+export INC_PERMON := no
+
+# if the PERMON library is required then the PETSC and PERMON subdirectories/links with/to actual versions must be
+# included in the GEFEL directory
+ifndef INC_PERMON
+
+  #
+  # PETSC directory with compatible version of PETSc should be found in GEFEL
+  #
+  ifneq ($(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/PETSC/),)
+    export INC_PETSC := yes
+    # PETSc directory was found
+  else
+    export INC_PETSC := no
+  endif
+  $(info PETSc subdirectory found: $(INC_PETSC))
+
+  #
+  # PERMON directory should be found in GEFEL
+  #
+  ifeq ($(INC_PETSC), yes)  
+    ifneq ($(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/PERMON/),)
+      export INC_PERMON := yes
+      # PERMON directory was found
+    endif
+  else
+    export INC_PERMON := no
+  endif
+  $(info PERMON directory found: $(INC_PERMON))
+
+
+  #
+  # export of paths for PERMON and PETSc libraries
+  #
+  ifeq ($(INC_PERMON), yes)
+    export PETSC_DIR  := $(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/PETSC)
+    export PERMON_DIR := $(realpath $(dir $(CURDIR)/$(lastword $(MAKEFILE_LIST)))GEFEL/PERMON)
+    ifeq ($(MAKECMDGOALS),opt)
+      export PETSC_ARCH := arch-linux-c-opt
+    else
+      export PETSC_ARCH := arch-linux-c-debug
+    endif
+    $(info PETSc directory: $(PETSC_DIR))
+    $(info PERMON directory: $(PERMON_DIR))
+    $(info PETSc/PERMON arch. subdirectory: $(PETSC_ARCH))
+  else
+    $(info No PERMON support)
+  endif
+endif
+ifeq ($(INC_PERMON), yes)
+  #
+  # Due to PETSc and PERMON, MPI compiler must be used instead of default g++
+  CC     = mpicxx.mpich
+  PCC    = mpicxx.mpich
+  DEFS  += -D INC_PERMON
+  SYS_LIBS += -L$(PERMON_DIR)/$(PETSC_ARCH)/lib -lpermon -L$(PETSC_DIR)/$(PETSC_ARCH)/lib -lpetsc -Wl,-rpath,$(PERMON_DIR)/$(PETSC_ARCH)/lib -Wl,-rpath,$(PETSC_DIR)/$(PETSC_ARCH)/lib 
+endif
+
+
+
+#######################################
+#                                     #
+#  Detection of additional libraries  #
+#  for parallel parts of the code     #
+#                                     #
+#######################################
+
+ifeq ($(PARSIFEL), yes)
+
+#
+# detect MPI library used for the communication among parallel processes 
+# MPI library is used ONLY in the parallel  parts of the code
+#
+#ifndef MPI_HOME
+#  MPI_HOME  =  $(shell ld -o /dev/null -lpmpich++ 2>/dev/null && echo "yes" || echo "no")
+#  MPI_HOME +=  $(shell ld -o /dev/null -lpmpich 2>/dev/null && echo "yes" || echo "no")
+#  XTEST := $(MPI_HOME)
+#  ifeq ($(MPI_HOME), "yes yes")
+#    export MPI_HOME :=
+#  else
+#   export MPI_HOME=/usr/local/mpich
+#   $(info variable MPI_HOME is set to default value $(MPI_HOME))
+#  endif
+#endif
+
+
+#ifndef PETSC_DIR
+#export PETSC_DIR=/usr/local/petsc
+#$(warning variable PETSC_DIR is set to default value $(PETSC_DIR))
+#endif
+
+endif
+
+
+
+##############################
+#                            #
+#  Common tragets and setup  #
+#                            #
+##############################
+
+###########################################################################################
+#  Following targets will be made regardless of whether there are files with the same names
+#
+.PHONY : default all deb opt optdeb depend dependclean
+.PHONY : clean cleanall cleandeb cleanopt cleanoptdeb cleandeb 
+.PHONY : omp ompdeb ompopt ompoptdeb cleanomp cleanompdeb cleanompopt cleanompoptdeb
+.PHONY : cleandep cleandepall cleandepdeb cleandepopt cleandepoptdeb cleandepompdeb cleandepompopt cleandepompoptdeb
+
+DBG_DIR        = _DBG/
+OPT_DIR        = _OPT/
+OPTDBG_DIR     = _OPTDBG/
+OMP_DBG_DIR    = _OMPDBG/
+OMP_OPT_DIR    = _OMPOPT/
+OMP_OPTDBG_DIR = _OMPOPTDBG/
+
+
+# default setup of the output directory for the storage of binary files
+OUTPUTDIR      = _DBG/
+
+# setup of the output directory according to target
+ifeq ($(MAKECMDGOALS),opt)
+OUTPUTDIR=$(OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),deb)
+OUTPUTDIR=$(DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),optdeb)
+OUTPUTDIR=$(OPTDBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),omp)
+OUTPUTDIR=$(OMP_DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),ompdeb)
+OUTPUTDIR=$(OMP_DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),ompopt)
+OUTPUTDIR=$(OMP_OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),ompoptdeb)
+OUTPUTDIR=$(OMP_OPTDBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),clean)
+OUTPUTDIR=$(DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandeb)
+OUTPUTDIR=$(DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanopt)
+OUTPUTDIR=$(OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanoptdeb)
+OUTPUTDIR=$(OPTDBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanomp)
+OUTPUTDIR=$(OMP_DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanompdeb)
+OUTPUTDIR=$(OMP_DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanompopt)
+OUTPUTDIR=$(OMP_OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleanompoptdeb)
+OUTPUTDIR=$(OMP_OPTDBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepdeb)
+OUTPUTDIR=$(DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepopt)
+OUTPUTDIR=$(OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepoptdeb)
+OUTPUTDIR=$(OPTDBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepompdeb)
+OUTPUTDIR=$(OMP_DBG_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepompopt)
+OUTPUTDIR=$(OMP_OPT_DIR)
+endif
+
+ifeq ($(MAKECMDGOALS),cleandepompoptdeb)
+OUTPUTDIR=$(OMP_OPTDBG_DIR)
+endif
+
+###################################################################
+# Set path for output of binary files
+#
+# Setting of root directory of compiled binary files, it must be relative path with respect
+# SIFEL root directory, i.e. on the same level where GEFEL, MEFEL and other SIFEL modules reside.
+# If not specified in the shell environment then the BIN directory is created in the
+# Makefile.in directory which is supposed to be SIFEL root directory
+ifndef BIN_ROOT
+BIN_ROOT       = BIN/
+endif
+$(info Root directory of binary files BIN is set to '$(realpath $(BIN_ROOT))')
+# extract SIFEL root directory as the Makefile.in path
+# (which is at the end of Makefile list actually)
+#SIFEL_ROOT = $(realpath $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))/
+SIFEL_ROOT := $(dir $(realpath $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
+#$(info SIFEL root path is: '$(SIFEL_ROOT)')
+# extract Makefile path (which is at the Makefile list beginning actually)
+MAKEFILE_PATH := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+#$(info Makefile path is: '$(MAKEFILE_PATH)')
+# module relative path with respect to the SIFEL root directory
+# generated as the difference between the given Makefile path and SIFEL root directory
+MODULE_PATH = $(subst $(SIFEL_ROOT),,$(MAKEFILE_PATH))
+#$(info Module path is: '$(MODULE_PATH)')
+# Assemble the resulting output directory in the form of:
+# SIFEL root path + relative path of BIN root directory + relative path of the given file with
+# respect to the SIFEL root directory + target output directory (_DBG, _OPT, ...)
+OUTPUTPATH = $(SIFEL_ROOT)$(BIN_ROOT)$(MODULE_PATH)$(OUTPUTDIR)
+#$(info Path of the output directory for binary files: '$(OUTPUTPATH)')
+
+
+# this target is made if nothing is specified at the command line
+all:  ;
+
+deb:  CFLAGS=$(DEBCFLAGS)
+deb:  all
+
+opt:  CFLAGS = $(OPTCFLAGS)
+opt:  COMPATFLAGS += $(COMPATOPTFLAGS)
+opt:  all
+
+optdeb:  CFLAGS=$(OPTDEBCFLAGS)
+optdeb:  COMPATFLAGS+=$(COMPATOPTFLAGS)
+optdeb:  all
+
+omp:     CFLAGS += -fopenmp
+omp:     DEFS += -D INC_OPENMP
+omp:     EXECFLAGS += -fopenmp
+omp:     all
+
+ompdeb:  CFLAGS=$(DEBCFLAGS) -fopenmp
+ompdeb:  DEFS += -D INC_OPENMP
+ompdeb:  EXECFLAGS += -fopenmp
+ompdeb:  all
+
+ompopt:  CFLAGS=$(OPTCFLAGS) -fopenmp
+ompopt:  COMPATFLAGS+=$(COMPATOPTFLAGS)
+ompopt:  DEFS += -D INC_OPENMP
+ompopt:  EXECFLAGS += -fopenmp
+ompopt:  all
+
+ompoptdeb:  CFLAGS=$(OPTDEBCFLAGS) -fopenmp
+ompoptdeb:  COMPATFLAGS+=$(COMPATOPTFLAGS)
+ompoptdeb:  DEFS += -D INC_OPENMP
+ompoptdeb:  EXECFLAGS += -fopenmp
+ompoptdeb:  all
+
+
+cleandeb:    OUTPUTDIR=$(DBG_DIR)
+cleandeb:    clean
+
+cleanopt:    OUTPUTDIR=$(OPT_DIR)
+cleanopt:    clean
+
+cleanoptdeb: OUTPUTDIR=$(OPTDBG_DIR)
+cleanoptdeb: clean
+
+cleanomp:    OUTPUTDIR=$(OMP_DBG_DIR)
+cleanomp:    clean
+
+cleanompdeb:    OUTPUTDIR=$(OMP_DBG_DIR)
+cleanompdeb:    clean
+
+cleanompopt:    OUTPUTDIR=$(OMP_OPT_DIR)
+cleanompopt:    clean
+
+cleanompoptdeb: OUTPUTDIR=$(OMP_OPTDBG_DIR)
+cleanompoptdeb: clean
+
+
+
+cleandep:       REMOVEDIR=$(DBG_DIR) $(OPT_DIR) $(OPTDBG_DIR) $(OMP_DBG_DIR) $(OMP_OPT_DIR) $(OMP_OPTDBG_DIR)
+cleandep:       cleanall
+
+cleandepdeb:    REMOVEDIR=$(DBG_DIR)
+cleandepdeb:    cleanall
+
+cleandepopt:    REMOVEDIR=$(OPT_DIR)
+cleandepopt:    cleanall
+
+cleandepoptdeb: REMOVEDIR=$(OPTDBG_DIR)
+cleandepoptdeb: cleanall
+
+cleandepompdeb:    REMOVEDIR=$(OMP_DBG_DIR)
+cleandepompdeb:    cleanall
+
+cleandepompopt:    REMOVEDIR=$(OMP_OPT_DIR)
+cleandepompopt:    cleanall
+
+cleandepompoptdeb: REMOVEDIR=$(OMP_OPTDBG_DIR)
+cleandepompoptdeb: cleanall

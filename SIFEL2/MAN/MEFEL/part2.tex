@@ -1,0 +1,1187 @@
+\part{Computer implementation II}
+
+There are five most important classes in the MEFEL part. Their names
+are {\sf probdesc, mechtop, mechmat, mechbclc} and {\sf mechcrsec}.
+One object (instance) of each mentioned classes is created. All other
+objects (instances) are attributes of one of these five main objects.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Class {\sf probdesc}}
+\index{class!{\sf probdesc}}
+
+PROBDESC is an abbreviation of PROBlem DESCription. This class contains all important
+informations about solved problem.
+
+\begin{tabular}{|l|l|}
+\hline
+class name & probdesc
+\\ \hline
+object name & Mp
+\\ \hline
+class description & class contains basic data about solved problem
+\\ \hline
+class location & MEFEL/SRC/probdesc.cpp, MEFEL/SRC/probdesc.h
+\\ \hline
+\end{tabular}
+
+\section{Basic instances in the class probdesc}
+\begin{itemize}
+\item{tprob (problemtype) - defines type of solved problem, see Section \ref{sectproblemtype},}
+
+\item{tstorsm (storagetype) - defines type of storage of the stiffness matrix, see GEFEL ??,}
+
+\item{tstormm (storagetype) - defines type of storage of the mass matrix, important only if the instance
+tprob (problemtype) is eigen\_dynamics or forced\_dynamics, see Section \ref{sectproblemtype} and GEFEL ??}
+
+\item{stmat (stiffmatrix) - defines type of used stiffness matrix, important only for problems with
+material nonlinearity, that is if instance tprob (problemtype) is nonlinear\_statics or mech\_timedependent\_prob,
+see Section \ref{sectstiffmatrix} and \ref{sectproblemtype}.}
+
+\item{tnlinsol (nonlinsolvertype) - defines type of solver of system of nonlinear algebraic equations, important only
+for nonlinear\_statics, see Section \ref{sectnonlinsolvertype},}
+
+\item{tsra (stressretalgtype) - defines stress return algorithm, see Section \ref{sectstressretalgtype},}
+
+\item{displnorm (displacementnorm) - defines system of length control in arc-length method,
+see Section \ref{sectdisplacementnorm},}
+
+\item{matmodel (materialmodel) - defines material model used in problem, see Section \ref{sectmattype},}
+
+\item{tepsol (epsolvertype) - }
+\end{itemize}
+
+
+\section{Other instances in the class probdesc}
+
+\subsection{Control of strain/stress computation}
+\index{control!strain computation}
+\index{control!stress computation}
+%\subsection{Instances straincomp, strainaver, stresscomp, stressaver}
+
+Strain evaluation is based on adopted strategy of decomposition of strain components
+into blocks. The decomposition is theoreticaly described in Section \ref{sectgencom} and the
+implementation is mentioned in Section \ref{sectgeninform}. Stress evaluation is based on
+the same strategy as strain evaluation. The existence of several sets of integration points
+leads to application of interpolation methods. They are described in details in Section \ref{sectgeninform}.
+
+\begin{tabular}{|l|l|}
+\hline
+instance & action
+\\ \hline \hline
+straincomp=0 & do not compute strains
+\\ \hline
+straincomp=1 & compute strains
+\\ \hline \hline
+strainaver=0 & do not average strain values in nodes
+\\ \hline
+strainaver=1 & average strain values in nodes
+\\ \hline \hline
+stresscomp=0 & do not compute stresses
+\\ \hline
+stresscomp=1 & compute stresses
+\\ \hline \hline
+stressaver=0 & do not average stress values in nodes
+\\ \hline
+stressaver=1 & average stress values in nodes
+\\ \hline
+\end{tabular}
+
+The code is able to compute strains and stresses at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level, not here. There is no connection between location where strains are computed and
+location where stresses are computed.
+
+Stress computation requires computation of strains at least at integration points.
+A choice straincomp=0 and stresscomp=1 leads
+to error because there are no data for stress evaluation. Averaging of strains and averaging of stresses
+are independent in the code. User must make decision which strategy should be used.
+
+
+\subsection{Control of nonlinear solvers}
+
+\subsubsection{Control of arc-length method}
+\index{control!arc-length method}
+
+\begin{tabular}{|l|l|}
+\hline
+instance & description
+\\ \hline \hline
+displnorm & type of norm used for increments of displacements
+\\
+(displacementnorm) & see Section \ref{sectdisplacementnorm}
+\\ \hline \hline
+hdbackupal=0 & do not make backup on hard-disc
+\\ \hline
+hdbackupal=1 & make backup on hard-disc
+\\ \hline
+hdbackupal=2 & start arc-length method from backup on hard-disc
+\\ \hline
+hdbackupal=11 & start arc-length method in adaptivity from backup on hard-disc
+\\ \hline \hline
+nial &  maximum number of increments
+\\ \hline
+niilal & maximum number of iterations in inner loop
+\\ \hline
+erral & required norm of vector of unbalanced forces
+\\ \hline
+dlal & length of the arc at the beginning
+\\ \hline
+dlminal & minimum length of the arc
+\\ \hline
+dlmaxal & maximum length of the arc
+\\ \hline
+psial & displacement-loading control switch (must be from $\langle0;1\rangle$
+\\ \hline \hline
+nsnal & number of selected nodes (for norm computation)
+\\
+ & only if displnorm=selnodes=6
+\\ \hline
+selnodal & array containing selected nodes (for norm computations)
+\\
+ & only if displnorm=selnodes=6
+\\ \hline \hline
+nsdofal & number of selected DOFs (for norm computation)
+\\
+ & only if displnorm=seldofs=2
+\\ \hline
+seldofal & array containing selected degrees of freedom
+\\
+ & only if displnorm=seldofs=2
+\\ \hline \hline
+selnodcoord & array containing coordinates of selected nodes
+\\ \hline
+probdimal & problem dimension (for increment of two node distance)
+\\
+ & only if displnorm=nodesdistincr=8
+\\ \hline
+%  ///  unit vector between selected nodes
+%  double nxal,nyal,nzal;
+\end{tabular}
+
+
+\subsubsection{Control of Newton-Raphson method}
+\index{control!Newton-Raphson method}
+
+\begin{tabular}{|l|l|}
+\hline
+instance & description
+\\ \hline
+ninr &  maximum number of increments
+\\ \hline
+niilnr & maximum number of iterations in inner loop
+\\ \hline
+errnr & required norm of vector of unbalanced forces
+\\ \hline
+incrnr & magnitude of increment of loading
+\\ \hline
+minincnr & minimum magnitude of increment of loading
+\\ \hline
+\end{tabular}
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Examples}
+\clearpage
+\subsection{Linear static problem}
+
+\noindent
+\begin{tabular}{l}
+{\tt patch test planeelementlq, plane stress} $\#$ arbitrary
+\\
+text defined by user, program do nothing with it, only
+prints it into output file
+\\
+{\tt EXAM/NEWTESTS/pelq1.out} $\#$ path and name of output file
+\\
+{\tt 1} $\#$ printing of auxiliary information
+\\
+{\tt 1} $\#$ type of problem -- linear statics (defined in alias.h)
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 1} $\#$ strain calculation
+\\
+{\tt 0} $\#$ no strain averaging in nodes
+\\
+{\tt 1} $\#$ stress calculation
+\\
+{\tt 0} $\#$ no stress averaging in nodes
+\\
+{\tt 1} $\#$ calculation of reactions
+\\
+{\tt 0} $\#$ no adaptivity is required
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 2} $\#$ type of stiffness matrix storage -- skyline
+\\
+{\tt 2} $\#$ type of solver of linear algebraic equations
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nonlinear static problem}
+
+\noindent
+\begin{tabular}{l}
+{\tt bar element, J2 flow, arc-length} $\#$ arbitrary
+\\
+text defined by user, program do nothing with it, only
+prints it into output file
+\\
+{\tt EXAM/NEWTESTS/barj2arc1.out} $\#$ path and name of output file
+\\
+{\tt 1} $\#$ printing of auxiliary information
+\\
+{\tt 10} $\#$ type of problem -- nonlinear statics (defined in alias.h)
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 0} $\#$ no strain calculation
+\\
+{\tt 0} $\#$ no stress calculation
+\\
+{\tt 0} $\#$ no calculation of reactions
+\\
+{\tt 0} $\#$ no adaptivity is required
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt EXAM/NEWTESTS/barj2arc1.dat} $\#$ path and name of
+\\ auxiliary file (e.g. for graphic output)
+\\
+{\tt 1} $\#$ type of solver of nonlinear equation system -- arc-length
+\\
+{\tt 1} $\#$ type of stress return algorithm -- cutting plane
+\\
+{\tt 2} $\#$ type of solver of linearized equation system -- $\mbf{LDL}^T$ decomposition
+\\
+{\tt 2} $\#$ type of stiffness matrix storage
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 40} $\#$ number of steps in arc-length method
+\\
+{\tt 40} $\#$ maximum number of iteration in inner loop
+\\
+{\tt 1.0e-8} $\#$ required norm of vector of residuals
+\\
+{\tt 1.0e-1} $\#$ length of arc
+\\
+{\tt 1.0e-8} $\#$ minimum length of arc
+\\
+{\tt 1.0} $\#$ maximum length of arc
+\\
+{\tt 0.0} $\#$ coefficient $\psi$ (weigth of norm of force vector)
+\\
+{\tt 0} $\#$ no backup in arc-length method
+\\
+{\tt 1} $\#$ type of displacement vector norm -- all components
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 20} $\#$ maximum number of iteration in cutting-plane method
+\\
+{\tt 1.0e-8} $\#$ required error in cutting-plane method
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 1} $\#$ number of printed unknown (into auxiliary file)
+\\
+{\tt 2} $\#$ number of node
+\\
+{\tt 1} $\#$ number of printed DOF
+\\
+{\tt 0} $\#$ no auxiliary output into output file
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time dependent mechanical problem}
+
+\noindent
+\begin{tabular}{l}
+{\tt two bars, viscoplastic model} $\#$ arbitrary
+\\
+text defined by user, program do nothing with it, only
+prints it into output file
+\\
+{\tt EXAM/NEWTESTS/barsvpl1.out} $\#$ path and name of output file
+\\
+{\tt 1} $\#$ printing of auxiliary information
+\\
+{\tt 15} $\#$ type of problem -- time dependent mechanical problem (defined in alias.h)
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 0} $\#$ no strain calculation
+\\
+{\tt 0} $\#$ no stress calculation
+\\
+{\tt 0} $\#$ no calculation of reactions
+\\
+{\tt 0} $\#$ no adaptivity is required
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt EXAM/NEWTESTS/barsvpl1.dat} $\#$ path and name of
+\\ auxiliary file (e.g. for graphic output)
+\\
+{\tt 0.0} $\#$ start time
+\\
+{\tt 15.50} $\#$ end time
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 0} $\#$ type of time function -- constant function (defines size of time increments)
+\\
+{\tt 0.01} $\#$ value of time function
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 2} $\#$ type of solver of linearized equation system -- $\mbf{LDL}^T$ decomposition
+\\
+{\tt 2} $\#$ type of stiffness matrix storage
+\\
+\end{tabular}
+
+\vspace{2mm}
+\noindent
+\begin{tabular}{l}
+{\tt 1} $\#$ number of printed unknown (into auxiliary file)
+\\
+{\tt 2} $\#$ number of node
+\\
+{\tt 1} $\#$ number of printed DOF
+\\
+{\tt 0} $\#$ no auxiliary output into output file
+\end{tabular}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Class {\sf mechtop}}
+\index{class!{\sf mechtop}}
+
+Class mechtop contains especially (but not only) data about topology of the solved mechanical
+problem. Basic instances are mentioned in Section \ref{sectmechtopbasinst}. Class mechtop
+contains nn instances of class node (see Section \ref{sectnode}) and ne instances of class
+element (see Section \ref{sectelement}).
+
+\section{Basic instances}
+\label{sectmechtopbasinst}
+\begin{itemize}
+\item{nn - number of nodes}
+%\index{number of!nodes}\index{nn}
+\item{ncn - number of constrained nodes}
+%\index{number of!constrained nodes}\index{ncn}
+\item{ne - number of elements}
+%\index{number of!elements}\index{ne}
+\end{itemize}
+
+\section{Class {\sf node}}
+\index{class!{\sf node}}
+\label{sectnode}
+
+Class {\sf node} contains all necessary informations connected with nodes which are not
+stored in class {\sf gnode} in GEFEL.
+
+\subsection{Basic instances}
+\begin{itemize}
+\item{crst (crsectype) - type of cross-section, see Section \ref{sectcrsectype},
+cross-sections are usually defined on nodes, they can
+be defined also on elements (especially for bars and beams)}
+
+\item{idcs - number of cross-section}
+
+\item{transf - indicator of local coordinate system in node, default value is 0 - no local system}
+
+\item{*e1,*e2,*e3 - pointers to basis vectors of local coordinate systems,
+arrays are allocated when variable transf is nonzero}
+
+\item{*r - pointer to array containing reactions in node, array is allocated when variable
+reactcomp in class probdesc is switched on}
+
+\item{ncontr\_strain - number of contributions to strain tensor, it is activated when strains are computed
+(straincomp in class probdesc) and averaged (strainaver in class probdesc)}
+%\index{ncontr\_strain}
+
+\item{ncontr\_stress - number of contributions to stress tensor, it is activated when stresses are computed
+(stresscomp in class probdesc) and averaged (stressaver in class probdesc)}
+%\index{ncontr\_stress}
+
+\item{*strain - pointer to array containing averaged strains in node, it is allocated when strains are computed
+(straincomp in class probdesc) and averaged (strainaver in class probdesc)}
+%\index{strain}
+
+\item{*stress - pointer to array containing averaged stresses in node, it is allocated when stresses are computed
+(stresscomp in class probdesc) and averaged (stressaver in class probdesc)}
+%\index{stress}
+\end{itemize}
+
+
+\section{Class {\sf element}}
+\index{class!{\sf element}}
+\label{sectelement}
+
+\begin{itemize}
+\item{te (elemtype) - type of element, see Section \ref{sectelemtype},}
+%\index{te}
+\item{prescdispl - indicator of prescribed displacements on element, default value is 0,
+the value is automatically changed to 1 in case of any prescribed displacement on element,}
+%\index{prescdispl}
+\item{presctemp - indicator of prescribed temperature changes on element, default value is 0,
+the value is automatically changed to 1 in case of any prescribed temperature on element,}
+%\index{presctemp}
+\item{react - indicator of reactions, default value is 0, the value is automatically changed to 1 in case if
+any reaction acts on element,}
+%\index{react}
+\item{nb - number of blocks in geometric matrix}
+%\index{nb}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Class {\sf mechmat}}
+\index{class!{\sf mechmat}}
+
+Class mechmat contains informations about material types used in the problem.
+It contains tnip instances of class intpoints.
+
+\section{Basic instances}
+\begin{itemize}
+\item{nmt - number of material types which are defined in Section \ref{sectmattype},}
+\item{tnip - total number of integration points, it is computed automatically,}
+\end{itemize}
+
+\section{Class {\sf intpoints}}
+\index{class!{\sf intpoints}}
+Intpoints is an abbreviation of integration points.
+
+\subsection{Basic instances}
+\begin{itemize}
+\item{nm - number of material types defined at integration point,}
+\item{tm (mattype) - array containing material types, see Section \ref{sectmattype},}
+\item{idm - array containing id of particular material types.}
+\item{ncompstr - number of components of strain tensor,}
+\item{ncompother - number of components of array other,}
+\item{ssst (strastrestate) - strain/stress state, see Section \ref{sectstrastrestate},}
+\item{*stress - array containing stresses,}
+\item{*strain - array containing strains,}
+\item{*other - array containing any other quantities, e.g. plastic strains, hardening parameters, stress
+components from previous step, etc.,}
+\item{*backup - array for backup of any other array.}
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Finite elements for mechanical problems}
+
+This chapter is devoted to the finite elements for mechanical problems. List
+of implemented elements is mentioned in Section \ref{sectelemtype}.
+
+\section{General informations}
+\label{sectgeninform}
+
+This section is devoted to the description of particular finite elements. Notion characteristic
+matrix \index{matrix!characteristic} means any matrix of finite element. It can be for example stiffness matrix,
+mass matrix, geometric matrix and so on. All matrices are considered at element level.
+
+With respect to maximal universality, block structure of all characteristic matrices is used.
+Decomposition of geometric matrix and stiffness matrix of the material is described in Section \ref{sectgencom}.
+The stiffness matrix is obtained as the sum of contributions (see Equation (\ref{eqstiffmatblockint})).
+As was mentioned in Section \ref{sectgencom}, each contribution can be integrated by different integration
+scheme. This fact is important for example in case of underintegrated finite elements. Block structure of
+matrices allows application of various approximation functions for particular unknown functions.
+On the other hand, existence of several sets of integration points on one element produces difficulty because
+various blocks of data are computed at various points on element and some interpolation must be used. The
+mentioned difficulty will be described with help of plane stress quadrilateral finite element. Plane stress
+is characterized by stress components $\sigma_{xx}, \sigma_{yy}, \tau_{xy}$ and by strain components
+$\varepsilon_{xx}, \varepsilon_{yy}, \gamma_{xy}$. If the bi-linear approximation functions are used, the full
+$2 \times 2$ numerical integration of all components leads to well known shear locking. Reduced integration
+which is based on $2 \times 2$ integration of normal components and one-point integration of tangent component
+is recommended for improving the behaviour of the element. In this case, the shear component must be evaluated
+at the center of the element otherwise nonsence is obtained. Normal components are therefore computed at points
+with natural coordinates equal to $\pm0.55$ while shear components are computed only at point with natural
+coordinates equal to $0$.
+
+Knowledge of all quantities at all integration points is important because during numerical integration
+various quantities are required. But there is also another requirement arising from users of the software.
+Users usually do not require any quantities expressed at the integration points but at the nodes.
+These reasons provoke construction of interpolation of any quantity from any integration point to any other
+point on element.
+
+The least square method is the basis of the interpolation. Suitable function for every quantity is used for
+interpolation and appropriate coefficients are obtained by the least square method. Nodal values of interpolated
+quantity are computed and there are two possibilities how to store them. The first variant is based on storage
+on processed element. In this case, adjacent elements do not influence on the element. This variant is denoted
+{\it no averaging}. The second variant is based on storage of nodal values on nodes. Therefore average of contributions
+from adjacent elements are obatined for every quantity. This resembles simple adaptive technique. The second
+variant is denoted as {\it averaging}.
+
+Not averaging variant can be always used. Averaging variant must be used carefully. The same components (quantities)
+must be sent to nodes otherwise nonsence is obtained. Typically, there are different coordinate systems on elements
+in shell analysis or analysis of beam structures. Therefore incompatible components can be obtained without
+suitable transformation.
+
+
+Evaluation of any quantity anywhere on element is simple if the nodal values are known.
+% je treba zjistit, zda-li se pouzivaji interpolacni funkce z MNC nebo bazove funkce prvku
+
+Components of strain tensor play important role in the decomposition. They are stored in vector and only in specific
+cases are stored in matrix form. The vector containing strain components is decomposed with respect to feature of
+solved problem (plane stress, axisymmetric problem, etc.). Particular decomposition are defined in sections devoted
+to the finite elements.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Material Models}
+\section{List of implemented material models}
+\begin{itemize}
+\item{isotropic elastic model}
+\item{fully anisotropic elastic model}
+\item{onedimensional model of plasticity}
+\item{$J_2$ flow plasticity model}
+\item{2D Mohr-Coulomb plasticity model}
+\item{3D Mohr-Coulomb plasticity model}
+\item{parabolic Mohr-Coulomb plasticity model}
+\item{microplane model}
+\item{Bingham viscosity model}
+\item{Lemaitre viscosity model}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Models of Plasticity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new plasticity model}
+\subsubsection {Implementing new class of plasticity}
+This section describes what the user needs when implements new plasticity model
+to MEFEL. First of all user needs yield function $f$, the first derivative of yield function with
+respect on stress tensor \ppd{f}{\sigma_{ij}}, optionally first derivative of plastic potential
+with respect on stress tensor \ppd{g}{\sigma_{ij}}. In case that plasticity model
+contains hardening/softening it's necessary the first derivative of yield function with
+respect on hardening parameters \ppd{f}{q_i}, derivative hardening parameters with respect
+on $\gamma$, $\ppd{q_i}{\gamma}=-H\ppd{g}{q_i}$ and/or user should provide function {\sf plasmodscalar}
+which computes term $\ppd{f}{q_i}H\ppd{g}{q_i}$ in cutting plane method.
+
+Each new material means the user should found new class with name of plasticity model {\sf myplasmodel}.
+This class should contain material parameters as a data members of this class. Note that the MEFEL
+in case plastic material suppose two materials. The first refers to plastic material and the second
+one refers to elastic material. So the elastic parameters such as th Young modulus $E$ needn't be
+included to the {\sf myplasmodel}. In addition the folowing methods should be defined :
+\begin{itemize}
+{\sf
+\item
+read(FILE* in)
+\item
+double yieldfunction(matrix \&sig, vector \&q)
+\item
+void deryieldfsigma(matrix \&sig, matrix \&dfds)
+\item
+void matstiff (matrix \&d, long ipp)
+\item
+void nlstresses (long ipp)
+\item
+void updateval (long ipp)
+}
+
+Optionally in case plasticity with hardening/softening :
+{\sf
+\item
+void deryieldfq(vector \&qtr, vector \&dfq)
+\item
+void der\_q\_gamma(vector \&dqdg)
+\item
+void updateq(vector \&epsp, strastrestate ssst, vector \&q)
+\item
+double plasmodscalar(vector \&qtr)
+}
+
+or
+{\sf
+\item
+void updateq(vector \&epsp, strastrestate ssst, vector \&q)
+\item
+double plasmodscalar(vector \&qtr)
+}
+
+Optionally in case nonassociated plasticity :
+{\sf
+\item
+void derplaspotsigma(matrix \&sig, matrix \&dgds)
+}
+\end{itemize}
+
+Function {\sf read(FILE* in)} should read material parameters for given plasticity from current
+position in the opened text file given by the function parameter {\it in}.\\
+
+Function {\sf double yieldfunction(matrix \&sig, vector \&q)} returns value of the yield function
+for given plasticity model {\sf myplasmodel}. Returned value is double type. The first parameter
+{\it sig} references to matrix which contains stress {\bf tensor} values $\sigma_{ij}$. The second
+parameter {\it q} is vector which contains values of hardening/softening parameters.\\
+
+Function {\sf void deryieldfsigma(matrix \&sig, matrix \&dfds)} computes values of \ppd{f}{\sigma_{ij}}
+for given plasticity model {\sf myplasmodel}. Returned values are passed through the second parameter
+{\it dfds}. The first parameter {\it sig} references to matrix which contains stress {\bf tensor}
+values $\sigma_{ij}$. The second parameter {\it dfds} is type of matrix which contains result values
+\ppd{f}{\sigma_{ij}}. This matrix is supposed to be proper allocated.\\
+
+Function {\sf void matstiff (matrix \&d, long ipp)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. User may use standard stiffness matrix for
+linear elastic material or when it is available may use tangent stiffness matrix (it will reduce
+number of iteration steps).\\
+
+Function {\sf void nlstresses (long ipp)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Function should
+work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf other} values in the integration point number
+{\it ipp} (See class {\sf mechmat, intpoint}). For plasticity models should contain reached plastic
+strains $\varepsilon^{pl}_{ij}$ and parametr $\gamma$ for cutting plane method.
+\item
+Call stress-return function built in {\sf mechmat} i.e {\sf cutting\_plane} with parameters filled from
+previous step. This method computes appropriate stresses and stores them into stress array in the
+integration point.
+\item
+Store result plastic strains and coefficient $\gamma$ and possible another values to the {\it other}
+array in the integration point. These values have to be stored to the {\bf actual positions} of the
+{\it other} array.
+\end{itemize}
+For example see {\sf drprag::nlstresses(long ipp)} in the file drprag.cpp.\\
+
+Function {\sf void updateval (long ipp)} copies values of {\sf other} array on the positions actual to
+backup positions in case that equilibrium for current step is reached. Parameter {\it ipp} is
+integration point number whose the {\sf other} array should be updated.
+
+
+In case nonassociated plasticity or plasticity with hardening/softening are neccessary following
+functions :\\
+
+Function {\sf void deryieldfq(vector \&qtr, vector \&dfq)} computes values of \ppd{f}{q_i}. The first
+parameter is vector with values of hardening parameters. Second parameter is used for output result
+values. Ammount and the order of these parameters is only for proposal. Prupose of this function will
+be described in the {\sf plasmodscalar} function.\\
+
+Function {\sf void der\_q\_gamma(vector \&dqdg)} computes values of \ppd{q_i}{\gamma} which means
+exactly product $-H\ppd{g}{q_i}$. Parameter {\it dqdg} is output parametr for result values.
+Ammount and the order of these parameters is only for proposal. Prupose of this function will be
+described in the {\sf plasmodscalar} function.\\
+
+Function {\sf double plasmodscalar(vector \&qtr)} computes $\ppd{f}{q_i}H\ppd{g}{q_i}$. This expression
+is used in the cutting plane method. Both previous function should be call here. So the function
+contains something like this :\\
+{\tt
+  double ret;\\
+  vector dfq(qtr.n);\\
+  vector dqg(qtr.n);\\
+  deryieldfq(qtr, dfq);\\
+  der\_q\_gamma(dqg);\\
+  scprd(dfq, dqg, ret);\\
+  return -ret;
+}
+
+When user prefers another way of representation of the expression $\ppd{f}{q_i}H\ppd{g}{q_i}$, there
+is possible to write only function {\sf plasmodscalar} which supply values of this expression. Function
+is called from mechmat's {\sf plasmodscalar(long ipp, vector \&qtr)} so there is possibility to
+pass parameter {\it ipp} to your function {\sf plasmodscalar} to obtain additional values from
+integration point.\\
+
+Function {\sf void updateq(vector \&epsp, strastrestate ssst, vector \&q)} updates hardening variables after
+cutting plane iteration loop has been run depending on the $\varepsilon^{pl}_{ij}$ and the stress/strain state.
+The first parameter {\it epsp} means vector with reached plastic strains. The second parameter {\it ssst}
+means stress/strain state in given integration point i.e. plane stress, plane strain, etc. Parameter {\it q}
+will contain output from this function - the updated hardening parameters.\\
+
+Function {\sf void derplaspotsigma(matrix \&sig, matrix \&dgds)} computes values of derivatives of plastic
+potential \ppd{g}{\sigma_{ij}} for given plasticity model {\sf myplasmodel}. Returned values are passed
+through the second parameter {\it dfds}. The first parameter {\it sig} references to matrix which contains
+stress {\bf tensor} values $\sigma_{ij}$. The second parameter {\it dfds} is type of matrix which contains
+result values \ppd{g}{\sigma_{ij}}. This matrix is supposed to be proper allocated.\\
+
+\subsubsection {Including new plasticity class to MEFEL files}
+Thus the new class {\sf myplasmodel} is written to files  myplasmodel.cpp${\rm |}$h. Now the user should
+include this class to the MEFEL. Here is list of files which have to be modified :
+
+{\bf alias.h}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that the name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the plasticity class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the MEFEL.\\
+
+{\bf intpoints.cpp}\\
+In function {\sf intpoints::alloc(long nlc)} it's neccessary to add new {\tt case} for alias of
+the new material. Contents of this case could be partially copied form {\tt case } of another plastic
+material i.e. druckerprager :\\
+{\tt
+    ncompother=ncompstr+1+NUMHARDPARAM;\\
+    strain = new double [ncompstr];\\
+    stress = new double [ncompstr];\\
+    other  = new double [ncompother];\\
+    memset (strain,0,ncompstr*sizeof(double));\\
+    memset (stress,0,ncompstr*sizeof(double));\\
+    memset (other,0,ncompother*sizeof(double));\\
+    //  other[0 - (ncompstr-1)]=plastic strain components\\
+    //  other[ncompstr]=gamma\\
+    //  other[ncompstr+1 - (ncompstr+1+NUMHARDPARAM-1)]=hardening parameters\\
+    //  folowing positions are used for same values but not for equilibrium state
+}\\
+Function allocates memory for arrays {\it stress, strain} and {\it other} in the integration points.
+NUMHARDPARAM is not really variable or macro in MEFEL but denotes the number of hardening parameters.
+This number will depend on given type of plasticity. User have to save on the first positions reached
+plastic strains $\varepsilon^{pl}_{ij}$ followed by the reached value of $\gamma$ coefficient for the cutting
+plane method. Rest saved values depend on the given plastic model. Generally it will be hardening parameters.
+Number of strain component and number of stored hardening parameters + $\gamma$ give us half number of necessary
+stored values at the {\it other} array. The reason is that the MEFEL on the first positions stores values at
+the reached equilibrium state and on the last positions the actual values are stored.\\
+
+Optionally user should modify function {\sf intpoints::read(FILE *in)} which isn't already used.
+But it has been saved for instance that the user wants different type of material in the each
+integration point. In this function user should add absolutelly same block as has been added in the
+{\sf element::read}.\\
+
+{\bf mechmat.h}\\
+This file contains declaration of the {\sf mechmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf myplasmodel} to the {\sf mechmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf myplasmodel} class or insert include file with {\sf myplasmodel} class declaration.\\
+
+
+{\bf mechmat.cpp}\\
+\begin{itemize}
+\item {\sf void mechmat::readmatchar (FILE *in)}
+\item {\sf void mechmat::matstiff (matrix \&d,long ipp)}
+\item {\sf double mechmat::yieldfunction (long ipp, matrix \&sig, vector \&q)}
+\item {\sf void mechmat::dfdsigma (long ipp, matrix \&sig, matrix \&dfds)}
+\item {\sf void mechmat::dgdsigma (long ipp, matrix \&sig, matrix \&dgds)}
+\item {\sf void mechmat::dfdq (long ipp, vector \&dq)}
+\item {\sf double mechmat::plasmodscalar (long ipp, vector \&qtr)}
+\item {\sf void mechmat::updateq (long ipp, double dgamma, vector \&epsp, vector \&q)}
+\item {\sf void updateipval ()}
+\item {\sf void mechmat::computenlstresses (long ipp)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf myplasmodel} should be included at the begining
+of mechmat.cpp\\
+
+In function {\sf readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf myplasmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYPLASMODEL materials \%ld",numtype);\\
+      MYPLASMODELPT = new MYPLASMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYPLASMODEL material in function\\
+                   mechmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYPLASMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYPLASMODEL with name of the new class {\sf myplasmodel} and MYPLASMODELPT with
+name of the pointer which has been used in the {\sf mechmat} class declaration in the file mechmat.hpp. This
+statement block the first allocates array with new material then folows loop where the number of sets of the
+parameters is read and then the {\sf read} function for the given material type is called.\\
+
+Function {\sf matstiff (matrix \&d,long ipp)} contains {\tt switch} statement which calls appropriate function
+for assembling stiffness matrix for given material. Here the new {\tt case} for the  {\sf myplasmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make only one modification. That means replacement name of pointer to array with materials, with name which has been
+used in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it d} of this function
+represents allocated result stiffnes matrix, the second one {\it ipp} is integration point number.\\
+
+Function {\sf yieldfunction (long ipp, long idpm, matrix \&sig, vector \&q)} contains {\tt switch} statement which calls
+appropriate function for yield function of given material. Here the new {\tt case} for the  {\sf myplasmodel} would
+be included. It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case}
+and then make only one modification. That means replacement name of pointer to array with materials, with name which
+has been used in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it ipp} is integration
+point number, {\it sig} is matrix with stress tensor and {\it q} is vector with hardening parameters.\\
+
+Function {\sf dfdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dfds)} contains {\tt switch} statement
+which calls appropriate function for derivatives of yield function with respect on stresses for given material. Here
+the new {\tt case} for the  {\sf myplasmodel} would be included. It is possible to take part of {\tt case} statement
+from another material and copy it into new {\tt case} and then make only one modification. That means replacement name
+of pointer to array with materials, with name which has been used in the {\sf mechmat} class declaration
+in the mechmat.h. Parameter {\it ipp} is integration point number, {\it sig} is matrix with stress tensor and
+{\it dfds} is output parameter i.e. allocated matrix with results.\\
+
+Function {\sf dgdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dgds)} computes derivatives of plastic
+potential with respect on stresses. Implementing procedure is same as in the previous function. Denotation of function
+parameters is same too.\\
+
+Function {\sf dfdq (long ipp, long idpm, vector \&dq)} computes derivatives of yield function with respect on hardening
+parameters. Implementing procedure is same as in the previous function. If plasticity model hasn't hardening, let
+the {\tt case} statement for given material empty only with keyword {\tt break}. Parameter {\it ipp} is integration
+point number, {\it dq} contains values with actual hardening parameters and togeather serv as output parameter for results.\\
+
+Function {\sf plasmodscalar (long ipp, long idpm, matrix \&sig, vector \&eps, vector \&epsp, vector \&qtr)} computes
+expression $\ppd{f}{q_i}H\ppd{g}{q_i}$ for cutting plane method. Implementing procedure is same as in the previous function.
+If plasticity model hasn't hardening, let the {\tt case} statement for given material empty only with keyword {\tt break}.
+Parameter {\it ipp} is integration point number,{\it qtr} contains values with actual hardening parameters.\\
+
+Function {\sf updateq (long ipp, long idpm, double dgamma, vector \&epsp, vector \&q)}
+Implementing procedure is same as in the previous function. If plasticity model hasn't hardening, let the {\tt case}
+statement for given material empty only with keyword {\tt break}. Parameter {\it ipp} is integration point number,
+{\it dgamma} is increment of $\gamma$ parameter in the cutting plane method, {\it epsp} is plastic strains in the
+trial state $\varepsilon^{pl}_{trial}$, {\it q} contains values of hardening parameters. See file mechmat.cpp, function
+{\sf void mechmat::cutting\_plane (long ipp, double \&gamma, vector \&epsn, vector $\&$epsp, vector $\&$q)}.\\
+
+Function {\sf updateipval ()} contains {\tt switch} statement which calls appropriate function for updateing valus in the
+integration point {\sf other} array for given material. That means this function should replace backup values of equilibrium
+state from the previous step with values that has been actually computed and equilibrium state for current step
+has been reached. Here the new {\tt case} for the  {\sf myplasmodel} would be included. Implementing procedure is same
+as in the previous function.\\
+
+Function {\sf computenlstresses (long ipp)} computes stresses in nonlinear mechanic problems for given integration
+point and material type. Implementing procedure is same as in the previous function. Parameter {\it ipp} is integration
+point number.
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Models of damage}
+
+This chapter describes damage models contained in MEFEL. Each model has described basic formulas,
+damage parameter function, damage function and material parametres. Numerical methods for nonlinear
+mechanics and for damage computation are described in the section . . .
+
+\subsection{Scalar isotropic damage}
+Parameters :\\
+\begin{itemize}
+\item {\sf indam} - intial value of damage variable $d$
+\item {\sf st} - tensile strength
+\item {\sf uf} - determines the softening -> corresponds to crack opening (not strain) when tension stress vanishes
+\item {\sf c}  - coefficient which is used when {\sf ft} = energy norm. (This parameter is used due to obtain correct
+                 units of the damage function parameter {\it kappa})
+\item {\sf ft} - this integer number determine which energy norm for parameter of damage function should be used
+                 See alias.h file - {\sf paramf\_type}
+\end{itemize}
+
+This model is based on two relationships. The first one is the realtion between stress $\sigma$ and $u$ which means
+crack opening,
+\begin{equation}
+ \sigma=f(u)=f_t exp(-u/u_f)
+\end{equation}
+where
+\begin{itemize}
+\item $f_t$ - tensile strength
+\item $u_f$ - determines the softening - corresponds to crack opening (not strain) when tension stress vanishes
+\end{itemize}
+
+The second one is stress/strain relation,
+\begin{equation}
+ \sigma=(1 - d) E \varepsilon
+\end{equation}
+where $d$ is damage variable.
+
+Supposing $\tilde{\varepsilon} - \varepsilon_e \approx u/h$, where $h$ is size of given element where the crack occured and
+$\varepsilon_e = \sigma/E$.
+
+Comparing these relations we should obtain equation :
+\begin{eqnarray}
+\sigma&=&(1 - d) E \tilde{\varepsilon} = f(h(\tilde{\varepsilon}-\sigma/E))\\
+(1 - d) E \tilde{\varepsilon} &=& f(h(\tilde{\varepsilon}-((1-d) E \tilde{\varepsilon})/E))\\
+(1 - d) E \tilde{\varepsilon} &=& f(h d \tilde{\varepsilon})\\
+0 &=& (1 - d) E \tilde{\varepsilon} - f(h d tilde{\varepsilon})
+\end{eqnarray}
+
+This last equation we solve for $d$ variable, $h$ is size of element and for 1D problem is treated as element length,
+for 2D problem is treated as $h = \sqrt{A}/2$, where $A$ is element area. Equation is solved with Newton tangent method.
+Number of iteration step is given by parameter {\it nicp} in the problem description. See probdesc.cpp file for more
+information.
+
+This model has implemented several ways for $\tilde{\varepsilon}$ computing. Which norm should be used is determined
+by the {\it ft} parameter. Following possibilities are implemented :
+\begin{itemize}
+\item {\sf norstrain} - $\tilde{\varepsilon}=\sqrt{\varepsilon_{ij} \varepsilon_{ij}}$
+\item {\sf norenergy} - $\tilde{\varepsilon}=c\sqrt{\varepsilon_{ij} D_{ijkl} \varepsilon_{kl}}$, where $D$ is stiffness matrix
+\item {\sf norposstrain} - $\tilde{\varepsilon}=\sqrt{<\varepsilon_{ij}> <\varepsilon_{ij}>}$
+\item {\sf norposenergy} - $\tilde{\varepsilon}=c\sqrt{<\varepsilon_{ij}> D_{ijkl} <\varepsilon_{kl}>}$
+\item {\sf norrankine} - $\tilde{\varepsilon}=\del{\sqrt{max(\sigma_I) max(\sigma_I)}}{E}$, where $max(\sigma_I)$ is maximal positive
+                         value of principal stresses and E is Young modulus.
+\item {\sf norrankinesmooth} - $\tilde{\varepsilon}=\del{\sqrt{<\sigma_I> <\sigma_I>}}{E}$
+\item {\sf normazar} - $\tilde{\varepsilon}=\sqrt{<\varepsilon_I> <\varepsilon_I>}$, where $\varepsilon_I$ are principal strains
+\item {\sf norvonmises} - $\tilde{\varepsilon} = \del{k-1}{2k(1-2\nu)}I_1+\del{1}{2k}\sqrt{\del{(k-1)^2}{(1-2\nu)^2}I_1^2 -
+                           \del{12k}{(1+\nu)^2}J_2}$,
+where k is ration between uni-axial compressive and uniaxial tensile strength. $I_1$ and $J_2$ are the first invariant of
+the strain tensor and the second invariant of the deviatoric strain tensor respectively.
+
+\end{itemize}
+
+\subsection{Scalar isotropic damage with crack closure}
+This model has been implemented by virtue of paper Continuum damage modelling and some computational issues (G. Pijaudier-Cabot,
+Ludovic Jason, RFGC - 6/2002 Numerical Modelling in Geomechanics), section 2.3 Integrated Damage Model.
+
+\subsection{Implementation of new scalar damage  model}
+\subsubsection {Implementing new class of scalar damage}
+This section describes what the user needs when implements new scalar damage model
+to MEFEL. First of all user needs damage parameter function $\tilde {\varepsilon}$ and damage function $f$,
+
+Each new material means the user should found new class with name of scalar damage model {\sf myscdammodel}.
+This class should contain material parameters as a data members of this class. Note that the MEFEL
+in case scalar damage material suppose two materials. The first refers to damage material and the second
+one refers to elastic material. So the elastic parameters such as th Young modulus $E$ needn't be
+included to the {\sf myscdammodel}. In addition the folowing methods should be defined :
+\begin{itemize}
+\item
+{\sf read(FILE* in)}
+\item
+{\sf void damfuncpar(long ipp, vector \&eps, vector \&kappa)}
+\item
+{\sf double damfunction(long ipp, vector \&kappa, vector \&eps)}
+\item
+{\sf void matstiff (matrix \&d, long ipp)}
+\item
+{\sf void nlstresses (long ipp)}
+\item
+{\sf void updateval (long ipp)}
+
+\end{itemize}
+
+Function {\sf read(FILE* in)} should read material parameters for given damage from current
+position in the opened text file given by the function parameter {\it in}.\\
+
+Function {\sf void damfuncpar(long ipp, vector \&eps, vector \&kappa)} returns value of the damage
+function parameter $\tilde {\varepsilon}$ for given damage model {\sf myscaldammodel}.
+Returned value is double type. The first parameter {\it eps} references to vector which contains strains.
+The second parameter {\it kappa} is vector which contains current values of damage parameters (For
+introduced models this parameter could be {\sf double} type, but {\sf vector} is prepared for another
+future models which could have more then one damage parameter of damage function. In such case this
+function should return {\sf vector} type instead of {\sf double}).\\
+
+Function {\sf void damfunction(long ipp, vector  \&kappa, vector \&eps)} returns value of the damage
+variable {\it d} for given damage model {\sf myscaldammodel}. Returned value is a{\sf double}.
+The first parameter {\it kappa} is vector which contains current values of damage parameters (For
+introduced models this parameter could be a {\sf double}, but {\sf vector} is prepared for another
+future models which could have more then one damage parameter of damage function. In such case this
+function should return {\sf vector} type instead of {\sf double}). The second parameter {\it eps}
+references to vector which contains strains.\\
+
+Function {\sf void matstiff (matrix  \&d, long ipp)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. User may use standard stiffness matrix for
+linear elastic material or when it is available may use tangent/secant stiffness matrix (it will reduce
+number of iteration steps).\\
+
+Function {\sf void nlstresses (long ipp)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Function should
+work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf other} values in the integration point number
+{\it ipp} (See class {\sf mechmat, intpoint}). For scalar damage models should contain reached damage
+parameter and damage variable  $d$.
+\item
+Call scalar damage solver function built in {\sf mechmat} i.e {\sf scal\_dam\_sol} with parameters filled
+from previous step. This method computes damage variable and stresses.
+\item
+Store result stresses and coefficient $\kappa$ and possible another values to the {\sf other}
+array in the integration point.
+\end{itemize}
+For example see {\sf scaldam::nlstresses(long ipp)} in the file scaldam.cpp.\\
+
+Function {\sf void updateval (long ipp)} copies values of {\sf other} array on the positions actual to
+backup positions in case that equilibrium for current step is reached. Parameter {\it ipp} is
+integration point number whose the {\sf other} array should be updated.
+
+\subsubsection {Including new scalar damage class to MEFEL files}
+Thus the new class {\sf myplasmodel} is written to files myscaldammodel.cpp${\rm |}$h. Now the user should
+include this class to the MEFEL. Here is list of files which have to be modified :
+
+{\bf alias.h}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the scalar damage class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the MEFEL.\\
+
+{\bf intpoints.cpp}\\
+In function {\sf intpoints::alloc(long nlc)} it's neccessary to add new {\tt case} for alias of
+the new material. Contents of this case could be partially copied form {\tt case } of another scalar
+damage material i.e. {\sf scaldamage} :\\
+{\tt
+    strain = new double [ncompstr];\\
+    stress = new double [ncompstr];\\
+    other = new double [4];\\
+    memset (strain,0,6*sizeof(double));\\
+    memset (stress,0,6*sizeof(double));\\
+    memset (other,0,4*sizeof(double));\\
+    //  other[0]=last strain-energy function value\\
+    //  other[1]=damage parameter\\
+    //  folowing positions are used for same values but not for equilibrium state\\
+    ncompother=4;\\
+    break;\\
+}\\
+Function allocates memory for arrays {\sf stress, strain} and {\sf other} in the integration points.
+User have to save on the first positions reached damage parameter $\tilde{\varepsilon_{ij}}$
+
+Optionally user should modify function {\sf intpoints::read(FILE *in)} which isn't already used.
+But it has been saved for instance that the user wants different type of material in the each
+integration point. In this function user should add absolutelly same block as has been added in the
+element::read.\\
+
+{\bf mechmat.h}\\
+This file contains declaration of the {\sf mechmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf myscaldammodel} to the {\sf mechmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf myplasmodel} class or insert include file with {\sf myscaldammodel} class declaration.\\
+
+
+{\bf mechmat.cpp}\\
+\begin{itemize}
+\item {\sf void mechmat::readmatchar (FILE *in)}
+\item {\sf void mechmat::matstiff (matrix \&d,long ipp)}
+\item {\sf void mechmat::damfuncpar(long ipp, vector \&eps, vector \&kappa)}
+\item {\sf double mechmat::damfunction(long ipp, vector \&kappa, vector \&eps)}
+\item {\sf void updateipval ()}
+\item {\sf void mechmat::computenlstresses (long ipp)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf myscaldammodel} should be included at the begining
+of mechmat.cpp\\
+
+In function {\sf readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf myscaldammodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYSCALDAMMODEL materials \%ld",numtype);\\
+      MYSCALDAMMODELPT = new MYSCALDAMMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYSCALDAMMODEL material in function\\
+                   mechmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYSCALDAMMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYSCALDAMMODEL with name of the new class {\sf myscaldammodel} and MYSCALDAMMODELPT with
+name of the pointer which has been used in the {\sf mechmat} class declaration in file mechmat.hpp. This
+statement block first allocates array with new material then folows loop where the number of set of parameters is
+read and then the {\sf read} function for the given material type is called.
+
+Function {\sf matstiff (matrix \&d,long ipp)} contains {\tt switch} statement which calls appropriate function
+for assembling stiffness matrix for given material. Here the new {\tt case} for the  {\sf myscaldammodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make only one modification. That means replacement name of pointer to array with materials, with name which has been used
+in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it d} of this function represents allocated
+result stiffnes matrix, the second one {\it ipp} is integration point number.
+
+Function {\sf damfuncpar(long ipp, vector \&eps, vector \&kappa)} contains {\tt switch} statement which calls
+appropriate function for computing parameter $\tilde{\varepsilon}$ for damage function of given material. Here the new
+{\tt case} for the  {\sf myscaldammodel} would be included. It is possible to take part of {\tt case} statement from
+another material and copy it into new {\tt case} and then make only one modification. That means replacement
+name of pointer to array with materials, with name which has been used in the {\sf mechmat} class declaration in the mechmat.h.
+The first parameter {\it ipp} is integration point number, {\it eps} is strain vector and {\it kappa} is vector with
+damage parameters.
+
+Function {\sf damfunction(long ipp, vector \&kappa, vector \&eps)} contains {\tt switch} statement which calls
+appropriate damage function for given material. This function returns value of damage variable $d$. Here the new
+{\tt case} for the  {\sf myscaldammodel} would be included. It is possible to take part of {\tt case} statement from
+another material and copy it into new {\tt case} and then make only one modification. That means replacement name of pointer
+to array with materials, with name which has been used in the {\sf mechmat} class declaration in the mechmat.h.
+Parameter {\it ipp} is integration point number, {\it kappa} is vector with damage function parameters and {\it eps} is
+strain vector.
+
+Function {\sf updateipval ()} contains {\tt switch} statement which calls appropriate function for updateing valus in the
+integration point {\sf other} array for given material. That means this function should replace backup values of equilibrium
+state from the previous step with values that has been actually computed and equilibrium state for current step
+has been reached. Here the new {\tt case} for the  {\sf myscaldammodel} would be included. Implementing procedure is same
+as in the previous function.
+
+Function {\sf computenlstresses (long ipp)} computes stresses in nonlinear mechanic problems for given integration
+point and material type. Implementing procedure is same as in the previous function. Parameter {\it ipp} is integration
+point number.

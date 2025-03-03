@@ -1,0 +1,904 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (X11; I; Linux 2.2.12-20 i686) [Netscape]">
+   <title>CML-file</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<hr NOSHADE>
+<h1>
+<font size=+4>CML-file</font></h1>
+&nbsp;
+<h2>
+<b><i><font size=+0>Ondra Hrstka</font></i></b><font size=+1> <tt><a href="mailto:ondra@klobouk.fsv.cvut.cz">&lt;ondra@klobouk.fsv.cvut.cz></a></tt></font></h2>
+June 6th, 2000
+<p>
+<hr NOSHADE><i>This is basic HTML documentation how to use a CML-file class.</i>
+<hr NOSHADE>
+<h2>
+<a NAME="toc1"></a>1. <a href="#1">Introduction &amp; Simple Example</a></h2>
+
+<h2>
+<a NAME="toc2"></a>2. <a href="#2">Instanciating &amp; configuring CML-file</a></h2>
+
+<ul>
+<li>
+<a href="#2.1">2.1 Configuring using C++ interface</a></li>
+
+<li>
+<a href="2.2">2.2 Configuring using an rc-file</a></li>
+
+<li>
+<a href="#2.3">2.3 Configuring using another CML-file</a></li>
+</ul>
+
+<h2>
+<a NAME="toc4"></a>3. <a href="#3">Reading data on lines</a></h2>
+
+<ul>
+<li>
+<a href="#3.1">3.1 Simple data</a></li>
+
+<li>
+<a href="#3.2">3.2 Multiple data on one line</a></li>
+
+<li>
+<a href="#3.3">3.3 Multiple data for one label</a></li>
+
+<li>
+<a href="#3.4">3.4 Data with label and keys</a></li>
+
+<li>
+<a href="#3.5">3.5 Percentages</a></li>
+
+<li>
+<a href="#3.6">3.6 Reading whole line for parsing using other routines</a></li>
+
+<li>
+<a href="#3.7">3.7 Reading data while they are spread into multiple files</a></li>
+</ul>
+
+<h2>
+<a NAME="toc5"></a>4. <a href="#4">Reading data in sections</a></h2>
+
+<h2>
+<a NAME="toc6"></a>5. <a href="#5">Checking Requirements</a></h2>
+
+<h2>
+<a NAME="toc7"></a>6. <a href="#6">Outputting</a></h2>
+
+<h2>
+<a NAME="toc8"></a>7. <a href="#7">Error flags</a></h2>
+
+<h2>
+<a NAME="toc9"></a>8. <a href="#8">Compiling CML-file</a></h2>
+
+<h2>
+<a NAME="toc27"></a>9. <a href="#9">Notices</a></h2>
+
+<hr NOSHADE>
+<p><a NAME="1"></a><b><font size=+2>1. Introduction &amp; Simple Example</font></b>
+<p><b><i><font size=+2>&nbsp;&nbsp;&nbsp; </font>Important note: CML-file
+stands for 'Cybule-like Multi Language'; obviously CML-file does not define
+any multi-language such as HTML; it's a joke :o). Firstly it was developed
+for my project Cybule (something like neuronal network) and was generalised
+into this.</i></b>
+<p>&nbsp;&nbsp;&nbsp; Well, what is it CML-file: it's a C++ class that
+provides some (I guess very easy) way to acquire data from a text configuration
+or data file. It uses very common "technology" of keywords: a keyword stands
+on the begining of each line. If somebody wants the rest of the line, simply
+sends the keyword to CML-file and CML-file returns wanted data. It's all
+for now but CML-file has some other capabilities, such as:
+<ul>
+<li>
+It does not require any order in the file; whereever data are located,
+CML-file finds them.</li>
+
+<li>
+Data may be spred into multiple files; CML-file knows how to make them
+together.</li>
+
+<li>
+Data after some keyword may be of type int, double or string; you acquire
+what you want and you don't need to atoi them or something.</li>
+
+<li>
+After some keyword you can read one or multiple items.</li>
+
+<li>
+You may have multiple lines with the same keyword and read them sequentialy
+or choose by a key (integer or string) that follows the keyword.</li>
+
+<li>
+It is quite fast - it does not run through all file while searching each
+keyword; instead it creates something like a map of the file.</li>
+
+<li>
+Data may be organized into sections - this is useful especially for long
+lists of data of the same kind, e.g. elements or nodes in some FEM computation.</li>
+
+<li>
+CML-file is able to check if file contains apropriate data.</li>
+
+<li>
+Also, CML-file is able to input and output data with same keywords - this
+can asure that no mistakes will be made in output file.</li>
+</ul>
+&nbsp;&nbsp;&nbsp; Enough advertisment; let's go on with some instructive
+example of the file, that will be read by CML-file:
+<p><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- this file contains information about train 'W.A.Mozart' that is going
+from Berlin - Haupt Bahnhoff to Prague - Main Station --</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- definition of the train --</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Name
+"Wolfgang Amadeus Mozart"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Locomotive
+type=Electric power=1750.5kW</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+Post</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+1stClass 1</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+Restaurant</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 2</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 3</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 4</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- crew --</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Machinenfuhrer
+"Helmut Diesenhoffer"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Conductors
+3</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; ConductorNames
+"Irene Ober-Hausendorfer" "Joachim Heinzmann" "Carl Wolf"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Cook
+"Jonathan Krueger-Stadler"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Waiter
+"Heinrich Zuckermann"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- stations --</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Berlin - Haupt Bahnhoff"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Chemnitz"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Decin"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Usti nad Labem"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Station
+"Prague - Main Station"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- arrivals and departs</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Depart
+"Berlin-Haupt Bahnhoff" 10.15</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; In
+"Dresden" 11.29 11.35</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; In
+"Chemnitz" 13.02 13.15</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; In
+"Decin" 14.44 14.50</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; In
+"Usti nad Labem" 15.22 15.30</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Arrival
+"Prague - Main Station" 16.54</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- reservations --</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; SECTION
+Reservations</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Armin
+Muehler-Stahl" 1 33 "Berlin - Haupt Bahnhoff" "Prague - Main Station"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Jorgen
+Prochnow" 2 59 "Chemnitz" "Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Ludwig
+von Spretti-Weilbach" 2 58 "Berlin - Haupt Bahnhoff" "Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; END</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; #
+-- end of file --</font></font>
+<p>&nbsp;&nbsp;&nbsp; I guess nobody needs any explanation of this absolutely
+stupid and useless example - but look, it's only an example :o).
+<br>&nbsp;&nbsp;&nbsp; Several modes of data format occur in this example,
+so:
+<p>&nbsp;&nbsp;&nbsp;<font face="Courier New,Courier"> Conductors 3</font>
+<p>&nbsp;&nbsp;&nbsp; This is the most simple form - a keyword and single
+value (int in this case); value can be also double or string, as in following:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">Name "Wolfgang Amadeus
+Mozart"</font>
+<p>&nbsp;&nbsp;&nbsp; Strings need not to be in commas ("something") but
+in case they include spaces.
+<br>&nbsp;&nbsp;&nbsp; If you want to have more than one value on single
+line you may (and they need not to ne of the same type, one may be int
+and other double etc.). Example is:
+<p>&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>ConductorNames
+"Irene Ober-Hausendorfer" "Joachim Heinzmann" "Carl Wolf"</font></font>
+<p>&nbsp;&nbsp;&nbsp; CML-file does not provide any parsing of a single
+line; if you need to parse something like this:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>Locomotive
+type=Electric power=1750.5kW</font></font>
+<p>&nbsp;&nbsp;&nbsp; you have to read the rest of the line behind the
+keyword as a line (whole string till the end of line) and parse it using
+other routines.&nbsp; As you can mention, this example does not tell how
+many wagons the train has - but it doesn't matter, CML-file will count
+them itself. So, when you want to read data of wagons, you start with asking
+"how many wagons do we have" and then (for example in some for-cycle) you
+read them one after one in the order as they are stored in the file by
+asking "give me type of wagon number 3" for example (but look, 3rd wagon
+is this:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>Wagon
+2ndClass 2</font></font>
+<p>&nbsp;- every indexing starts from zero).&nbsp; Notice: number 2 is
+number of passenger wagon that I use in reservations section - look there.
+<br>&nbsp;&nbsp;&nbsp; The same comes for data of stations.
+<br>&nbsp;&nbsp;&nbsp; Lines that contain information about stations between
+Berlin and Prague has the same keyword and you can read this using reading
+with key, where key is string-type and is for example <font face="Courier New,Courier">"Dresden".</font>&nbsp;
+Than you can use 'reading with order' as in <font face="Courier New,Courier">ConductorNames</font>
+line; note that <font face="Courier New,Courier">11.29</font> (we are in
+Dresden) has order 0 and <font face="Courier New,Courier">11.35</font>
+has order 1:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>In
+"Dresden" 11.29 11.35</font></font>
+<p>&nbsp;&nbsp;&nbsp; Last thing are reservations. Between lines
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>SECTION
+Reservations</font></font>
+<p>&nbsp;&nbsp;&nbsp; and
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier"><font size=-2>END</font></font>
+<p>&nbsp;&nbsp;&nbsp; are stored data lines:
+<p>&nbsp;&nbsp;&nbsp; "<font face="Courier New,Courier"><font size=-2>Armin
+Muehler-Stahl" 1 33 "Berlin - HauptBahnhoff" "Prague - Main Station"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp; "Jorgen Prochnow"
+2 59 "Chemnitz" "Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp; "Ludwig von Spretti-Weilbach"
+2 58 "Berlin - HauptBahnhoff" "Dresden"</font></font>
+<p>&nbsp;&nbsp;&nbsp; Reading of this is done by following steps:
+<br>&nbsp;&nbsp;&nbsp; 1. Tell CML-file which section you want to read
+(well, you may have more than one section in one file - but they must have
+different names).
+<br>&nbsp;&nbsp;&nbsp; 2. One after one you get whole these lines.
+<br>&nbsp;&nbsp;&nbsp; 3. Tell CML-file that you are done with this section
+(note: you may not start reading somewhere in other place of file during
+reading one section; first you must tell CML-file that you have finished
+the section.
+<p><a NAME="2"></a><b><font size=+2>2. Instanciating &amp; configuring
+CML-file</font></b>
+<p>&nbsp;&nbsp;&nbsp; Well, just look how to instanciate some CML-file.
+<br>&nbsp;&nbsp;&nbsp; The CML-file is an C++ class, so you must declare
+this as a variable (the instance of class):
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">cmlfile F ;</font>
+<p>&nbsp;&nbsp;&nbsp; Or you may straightly open a file doing this:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">cmlfile F( "train.cml"
+) ;</font>
+<p>&nbsp;&nbsp;&nbsp; I think I should note there that after all you may
+close it using:
+<p>&nbsp;&nbsp;&nbsp;<font face="Courier New,Courier"> F.close() ;</font>
+<p>&nbsp;&nbsp;&nbsp; but it is not necessary, because destructor of the
+class itself closes everything. Well, generally it is better to use destructor,
+because CML-file has relatively high amount of memory allocated for itself
+(of course, not megabytes) and destructor frees this all.
+<br>&nbsp;&nbsp;&nbsp; After instanciating CML-file you should configure
+it, which means, tell CML-file what keywords and what sections you will
+use and also the 'requirements' - this means for example the following:
+every train must have a locomotive, so line with keyword <font face="Courier New,Courier">Locomotive</font>
+is necessary - so required. The CML-file can than answer a question if
+every required data are present in the file.
+<br>&nbsp;&nbsp;&nbsp; You have 3 ways to configure a CML-file: or using
+some C++ interface, or with so called rc-file or by 'inheritance' from
+another CML-file. No, I don't mean 'inheritance' in the C++ way of speaking
+but simply this: you send one CML-file to another and the other will copy
+the configuration to itself. It will copy - well , it's slow and I could
+only link it, but I assume, that another file may have something special
+and so I would like to leave the possibility to make additional changes.
+<br>&nbsp;&nbsp;&nbsp; There is a function called
+<p><font face="Courier New,Courier">&nbsp; void cmlfile::compile ( void
+)</font>
+<p>that reads the file and creates a map. Normally it is called automatically;
+but you can call it by yourself if you want:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.compile() ;</font>
+<p><a NAME="2.1"></a><b><font size=+1>2.1 Configuring using C++ interface</font></b>
+<p>&nbsp;&nbsp;&nbsp; It is the most complicated way. We have some couple
+of functions:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::set_labels
+( int olabels ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::set_sections
+( int osections ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::set_label_string
+( int olabel , char *olabel_string ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::set_section_string
+( int olabel , char *osection_string ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::require
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::minimal
+( int olabel , int ominimal ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::optionalize
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::refuse
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::set_minimal_rows
+( int osection , int ominimal ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; So:
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">set_labels</font>
+tells CML-file how many labels (keywords as for example <font face="Courier New,Courier">Machinenfuhrer</font>)
+will be used,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">set_sections </font>tells
+CML-file how many sections (as <font face="Courier New,Courier">Reservations</font>)
+will be used,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">set_label_string</font>
+tells that for example keyword for label number 5 is "<font face="Courier New,Courier">Machinenfuhrer</font>";
+this number has no other meaning but it must be lower than number of labels
+that was set using <font face="Courier New,Courier">set_labels</font>;
+also, if I said that I will have 10 labels, their numbers must be between
+0 and 9; 10 is too big,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">set_section_string</font>
+is the same for sections,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">require</font>
+tells CML-file that apropriate label is necessary to be in the file; it
+means that it must be there minimally once,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">minimal</font>
+tells minimal amount of lines with apropriate label that must be in the
+file,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">optionalize </font>tells
+that apropriate label need not to be in the file,
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">refuse </font>tells
+that apropriate label must not be in the file (but actually it does not
+generate an error if it catch such label),
+<br>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">set_minimal_rows</font>
+tells that apropriate section must have minimally some amount of rows;
+if no of functions above (since <font face="Courier New,Courier">require</font>)
+is used, default value is that every label is optional and minimal number
+of rows for all sections is 0.
+<p>&nbsp;&nbsp;&nbsp; Now, I will show example function that configure
+CML-file for reading file that defines the train (but first I will make
+some <font face="Courier New,Courier">#define</font>s, because I don't
+want to remember numbers of labels):
+<p>&nbsp;&nbsp;&nbsp;<font face="Courier New,Courier">&nbsp;&nbsp; #include
+"cmlfile.h"</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Name 0</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Locomotive
+1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Wagon 2</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Machinenfuhrer
+3</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Conductors
+4</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define ConductorNames
+5</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Cook 6</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Waiter
+7</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Station
+8</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Depart
+9</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define In 10</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Arrival
+11</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; #define Reservations
+0</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void configure (
+cmlfile &amp;oF )</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; {</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_labels( 12 ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_sections( 1 ) ;</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Name,"Name" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Locomotive,"Locomotive" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Wagon,"Wagon" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Machinenfuhrer,"Machinenfuhrer" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Conductors,"Conductors" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( ConductorNames,"ConductorNames" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Cook,"Cook" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Waiter,"Waiter" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Station,"Station" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Depart,"Depart" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( In,"In" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_label_string( Arrival,"Arrival" ) ;</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.set_section_string( Reservations,"Reservations" ) ;</font>
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Name ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Locomotive ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.minimal( Wagon,2 ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Machinenfuhrer ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Conductors ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.minimal( Station,2 ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Depart ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oF.require( Arrival ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; }</font>
+<p>&nbsp;&nbsp;&nbsp; Everything clear? Hope so :o)
+<br>&nbsp;&nbsp;&nbsp; Note: you may use functions as require anytime,
+so for example, when you realise, that train goes through 4 station between
+Berlin and Prague, you may apply:
+<p>&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">F.minimal( In,4
+) ;</font>
+<p><a NAME="2.2"></a><b><font size=+1>2.2 Configuring using an rc-file</font></b>
+<p>&nbsp;&nbsp;&nbsp; This is somehow more simple. You create an rc-file,
+that may look like this:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">Name
+1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Locomotive 1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Wagon 2</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Machinenfuhrer
+1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Conductors 1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; ConductorNames
+1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Cook 0</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Waiter 0</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Station 2</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Depart 1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; In 0</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Arrival 1</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; SECTION Reservations
+0</font>
+<p>&nbsp;&nbsp;&nbsp; Number at the end of each lines means the minimal
+number of lines with apropriate keyword in the file.
+<br>&nbsp;&nbsp;&nbsp; Assume that name of rc-file is example.rc. Then
+we can configure CML-file instead of function <font face="Courier New,Courier">configure</font>
+from previous subsection by calling this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.load_labels( "example.rc"
+) ;</font>
+<p>&nbsp;&nbsp;&nbsp; It opens rc-file and reads everuthing itself.
+<br>&nbsp;&nbsp;&nbsp; Obviously, if you want another format of rc-file,
+you must read your own routine using the C++ interface.
+<p><a NAME="2.3"></a><b><font size=+1>2.3&nbsp; Configuring using another
+CML-file</font></b>
+<p>&nbsp;&nbsp;&nbsp; Well, if you have for example CML-file F already
+configured, you can inherit it's configuration to another CML-file (for
+example F2) using this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F2.inherit_labels(
+F ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; And it's all.
+<p><a NAME="3"></a><b><font size=+2>3. Reading data on lines</font></b>
+<p>&nbsp;&nbsp;&nbsp; There are several cases that may occur while reading
+data on lines (which means not in sections).
+<p><a NAME="3.1"></a><b><font size=+1>3.1 Simple data</font></b>
+<p>&nbsp;&nbsp;&nbsp; This is (in our railroady example):
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">Name
+"Wolfgang Amadeus Mozart"</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; Machinenfuhrer "Helmut
+Diesenhoffer"</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; Conductors 3</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; Cook "Jonathan Krueger-Stadler"</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; Waiter "Heinrich Zuckermann"</font>
+<p>&nbsp;&nbsp;&nbsp; Nothing more than a keyword (single in whole file)
+and single data item. We have functions:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">void
+cmlfile::get_value ( int olabel , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; void cmlfile::get_value
+( int olabel , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; void cmlfile::get_value
+( int olabel , char *ovalue ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; So we can acquire for example name of the train by
+this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp; char train_name[64] ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp; F.get_value( Name,train_name
+) ;</font>
+<p>&nbsp;&nbsp;&nbsp; I would like to note here, that if you used rc-file
+to configure CML-file that in such case is not very apropriate to define
+these <font face="Courier New,Courier">#define</font>s as was done is subsection
+<a href="#2.1">2.1</a>
+- and this is because you may not be sure that you wrote items into rc-file
+in the order that is corresponing with <font face="Courier New,Courier">#define</font>s.
+So you must either remember this order (and it is not comfortable, I know)
+or instead of what is written above, use:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">F.get_value(
+LABEL( "Name" ),train_name ) ;</font>
+<p><a NAME="3.2"></a><b><font size=+1>3.2 Multiple data on one line</font></b>
+<p>&nbsp;&nbsp;&nbsp; Example again:
+<p><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; ConductorNames
+"Irene Ober-Hausendorfer" "Joachim Heinzmann" "Carl Wolf"</font></font>
+<p>&nbsp;&nbsp;&nbsp; Irene Ober-Hausendorfer has order 0, Joachim Heinzmann
+1 and Carl Wolf 2.
+<br>&nbsp;&nbsp;&nbsp; Functions are similar only they have one parameter
+additional:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value
+( int olabel , int oorder , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value
+( int olabel , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value
+( int olabel , int oorder , char *ovalue ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; Carl Wolf can be obtained by this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; char conductor_name3[64]
+;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.get_value( ConductorNames,2,conductor_name3
+) ;</font>
+<p><a NAME="3.3"></a><b><font size=+1>3.3 Multiple data for one label</font></b>
+<p>&nbsp;&nbsp;&nbsp; Example are wagons:
+<p><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+Post</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+1stClass 1</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+Restaurant</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 2</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 3</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Wagon
+2ndClass 4</font></font>
+<p>&nbsp;&nbsp;&nbsp; First of all you should ask CML-file how many wagons
+do we have:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int number_of_wagons
+;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.get_value_count(
+Wagon,number_of_wagons ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; Then you may read information on wagons one after
+one in cycle:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int i,wagon_id ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; char wagon[64]
+;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; for ( i=0 ; i&lt;number_of_wagons
+; i++ )</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; {</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+F.get_value_with_index( Wagon,i,wagon ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if ( !strcmp( wagon,"1stClass" ) || ( !strcmp( wagon,"2ndClass" )))</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+F.get_value_with_index( Wagon,i,1,wagon_id ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; }</font>
+<p>&nbsp;&nbsp;&nbsp; Note - I have read the number at the end of the line
+if type of wagon was <font face="Courier New,Courier">1stClass</font> or
+<font face="Courier New,Courier">2ndClass
+</font>using
+the function that has additional parameter order like in previous subsection.
+<br>&nbsp;&nbsp;&nbsp; Yes, I merely forgot to citate the function headers:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , char *ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , int oorder , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_index
+( int olabel , int oindex , int oorder , char *ovalue ) ;</font>
+<p><a NAME="3.4"></a><b><font size=+1>3.4 Data with label and keys</font></b>
+<p>&nbsp;&nbsp;&nbsp; Sometimes we may have multiple lines with the same
+keyword and we want to choose which one to read each time by some additional
+key; in our example - we already know through what stations our train goes
+and now we need to know where it arrives there and when leaves. These lines
+contain such information.
+<p>&nbsp;&nbsp;<font face="Courier New,Courier"><font size=-2>&nbsp; In
+"Dresden" 11.29 11.35</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp; In "Chemnitz"
+13.02 13.15</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp; In "Decin"
+14.44 14.50</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp; In "Usti
+nad Labem" 15.22 15.30</font></font>
+<p>&nbsp;&nbsp;&nbsp; So we should use some function of type <font face="Courier New,Courier">get_value_with_key</font>;
+here they are:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , char *ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , int oorder , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , char *okey , int oorder , char *ovalue ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; Say that we would like to acquire data for Chemnitz.
+Just use this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; double chemnitz_arrival,chemnitz_leave
+;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.get_value_with_key(
+In,"Chemnitz",0,chemnitz_arrival ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.get_value_with_key(
+In,"Chemnitz",1,chemnitz_leave ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; The key is not necessarily a string; it may also
+be simply int. Then you may use these set of functions:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , char *ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , int oorder , int &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_value_with_key
+( int olabel , int okey , int oorder , char *ovalue ) ;</font>
+<p><a NAME="3.5"></a><b><font size=+1>3.5 Percentages</font></b>
+<p>&nbsp;&nbsp;&nbsp; It's absolutely simple. Double value may be given
+also by percentage - instead 0.05 there is 5%. If you use one of these
+functions:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage
+( int olabel , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage
+( int olabel , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_key
+( int olabel , int okey , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_key
+( int olabel , int okey , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_key
+( int olabel , char *okey , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_key
+( int olabel , char *okey , int oorder , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_index
+( int olabel , int okey , double &amp;ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_percentage_with_index
+( int olabel , int okey , int oorder , double &amp;ovalue ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; they automaticaly choose whether it is written as&nbsp;
+the first or second case and in both return 0.05.
+<br>&nbsp;&nbsp;&nbsp; Promiles are not supported :o).
+<p><a NAME="3.6"></a><b><font size=+1>3.6 Reading whole line for parsing
+using other routines</font></b>
+<p>&nbsp;&nbsp;&nbsp; As was said before, CML-file does not provide any
+functionality for parsing lines such as:
+<p><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; Locomotive
+type=Electric power=1750.5kW</font></font>
+<p>&nbsp;&nbsp;&nbsp; So you must parse it yourself. CML-file only gives
+you the line, ifever there is only one line or multiple lines. If you have
+more than one line, you can access them either by index similar as functions
+<font face="Courier New,Courier">get_value_with_index</font>&nbsp;
+either using int or string key similar as with functions <font face="Courier New,Courier">get_value_with_key.</font>
+So there are these functions:
+<p>&nbsp;&nbsp;<font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void
+cmlfile::get_line ( int olabel , char *oline ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp; void cmlfile::get_line_with_key
+( int olabel , int okey , char *oline ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp; void cmlfile::get_line_with_key
+( int olabel , char *okey , char *oline ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp; void cmlfile::get_line_with_index
+( int olabel , int oindex , char *oline ) ;&nbsp;&nbsp;&nbsp;&nbsp; .</font>
+<p>&nbsp;&nbsp;&nbsp; Using this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; char line[256] ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.get_line( Locomotive,line
+) ;</font>
+<p>&nbsp;&nbsp;&nbsp; you acquire string '<font face="Courier New,Courier">type=Electic
+power=1750.5kW</font>' into the variable <font face="Courier New,Courier">line</font>.
+<p><a NAME="3.7"></a><b><font size=+1>3.7 Reading data while they are spread
+into multiple files</font></b>
+<p>&nbsp;&nbsp;&nbsp; Very shortly. Files may be included one into other
+using directive <font face="Courier New,Courier">FILE</font>. I decided
+about the limit of maximum files opened from and it is now 16. If you disagree,
+just hack my <font face="Courier New,Courier">cmlfile.c</font> file, find
+<font face="Courier New,Courier">#define
+MaxFiles 16</font>, correct it and recompile.
+<br>&nbsp;&nbsp;&nbsp; So, to using it, simply write something like:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier New,Courier">FILE
+otherfile.cml</font>
+<p>&nbsp;&nbsp;&nbsp; into file (like <font face="Courier New,Courier">train.cml</font>)
+and everything else work (I hope :o)).
+<br>&nbsp;&nbsp;&nbsp; And - if you place 6 stations in file <font face="Courier New,Courier">train.cm</font>l
+and 4 in file <font face="Courier New,Courier">otherfile.cml,</font> the
+train will than go through 10 stations (<font face="Courier New,Courier">get_value_count</font>
+will return 10.) Is it clear?
+<p><a NAME="4"></a><b><font size=+2>4. Reading data in sections</font></b>
+<p><b>&nbsp;&nbsp;&nbsp; </b>Some kind of data are such that using keyword
+with them is the right thing. Assume that if we have very long list of
+data where each item has the same syntax, using keyword on the beggining
+of each line will make our file unusably too long. So we close them all
+into the section, that looks like this:
+<p>&nbsp;&nbsp;<font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;
+SECTION Reservations</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Armin
+Muehler-Stahl" 1 33 "Berlin - Haupt Bahnhoff" "Prague - Main Station"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Jorgen
+Prochnow" 2 59 "Chemnitz" "Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; "Ludwig
+von Spretti-Weilbach" 2 58 "Berlin - Haupt Bahnhoff" "Dresden"</font></font>
+<br><font face="Courier New,Courier"><font size=-2>&nbsp;&nbsp;&nbsp; END</font></font>
+<p>&nbsp;&nbsp;&nbsp; Reading of these data contains 3 steps.
+<br>&nbsp;&nbsp;&nbsp; 1. Start reading some section - you will get number
+of rows.
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int rows;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.find_section(
+Reservation,rows ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; 2. Read one after one all lines
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; char line[256] ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int i ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; for ( i=0 ; i&lt;rows
+; i++ )</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; {</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+F.get_section_line( Reservations,line ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; }</font>
+<p>&nbsp;&nbsp;&nbsp; 3. Tell CML-file that you are done reading this section.
+As was mentioned before, CML-file will not allow you to read any other
+data if you don't finish reading the section.
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.end_reading_section()
+;</font>
+<p>&nbsp;&nbsp;&nbsp; There are headers of our functions:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::find_section
+( int olabel , int &amp;osection_rows ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::get_section_line
+( int olabel , char *oline ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::end_reading_section
+( void ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; How many sections can you have? As many as you want,
+but they must have different names. Also, you can spread one section into
+multiple files and CML-file will paste them into one.
+<br>&nbsp;&nbsp;&nbsp; If you used rc-file to configure CML-file, it is
+not very useful to send directly the labels into functions above and instead
+you may write:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.find_section(
+SECTION( "Reservations" ),rows ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; and so on.
+<p><a NAME="5"></a><b><font size=+2>5. Checking requirements</font></b>
+<p>&nbsp;&nbsp;&nbsp; CML-file is able to check whether the file contains
+enough data. Look in chapter <a href="#2">Instanciating &amp; configuring
+CML-file,</a> there I explained how to tell CML-file, which data are required
+and how many times. After this you can use couple of functions that can
+tell you if file is OK or not:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::check_requirements
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::check_label
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::check_section
+( int osection ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; Must I explain details? Guess not.
+<br>&nbsp;&nbsp;&nbsp; Instead I will say something about what these functions
+are doing if they find some problem. They:
+<p>&nbsp;&nbsp;&nbsp; 1. Write some sentence to console.
+<br>&nbsp;&nbsp;&nbsp; 2. Sets some internal flag.
+<p>&nbsp;&nbsp;&nbsp; You can check whether some problem occures using
+this function:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::error_in_requirements
+( void ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; which returns 1 if problems have occured and 0 if
+everything is OK.
+<br>&nbsp;&nbsp;&nbsp; Well, I think that you won't be satisfied with this
+working-around-problems, but if you know something better, just hack my
+<font face="Courier New,Courier">cybfile.c</font>
+file. Find these functions - I think everybody can understand very easily.
+<p><a NAME="6"></a><b><font size=+2>6. Ouputting</font></b>
+<p>&nbsp;&nbsp;&nbsp; CML-file provides capability for writing into some
+output file also. It uses the same labels and so it prints out the correct
+strings as keywords into output file. If you find this useless, you obviously
+need not to use it :o).
+<br>&nbsp;&nbsp;&nbsp; I will present here functions and examples and for
+each example I will present it's output. But first you must open some file
+for output:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; cmlfile outF ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; F.open_for_output(
+"out.cml" )&nbsp; ;</font>
+<p>&nbsp;&nbsp;&nbsp; Than just use these functions:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out
+( int olabel , int ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out
+( int olabel , double ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out
+( int olabel , char *ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_label
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_int
+( int ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_double
+( double ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_string
+( char *ovalue ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_eoln
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_section
+( int olabel ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_data
+( char *oline ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::out_section_end
+( void ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; Now, one after one:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out( Name,"Wolfgang
+Amadeus Mozart" ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; will write this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Name "Wolfgang Amadeus
+Mozart"</font>
+<p>&nbsp;&nbsp;&nbsp; Then:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_label(
+ConductorNames ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_string(
+"Joseph Keitel" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_string(
+"Heinz Albert Petersen" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_eoln()
+;</font>
+<p>&nbsp;&nbsp;&nbsp; will write this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; ConductorNames "Joseph
+Keitel" "Heinz Albert Petersen"</font>
+<p>&nbsp;&nbsp;&nbsp; And:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_section(
+Reservations ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_data(
+"Helmut Grockenberger 4 70 Dresden Decin" ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; outF.out_section_end()
+;</font>
+<p>&nbsp;&nbsp;&nbsp; will write this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; SECTION Reservations</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; Helmut Grockenberger
+4 70 Dresden Decin</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; END</font>
+<p>&nbsp;&nbsp;&nbsp; It is not exactly what you expect? Commas missing?
+Well, section data are not my problem, you know. CML-file only reads and
+writes whole lines.
+<p><a NAME="7"></a><b><font size=+2>7. Error flags</font></b>
+<p>&nbsp;&nbsp;&nbsp; If some error ocuurs, CML-file sets some internal
+flag. These functions tell you if some error has occured.
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::error_opening_file
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::error_reading_file
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::error_writing_file
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::error_in_requirements
+( void ) ;</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; int cmlfile::any_error
+( void ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; You should check it - "time to time." Note that if
+error occurs and you want to continue reading, you should use this:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; void cmlfile::clear_errors
+( void ) ;</font>
+<p>&nbsp;&nbsp;&nbsp; CML-file allows you reading next data even if error-flag
+is set to 1. But - you cannot recognize any new errors that may occur next
+because flags are already set to 1.
+<p><a NAME="8"></a><b><font size=+2>8. Compiling CML-file</font></b>
+<p>&nbsp;&nbsp;&nbsp; CML-file is now released as shared library. You get
+file <font face="Courier New,Courier">cmfile-0001.tgz</font>; unpack it,
+than type '<font face="Courier New,Courier">make</font>' or '<font face="Courier New,Courier">make
+lib</font>' -&nbsp; it creates the library; than become root and type '<font face="Courier New,Courier">make
+install</font>' - first of it you can edit lines:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier New,Courier">
+INSTDIR_INCLUDE = /usr/include</font>
+<br><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; INSTDIR_LIB = /usr/lib</font>
+<p>&nbsp;&nbsp;&nbsp; These lines specify destination, where header file
+(<font face="Courier New,Courier">cmlfile.h</font>) and library (<font face="Courier New,Courier">libcmlfile.so</font>)
+are going to be stored. (Wow, these lines you can find in the <font face="Courier New,Courier">makefile</font>.)
+<p>&nbsp;&nbsp;&nbsp; After having successfully installed cmlfile, you
+can use it in some your own program. Just include the header:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier New,Courier">
+#include &lt;cmlfile.h></font>
+<p>&nbsp;&nbsp;&nbsp; When compiling and linking your program, use switch
+-lcmlfile to your linker. Such as:
+<p><font face="Courier New,Courier">&nbsp;&nbsp;&nbsp; g++ -o something
+something.o -lcmlfile</font>
+<p>&nbsp;&nbsp;&nbsp; Please do not forget that cmlfile is c++ class, so
+you need g++ to compile the piece of program that uses it.
+<p>&nbsp;&nbsp;&nbsp;&nbsp;
+<br><a NAME="9"></a><b><font size=+2>9. Notices</font></b>
+<p>&nbsp;&nbsp;&nbsp; This is the first released version of cmlfile (cmlfile-0001).
+I hope it does not contain fatal errors, but who knows...
+<br>&nbsp;&nbsp;&nbsp; I must mention, that this comes under GPL.
+<p>
+<hr NOSHADE>
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

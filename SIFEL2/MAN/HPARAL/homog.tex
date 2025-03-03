@@ -1,0 +1,90 @@
+\section{Transport Processes, Homogenisation, Parallelisation}
+
+\subsection{General Description}
+
+This section describes the part of SIFEL computer program
+which deals with transport processes equipped with homogenisation.
+Because of very large demands on computer time and memory,
+such problems are parallelised. It is not the classical
+parallelisation because the macroproblem is solved on the
+master processor while microproblems are spread on slave processors.
+It means, necessary data are sent from the master to slaves
+but the slaves execute independent single processor problems.
+Therefore, it is called hybrid parallelisation.
+
+The macroproblem is discretized by the finite element method
+and the classical input file to TRFEL program is assembled.
+The only difference is in the definition of material models
+on the elements. The homomat material models (their number is
+110, see aliast.h) have to be used. Each element of the
+macroproblem is equipped with its own instance of the class
+{\tt homomat}. It means, the number of instances of the
+material homomat is equal to the number of finite elements
+in the problem. It is necessary because the constitutive matrices
+obtained from homogenisation are stored in the material
+model homomat.
+
+
+The microproblems are also discretised by the finite element
+method and the classical input files to TRFEL program
+have to be assembled. Each input file will be read by
+appropriate slave processor.
+
+\subsection{Implementation Details}
+
+All processors read the classical TRFEL input files by the
+subroutine {\tt trfel\_init (argc,argv,stochd);} located
+in the file {\tt SIFEL/HPARAL/SRC/hptrfelinit.cpp}.
+Therefore, any development in the TRFEL program is automatically
+available in this part devoted to multi-level approach.
+Another advantage is the same form of the input files.
+
+The nonstationary transport process with homogenisation is performed
+by the subroutine {\tt parallel\_homogenization ()} located
+in the file {\tt SIFEL/HPARAL/SRC/hpnpsolvert.cpp}.
+
+The correspondence between macroproblem and microproblems is crucial
+in homogenization. Type of the correspondence is defined by the
+variable {\tt mami} of the class {\tt probdesct}.
+\begin{itemize}
+\item
+{\tt mami=elem\_domain} - each finite element of the macroproblem
+is connected with one microproblem; each element sends its data
+to the appropriate microproblem and it obtains the constitutive matrices
+\item
+{\tt mami=aggregate\_domain} - 
+several neighbouring finite elements create an aggregate which is
+connected with one microproblem; the aggregate collects data from all
+its elements and sends it to a microproblem, the microproblem
+is executed for each element in the aggregate and it sends the appropriate
+matrices back to the aggregate.
+\item
+{\tt mami=eff\_aggregate\_domain} - 
+several neighbouring finite elements create an aggregate which is
+connected with one microproblem; values from all elements in
+aggregates are averaged, each aggregate sends only one set of data to
+microproblem, the microproblem is executed only once for the whole aggregate
+and it sends back one matrix which is used on all elements aggregated in the
+aggregate.
+\end{itemize}
+
+
+
+With respect to the minimization of interprocessor communication,
+only one connection between the master processor and each slave processor
+is established in every iteration. All data have to be collected and
+sent to slave processors in one array.
+
+
+Auxiliary array {\tt eldom} with {\tt Tt->ne} (the number of finite
+elements in the macroproblem) components is allocated
+there. {\tt eldom[i]=j} means that the i-th element of the
+macroproblem is connected to the j-th microproblem. Generally,
+several finite elements of macroproblem may be connected to
+the same microproblem. Another auxiliary array {\tt neldom}
+with {\tt Nproc} (the number of processors) components is
+allocated. {\tt neldom[i]=j} means that j finite elements of
+the macroproblem are connected to the i-th microproblem.
+{\tt neldom[0]=0} is always true because there is no microproblem
+on the master processor.
+

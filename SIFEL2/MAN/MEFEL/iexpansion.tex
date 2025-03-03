@@ -1,0 +1,534 @@
+\chapter{Expansion of the MEFEL}
+\section{Implementation of new finite element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation of new material model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new arbitrary model}
+The main aims of any material model in the code are
+\begin{itemize}
+\item{evaluation of correct stresses for trial strains,}
+\item{assemblage of the matrix of stiffness coefficients, $\mbf{D}$.}
+\end{itemize}
+
+Strains and stresses are stored at integration points. The actual strains are computed by any solver
+implemented in the code and stored at integration points. 
+
+Every material model must contain the following functions:
+\begin{itemize}
+\item{
+{\sf void newmaterial::read (FILE *in)}
+\newline reads necessary data of the model, {\it in} is pointer to the input file,
+}
+\item{
+{\sf void newmaterial::matstiff (matrix \&d,long ipp,long ido)}
+\newline assembles the stiffness matrix (matrix $\mbf{D}$), {\it ipp}
+denotes the number of integration point, {\it ido} stands for the
+index in array {\sf other}, the default value is 0,
+}
+\item{
+{\sf void newmaterial::nlstresses (long ipp, long im, long ido)}
+\newline computes correct stresses for computed strains,
+{\it ipp} denotes the number of integration point,
+{\it im} expresses the number of material model at the integration point (default value is 0),
+{\it ido} stands for the index in array {\sf other} (default value is 0),
+}
+\item{
+{\sf void newmaterial::updateval (long ipp,long im,long ido)}
+\newline updates all material parameters when the equilibrium is reached,
+{\it ipp} denotes the number of integration point,
+{\it im} expresses the number of material model at the integration point (default value is 0),
+{\it ido} stands for the index in array {\sf other} (default value is 0),
+}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new plasticity model}
+\subsubsection {Implementing new class of plasticity}
+This section describes what the user needs when implements new plasticity model
+to MEFEL. First of all user needs yield function $f$, the first derivative of yield function with
+respect on stress tensor \ppd{f}{\sigma_{ij}}, optionally first derivative of plastic potential
+with respect on stress tensor \ppd{g}{\sigma_{ij}}. In case that plasticity model
+contains hardening/softening it's necessary the first derivative of yield function with
+respect on hardening parameters \ppd{f}{q_i}, derivative hardening parameters with respect
+on $\gamma$, $\ppd{q_i}{\gamma}=-H\ppd{g}{q_i}$ and/or user should provide function {\sf plasmodscalar}
+which computes term $\ppd{f}{q_i}H\ppd{g}{q_i}$ in cutting plane method.
+
+Each new material means the user should found new class with name of plasticity model {\sf myplasmodel}.
+This class should contain material parameters as a data members of this class. Note that the MEFEL
+in case plastic material suppose two materials. The first refers to plastic material and the second
+one refers to elastic material. So the elastic parameters such as th Young modulus $E$ needn't be
+included to the {\sf myplasmodel}. In addition the folowing methods should be defined :
+\begin{itemize}
+{\sf
+\item
+read(FILE* in)
+\item
+double yieldfunction(matrix \&sig, vector \&q)
+\item
+void deryieldfsigma(matrix \&sig, matrix \&dfds)
+\item
+void matstiff (matrix \&d, long ipp)
+\item
+void nlstresses (long ipp, long im, long ido)
+\item
+void updateval (long ipp, long im, long ido)
+}
+
+Optionally in case plasticity with hardening/softening :
+{\sf
+\item
+void deryieldfq(vector \&qtr, vector \&dfq)
+\item
+void der\_q\_gamma(vector \&dqdg)
+\item
+void updateq(vector \&epsp, strastrestate ssst, vector \&q)
+\item
+double plasmodscalar(vector \&qtr)
+}
+
+or
+{\sf
+\item
+void updateq(vector \&epsp, strastrestate ssst, vector \&q)
+\item
+double plasmodscalar(vector \&qtr)
+}
+
+Optionally in case nonassociated plasticity :
+{\sf
+\item
+void derplaspotsigma(matrix \&sig, matrix \&dgds)
+}
+\end{itemize}
+
+Function {\sf read(FILE* in)} should read material parameters for given plasticity from current
+position in the opened text file given by the function parameter {\it in}.\\
+
+Function {\sf double yieldfunction(matrix \&sig, vector \&q)} returns value of the yield function
+for given plasticity model {\sf myplasmodel}. Returned value is double type. The first parameter
+{\it sig} references to matrix which contains stress {\bf tensor} values $\sigma_{ij}$. The second
+parameter {\it q} is vector which contains values of hardening/softening parameters.\\
+
+Function {\sf void deryieldfsigma(matrix \&sig, matrix \&dfds)} computes values of \ppd{f}{\sigma_{ij}}
+for given plasticity model {\sf myplasmodel}. Returned values are passed through the second parameter
+{\it dfds}. The first parameter {\it sig} references to matrix which contains stress {\bf tensor}
+values $\sigma_{ij}$. The second parameter {\it dfds} is type of matrix which contains result values
+\ppd{f}{\sigma_{ij}}. This matrix is supposed to be proper allocated.\\
+
+Function {\sf void matstiff (matrix \&d, long ipp, long ido)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. The last parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type. User may use standard 
+stiffness matrix for linear elastic material or when it is available may use tangent stiffness matrix (it will reduce
+number of iteration steps).\\
+
+Function {\sf void nlstresses (long ipp, long im, long ido)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Parameter {\it im} is index of material type
+in the array {\sf tm} for given integration point. Parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type.
+Function should work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf eqother} values in the integration point number
+{\it ipp} (See class {\sf mechmat, intpoint}). For plasticity models should contain reached plastic
+strains $\varepsilon^{pl}_{ij}$ and parametr $\gamma$ for cutting plane method.
+\item
+Call stress-return function built in {\sf mechmat} i.e {\sf cutting\_plane} with parameters filled from
+previous step. This method computes appropriate stresses and stores them into stress array in the
+integration point.
+\item
+Store result plastic strains and coefficient $\gamma$ and possible another values to the {\sf other}
+array in the integration point. 
+\end{itemize}
+For example see {\sf drprag::nlstresses(long ipp, long im, long ido)} in the file drprag.cpp.\\
+
+Function {\sf void updateval (long ipp, long im, long ido)} copies values of {\sf other} array to
+the eqother array in case that equilibrium for current step is reached. Parameter {\it ipp} is
+integration point number whose the {\sf eqother} array should be updated. Parameter {\it im} denotes
+index material type in the array {\sf tm} of given integration point. {\it ido} is index in the
+{\sf other/eqother} array of the given integration point, from where the updated internal variables are stored.
+
+
+In case nonassociated plasticity or plasticity with hardening/softening are neccessary following
+functions :\\
+
+Function {\sf void deryieldfq(vector \&qtr, vector \&dfq)} computes values of \ppd{f}{q_i}. The first
+parameter is vector with values of hardening parameters. Second parameter is used for output result
+values. Ammount and the order of these parameters is only for proposal. Prupose of this function will
+be described in the {\sf plasmodscalar} function.\\
+
+Function {\sf void der\_q\_gamma(vector \&dqdg)} computes values of \ppd{q_i}{\gamma} which means
+exactly product $-H\ppd{g}{q_i}$. Parameter {\it dqdg} is output parametr for result values.
+Ammount and the order of these parameters is only for proposal. Prupose of this function will be
+described in the {\sf plasmodscalar} function.\\
+
+Function {\sf double plasmodscalar(vector \&qtr)} computes $\ppd{f}{q_i}H\ppd{g}{q_i}$. This expression
+is used in the cutting plane method. Both previous function should be call here. So the function
+contains something like this :\\
+{\tt
+  double ret;\\
+  vector dfq(qtr.n);\\
+  vector dqg(qtr.n);\\
+  deryieldfq(qtr, dfq);\\
+  der\_q\_gamma(dqg);\\
+  scprd(dfq, dqg, ret);\\
+  return -ret;
+}
+
+When user prefers another way of representation of the expression $\ppd{f}{q_i}H\ppd{g}{q_i}$, there
+is possible to write only function {\sf plasmodscalar} which supply values of this expression. Function
+is called from mechmat's {\sf plasmodscalar(long ipp, long idpm, matrix \&sig, vector \&eps, vector \&qtr)} 
+so there is possibility to pass parameters {\it ipp, sig, eps} to your function {\sf plasmodscalar} to obtain 
+additional values from integration point.\\
+
+Function {\sf void updateq(long ipp, long ipp, vector \&epsp, vector \&q)} 
+updates hardening variables after cutting plane iteration loop has been run depending on the $\varepsilon^{pl}_{ij}$ and 
+the stress/strain state. Parameter {\it q} will contain output from this function - the updated hardening parameters.
+Rest parameters passed to your function {\sf plasmodscalar} from mechmat's {\sf plasmodscalar} should be used obtain 
+additional necessary values from integration points.
+\\
+
+Function {\sf void derplaspotsigma(matrix \&sig, matrix \&dgds)} computes values of derivatives of plastic
+potential \ppd{g}{\sigma_{ij}} for given plasticity model {\sf myplasmodel}. Returned values are passed
+through the second parameter {\it dfds}. The first parameter {\it sig} references to matrix which contains
+stress {\bf tensor} values $\sigma_{ij}$. The second parameter {\it dfds} is type of matrix which contains
+result values \ppd{g}{\sigma_{ij}}. This matrix is supposed to be proper allocated.\\
+
+\subsubsection {Including new plasticity class to MEFEL files}
+Thus the new class {\sf myplasmodel} is written to files  myplasmodel.cpp${\rm |}$h. Now the user should
+include this class to the MEFEL. Here is list of files which have to be modified :
+
+{\bf alias.h}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that the name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the plasticity class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the MEFEL.\\
+
+{\bf mechmat.h}\\
+This file contains declaration of the {\sf mechmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf myplasmodel} to the {\sf mechmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf myplasmodel} class or insert include file with {\sf myplasmodel} class declaration.\\
+
+
+{\bf mechmat.cpp}\\
+\begin{itemize}
+\item {\sf void mechmat::readmatchar (FILE *in)}
+\item {\sf void mechmat::matstiff (matrix \&d,long ipp)}
+\item {\sf double mechmat::yieldfunction (long ipp, long idpm, matrix \&sig, vector \&q)}
+\item {\sf void mechmat::dfdsigma (long ipp, long idpm, matrix \&sig, matrix \&dfds)}
+\item {\sf void mechmat::dgdsigma (long ipp, long idpm, matrix \&sig, matrix \&dgds)}
+\item {\sf void mechmat::dfdq (long ipp, long idpm, vector \&dq)}
+\item {\sf double mechmat::plasmodscalar (long ipp, long idpm, vector \&qtr)}
+\item {\sf void mechmat::updateq (long ipp, long idpm, double dgamma, vector \&epsp, vector \&q)}
+\item {\sf void mechmat::updateipvalmat (long ipp,long im,long ido)}
+\item {\sf void mechmat::computenlstresses (long ipp,long im,long ido)}
+\item {\sf long mechmat::givencompother (long ipp,long im)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf myplasmodel} should be included at the begining
+of mechmat.cpp\\
+
+In function {\sf mechmat::readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf myplasmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYPLASMODEL materials \%ld",numtype);\\
+      MYPLASMODELPT = new MYPLASMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYPLASMODEL material in function\\
+                   mechmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYPLASMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYPLASMODEL with name of the new class {\sf myplasmodel} and MYPLASMODELPT with
+name of the pointer which has been used in the {\sf mechmat} class declaration in the file mechmat.hpp. This
+statement block the first allocates array with new material then folows loop where the number of sets of the
+parameters is read and then the {\sf read} function for the given material type is called.\\
+
+Function {\sf mechmat::matstiff (matrix \&d,long ipp,long im,long ido)} contains {\tt switch} statement which calls appropriate function
+for assembling stiffness matrix for given material. Here the new {\tt case} for the  {\sf myplasmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make only one modification. That means replacement name of pointer to array with materials, with name which has been
+used in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it d} of this function
+represents allocated result stiffnes matrix, the second one {\it ipp} is integration point number. {\it im} is index of
+material type in the array {\sf tm} of given integration point, {\it ido} stands for index of the first internal variable
+in the array {\sf other} or {\sf eqother} of given integration point.\\
+
+Function {\sf mechmat::yieldfunction (long ipp, long idpm, matrix \&sig, vector \&q)} contains {\tt switch} statement which calls
+appropriate function for yield function of given material. Here the new {\tt case} for the  {\sf myplasmodel} would
+be included. It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case}
+and then make only one modification. That means replacement name of pointer to array with materials, with name which
+has been used in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it ipp} is integration
+point number, {\it idpm} is index of given plasticity material type in the {\sf tm} array of given integration point, 
+{\it sig} is matrix with stress tensor and {\it q} is vector with hardening parameters.\\
+
+Function {\sf mechmat::dfdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dfds)} contains {\tt switch} statement
+which calls appropriate function for derivatives of yield function with respect on stresses for given material. Here
+the new {\tt case} for the  {\sf myplasmodel} would be included. It is possible to take part of {\tt case} statement
+from another material and copy it into new {\tt case} and then make only one modification. That means replacement name
+of pointer to array with materials, with name which has been used in the {\sf mechmat} class declaration
+in the mechmat.h. Parameter {\it ipp} is integration point number, {\it idpm} is index of given plasticity material type 
+in the {\sf tm} array of given integration point, {\it sig} is matrix with stress tensor and {\it q} is vector with hardening parameters.
+{\it dfds} is output parameter i.e. allocated matrix with results.\\
+
+Function {\sf mechmat::dgdsigma (long ipp, long idpm, matrix \&sig, vector \&q, matrix \&dgds)} computes derivatives of plastic
+potential with respect on stresses. Implementing procedure is same as in the previous function. Denotation of function
+parameters is same too.\\
+
+Function {\sf mechmat::dfdq (long ipp, long idpm, vector \&dq)} computes derivatives of yield function with respect on hardening
+parameters. Implementing procedure is same as in the previous function. If plasticity model hasn't hardening, let
+the {\tt case} statement for given material empty only with keyword {\tt break}. Parameter {\it ipp} is integration
+point number, {\it dq} contains values with actual hardening parameters and togeather serv as output parameter for results.
+{\it q} is vector with hardening parameters.\\
+
+Function {\sf mechmat::plasmodscalar (long ipp, long idpm, matrix \&sig, vector \&eps, vector \&epsp, vector \&qtr)} computes
+expression $\ppd{f}{q_i}H\ppd{g}{q_i}$ for cutting plane method. Implementing procedure is same as in the previous function.
+If plasticity model hasn't hardening, let the {\tt case} statement for given material empty only with keyword {\tt break}.
+Parameter {\it ipp} is integration point number,{\it idpm} is index of given plasticity material type in the {\sf tm} array 
+of given integration point, {\it sig} is matrix with stress {\bf tensor}, {\it eps} is vector of total strains, {\it epsp} is vector of plastic strains, 
+{\it qtr} contains values with actual hardening parameters.\\
+
+Function {\sf mechmat::updateq (long ipp, long idpm, double dgamma, vector \&epsp, vector \&q)}
+Implementing procedure is same as in the previous function. If plasticity model hasn't hardening, let the {\tt case}
+statement for given material empty only with keyword {\tt break}. Parameter {\it ipp} is integration point number,{\it idpm} is 
+index of given plasticity material type in the {\sf tm} array of given integration point,
+{\it dgamma} is increment of $\gamma$ parameter in the cutting plane method, {\it epsp} is plastic strains in the
+trial state $\varepsilon^{pl}_{trial}$, {\it q} contains values of hardening parameters. See file mechmat.cpp, function
+{\sf void mechmat::cutting\_plane (long ipp, double \&gamma, vector \&epsn, vector $\&$epsp, vector $\&$q)}.\\
+
+Function {\sf mechmat::updateipvalmat (long ipp,long im,long ido)} contains {\tt switch} statement which calls appropriate function 
+for updateing valus in the integration point {\sf eqother} array for given material. That means this function should replace 
+backup values of equilibrium state from the previous step with values that has been actually computed and equilibrium state for current step
+has been reached. Here the new {\tt case} for the  {\sf myplasmodel} would be included. Implementing procedure is same
+as in the previous function. {\it ipp} is integration point number, {\it im} is index of material type in the array {\sf tm} of given integration point, 
+{\it ido} stands for index of the first internal variable in the array {\sf other} or {\sf eqother} of given integration point.\\
+
+Function {\sf mechmat::computenlstresses (long ipp,long im,long ido)} computes stresses in nonlinear mechanic problems for given integration
+point and material type. Implementing procedure is same as in the previous function. Parameters are denoted same too.
+
+Function {\sf mechmat::givencompother (long ipp,long im)} returns for given material type number of internal variables. That means
+number of elements in the arrays {\sf other} and {\sf eqother} which are used for given material type.
+Contents of this case could be partially copied form {\tt case } of another plastic
+material i.e. druckerprager :\\
+{\tt
+    ncompo=ncompstr+1+NUMHARDPARAM;\\
+    //  other[0 - (ncompstr-1)]=plastic strain components\\
+    //  other[ncompstr]=gamma\\
+    //  other[ncompstr+1 - (ncompstr+1+NUMHARDPARAM-1)]=hardening parameters\\
+}\\
+NUMHARDPARAM is not really variable or macro in MEFEL but denotes the number of hardening parameters.
+This number will depend on given type of plasticity. User have to save on the first positions reached
+plastic strains $\varepsilon^{pl}_{ij}$ followed by the reached value of $\gamma$ coefficient for the cutting
+plane method. Rest saved values depend on the given plastic model. Generally it will be hardening parameters.
+Number of strain component and number of stored hardening parameters + $\gamma$ give us number of necessary
+stored values at the {\sf other} or {\sf eqother} arrays.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  DAMAGE
+
+\subsection{Implementation of new scalar damage  model}
+\subsubsection {Implementing new class of scalar damage}
+This section describes what the user needs when implements new scalar damage model
+to MEFEL. First of all user needs damage parameter function $\tilde {\varepsilon}$ and damage function $f$,
+
+Each new material means the user should found new class with name of scalar damage model {\sf myscdammodel}.
+This class should contain material parameters as a data members of this class. Note that the MEFEL
+in case scalar damage material suppose two materials. The first refers to damage material and the second
+one refers to elastic material. So the elastic parameters such as th Young modulus $E$ needn't be
+included to the {\sf myscdammodel}. In addition the folowing methods should be defined :
+\begin{itemize}
+\item
+{\sf read(FILE* in)}
+\item
+{\sf void damfuncpar(long ipp, vector \&eps, vector \&kappa)}
+\item
+{\sf double damfunction(long ipp, vector \&kappa, vector \&eps)}
+\item
+{\sf void matstiff (matrix \&d, long ipp, long ido)}
+\item
+{\sf void nlstresses (long ipp, long im, long ido)}
+\item
+{\sf void updateval (long ipp, long im, long ido)}
+
+\end{itemize}
+
+Function {\sf read(FILE* in)} should read material parameters for given damage from current
+position in the opened text file given by the function parameter {\it in}.\\
+
+Function {\sf void damfuncpar(long ipp, vector \&eps, vector \&kappa)} returns value of the damage
+function parameter $\tilde {\varepsilon}$ for given damage model {\sf myscaldammodel}.
+Returned value is double type. The first parameter {\it eps} references to vector which contains strains.
+The second parameter {\it kappa} is vector which contains current values of damage parameters (For
+introduced models this parameter could be {\sf double} type, but {\sf vector} is prepared for another
+future models which could have more then one damage parameter of damage function. In such case this
+function should return {\sf vector} type instead of {\sf double}).\\
+
+Function {\sf void damfunction(long ipp, vector  \&kappa, vector \&eps)} returns value of the damage
+variable {\it d} for given damage model {\sf myscaldammodel}. Returned value is a{\sf double}.
+The first parameter {\it kappa} is vector which contains current values of damage parameters (For
+introduced models this parameter could be a {\sf double}, but {\sf vector} is prepared for another
+future models which could have more then one damage parameter of damage function. In such case this
+function should return {\sf vector} type instead of {\sf double}). The second parameter {\it eps}
+references to vector which contains strains.\\
+
+Function {\sf void matstiff (matrix  \&d, long ipp, long ido)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. User may use standard stiffness matrix for
+linear elastic material or when it is available he may use tangent/secant stiffness matrix (it will reduce
+number of iteration steps).Parameter {\it ido} is index in the {\sf other/eqother} array of the given integration 
+point, from where the internal variables are stored.
+\\
+
+Function {\sf void nlstresses (long ipp, long im, long ido)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Parameter {\it im} denotes
+index material type in the array {\sf tm} of given integration point. {\it ido} is index in the
+{\sf other/eqother} array of the given integration point, from where the internal variables are stored.
+
+The function should work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf eqother} values in the integration point number
+{\it ipp} (See class {\sf mechmat, intpoint}). For scalar damage models should contain reached damage
+parameter and damage variable  $d$.
+\item
+Call scalar damage solver function built in {\sf mechmat} i.e {\sf scal\_dam\_sol} with parameters filled
+from previous step. This method computes damage variable and stresses.
+\item
+Store result stresses and coefficient $\kappa$ and possible another values to the {\sf other}
+array in the integration point.
+\end{itemize}
+For example see {\sf scaldam::nlstresses(long ipp, long im, long ido)} in the file scaldam.cpp.\\
+
+Function {\sf void updateval (long ipp, long im, long ido)} copies values of {\sf other} array to 
+backup array {\sf eqother} in case that equilibrium for current step is reached. 
+Parameter {\it ipp} is integration point number whose the {\sf eqother} array should be updated.
+Parameter {\it im} denotes index material type in the array {\sf tm} of given integration point. 
+{\it ido} is index in the {\sf other/eqother} array of the given integration point, from where the 
+updated internal variables are stored.
+
+
+\subsubsection {Including new scalar damage class to MEFEL files}
+Thus the new class {\sf myscdammodel} is written to files myscaldammodel.cpp${\rm |}$h. 
+Now the user should include this class to the MEFEL. Here is list of files which have to 
+be modified :
+
+{\bf alias.h}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the scalar damage class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the MEFEL.\\
+
+{\bf mechmat.h}\\
+This file contains declaration of the {\sf mechmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf myscaldammodel} to the {\sf mechmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf myplasmodel} class or insert include file with {\sf myscaldammodel} class declaration.\\
+
+
+{\bf mechmat.cpp}\\
+\begin{itemize}
+\item {\sf void mechmat::readmatchar (FILE *in)}
+\item {\sf void mechmat::matstiff (matrix \&d,long ipp,long im,long ido)}
+\item {\sf void mechmat::damfuncpar(long ipp, long im,vector \&eps, vector \&kappa)}
+\item {\sf double mechmat::damfunction(long ipp, long im, vector \&kappa, vector \&eps)}
+\item {\sf void mechmat::updateipvalmat (long ipp, long im, long ido)}
+\item {\sf void mechmat::computenlstresses (long ipp, long im, long ido)}
+\item {\sf long mechmat::givencompother (long ipp,long im)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf myscaldammodel} should be included at the begining
+of mechmat.cpp\\
+
+In function {\sf mechmat::readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf myscaldammodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYSCALDAMMODEL materials \%ld",numtype);\\
+      MYSCALDAMMODELPT = new MYSCALDAMMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYSCALDAMMODEL material in function\\
+                   mechmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYSCALDAMMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYSCALDAMMODEL with name of the new class {\sf myscaldammodel} and MYSCALDAMMODELPT with
+name of the pointer which has been used in the {\sf mechmat} class declaration in file mechmat.hpp. This
+statement block first allocates array with new material then folows loop where the number of set of parameters is
+read and then the {\sf read} function for the given material type is called.
+
+Function {\sf mechmat::matstiff (matrix \&d,long ipp,long im,long ido)} contains {\tt switch} statement which calls appropriate function
+for assembling stiffness matrix for given material. Here the new {\tt case} for the  {\sf myscaldammodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make only one modification. That means replacement name of pointer to array with materials, with name which has been used
+in the {\sf mechmat} class declaration in the mechmat.h. The first parameter {\it d} of this function represents allocated
+result stiffnes matrix, the second one {\it ipp} is integration point number.Parameter {\it im} denotes
+index material type in the array {\sf tm} of given integration point. {\it ido} is index in the
+{\sf other/eqother} array of the given integration point, from where the internal variables are stored.
+
+
+Function {\sf mechmat::damfuncpar(long ipp, long im,vector \&eps, vector \&kappa)} contains {\tt switch} statement which calls
+appropriate function for computing parameter $\tilde{\varepsilon}$ for damage function of given material. Here the new
+{\tt case} for the  {\sf myscaldammodel} would be included. It is possible to take part of {\tt case} statement from
+another material and copy it into new {\tt case} and then make only one modification. That means replacement
+name of pointer to array with materials, with name which has been used in the {\sf mechmat} class declaration in the mechmat.h.
+The first parameter {\it ipp} is integration point number. Parameter {\it im} denotes index material type in the array {\sf tm} 
+of given integration point. {\it eps} is strain vector and {\it kappa} is vector with
+damage parameters.
+
+Function {\sf mechmat::damfunction(long ipp, long im,vector \&kappa, vector \&eps)} contains {\tt switch} statement which calls
+appropriate damage function for given material. This function returns value of damage variable $d$. Here the new
+{\tt case} for the  {\sf myscaldammodel} would be included. It is possible to take part of {\tt case} statement from
+another material and copy it into new {\tt case} and then make only one modification. That means replacement name of pointer
+to array with materials, with name which has been used in the {\sf mechmat} class declaration in the mechmat.h.
+Parameter {\it ipp} is integration point number. Parameter {\it im} denotes index material type in the array {\sf tm} of given integration point. 
+{\it kappa} is vector with damage function parameters and {\it eps} is strain vector.
+
+Function {\sf mechmat::updateipvalmat (long ipp, long im, long ido)} contains {\tt switch} statement which calls appropriate function 
+for updateing valus in the integration point {\sf eqother} array for given material. That means this function should replace backup values 
+of equilibrium state from the previous step with values that has been actually computed and stored in the {\sf other} array and equilibrium state 
+for current step has been reached. Here the new {\tt case} for the  {\sf myscaldammodel} would be included. Implementing procedure is same
+as in the previous function.
+
+Function {\sf computenlstresses (long ipp, long im, long ido)} computes stresses in nonlinear mechanic problems for given integration
+point and material type. Implementing procedure is same as in the previous function. Parameter {\it ipp} is integration
+point number. Rest parameters have the same notation and the same mean as in the previous function.
+
+Function {\sf mechmat::givencompother (long ipp,long im)} returns for given material type number of internal variables. That means
+number of elements in the arrays {\sf other} and {\sf eqother} which are used for given material type.
+Contents of this case could be partially copied form {\tt case } of another scalar damage
+material i.e. scaldamage :\\
+{\tt
+    ncompo=2;\\
+    //  other[0]=equivalent strain\\
+    //  other[1]=damage\\
+}\\
+Number of saved values depend on the given damage model. Generally it will be equivalent strains and damage.

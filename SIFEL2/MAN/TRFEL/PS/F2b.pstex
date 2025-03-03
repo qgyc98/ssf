@@ -1,0 +1,712 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 30 62 536 673
+%%Title: graf_alfa.pstex
+%%Creator: krejci@adela with xmgr
+%%CreationDate: Thu May  4 15:19:21 2000
+%%EndComments
+80 dict begin
+/languagelevel where
+{pop /gs_languagelevel languagelevel def}
+{/gs_languagelevel 1 def} ifelse
+gs_languagelevel 1 gt {
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<0000000000000000000000000000000000000000000000000000000000000000>} image end }
+			>> 	matrix makepattern /Pat0 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<1111000044440000111100004444000011110000444400001111000044440000>} image end }
+			>> 	matrix makepattern /Pat1 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<1111444411114444111144441111444411114444111144441111444411114444>} image end }
+			>> 	matrix makepattern /Pat2 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555>} image end }
+			>> 	matrix makepattern /Pat3 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<eeeebbbbeeeebbbbeeeebbbbeeeebbbbeeeebbbbeeeebbbbeeeebbbbeeeebbbb>} image end }
+			>> 	matrix makepattern /Pat4 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<eeeeffffbbbbffffeeeeffffbbbbffffeeeeffffbbbbffffeeeeffffbbbbffff>} image end }
+			>> 	matrix makepattern /Pat5 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<f77dffffbeeffffff77dffffbeeffffff77dffffbeeffffff77dffffbeefffff>} image end }
+			>> 	matrix makepattern /Pat6 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff>} image end }
+			>> 	matrix makepattern /Pat7 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<e1e1f0f078783c3c1e1e0f0f8787c3c3e1e1f0f078783c3c1e1e0f0f8787c3c3>} image end }
+			>> 	matrix makepattern /Pat8 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<87870f0f1e1e3c3c7878f0f0e1e1c3c387870f0f1e1e3c3c7878f0f0e1e1c3c3>} image end }
+			>> 	matrix makepattern /Pat9 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc>} image end }
+			>> 	matrix makepattern /Pat10 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff>} image end }
+			>> 	matrix makepattern /Pat11 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<7e7ebdbddbdbe7e7e7e7dbdbbdbd7e7e7e7ebdbddbdbe7e7e7e7dbdbbdbd7e7e>} image end }
+			>> 	matrix makepattern /Pat12 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<fd7e7ebfbfdfdfefeff7f7fbfbfdfd7e7ebfbfdfdfefeff7f7fbfbfdfd7e7ebf>} image end }
+			>> 	matrix makepattern /Pat13 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<7ebffd7efbfdf7fbeff7dfefbfdf7ebffd7efbfdf7fbeff7dfefbfdf7ebffd7e>} image end }
+			>> 	matrix makepattern /Pat14 exch def 
+<</PaintType 1 /PatternType 1 /TilingType 1
+			/BBox [0 0 12 12] /XStep 12 /YStep 12 /PaintProc{ begin 
+			12 12 scale 16 16 1 [16 0 0 16 0 0] 
+{<fffffbdff3dfebdfdbdfbbdf7bdffbdefbddfbdbfbd7fbcffbdfffffffffffff>} image end }
+			>> 	matrix makepattern /Pat15 exch def 
+}{
+/Pat0 { 0.000000 setgray } def
+/Pat1 { 0.062500 setgray } def
+/Pat2 { 0.125000 setgray } def
+/Pat3 { 0.187500 setgray } def
+/Pat4 { 0.250000 setgray } def
+/Pat5 { 0.312500 setgray } def
+/Pat6 { 0.375000 setgray } def
+/Pat7 { 0.437500 setgray } def
+/Pat8 { 0.500000 setgray } def
+/Pat9 { 0.562500 setgray } def
+/Pat10 { 0.625000 setgray } def
+/Pat11 { 0.687500 setgray } def
+/Pat12 { 0.750000 setgray } def
+/Pat13 { 0.812500 setgray } def
+/Pat14 { 0.875000 setgray } def
+/Pat15 { 0.937500 setgray } def
+/setpattern { } def
+} ifelse
+/m {moveto} bind def
+/l {lineto} bind def
+/s {stroke} bind def
+% Symbol fill
+/f { gsave fill grestore stroke } bind def
+% Opaque symbol
+/o { gsave 1.000000 1.000000 1.000000 setrgbcolor
+     fill grestore stroke } bind def
+% Circle symbol
+/a { 3 -1 roll 0 360 arc } bind def
+/da { a s } bind def
+/fa { a f } bind def
+/oa { a o } bind def
+% Square symbol
+/sq { moveto dup dup rmoveto 2 mul
+      dup neg 0 rlineto dup neg 0 exch rlineto
+      0 rlineto closepath } bind def
+/dsq { sq s } bind def
+/fsq { sq f } bind def
+/osq { sq o } bind def
+% Triangle symbols
+/t1 { moveto dup 0 exch rmoveto
+      dup neg dup 2 mul rlineto 2 mul 0 rlineto
+      closepath } bind def
+/dt1 { t1 s } bind def
+/ft1 { t1 f } bind def
+/ot1 { t1 o } bind def
+/t2 { moveto dup neg 0 rmoveto
+      dup dup 2 mul exch neg rlineto
+      2 mul 0 exch rlineto closepath } bind def
+/dt2 { t2 s } bind def
+/ft2 { t2 f } bind def
+/ot2 { t2 o } bind def
+/t3 { moveto dup neg 0 exch rmoveto
+      dup dup 2 mul rlineto neg 2 mul 0 rlineto
+      closepath } bind def
+/dt3 { t3 s } bind def
+/ft3 { t3 f } bind def
+/ot3 { t3 o } bind def
+/t4 { moveto dup 0 rmoveto
+      dup dup -2 mul exch rlineto
+      -2 mul 0 exch rlineto closepath } bind def
+/dt4 { t4 s } bind def
+/ft4 { t4 f } bind def
+/ot4 { t4 o } bind def
+% Diamond symbol
+/di { moveto dup 0 exch rmoveto
+      dup neg dup rlineto dup dup neg rlineto
+      dup dup rlineto closepath } bind def
+/ddi { di s } bind def
+/fdi { di f } bind def
+/odi { di o } bind def
+% Plus symbol
+/pl { dup 0 rmoveto dup -2 mul 0 rlineto
+      dup dup rmoveto -2 mul 0 exch rlineto
+    } bind def
+/dpl { m pl s } bind def
+% x symbol
+/x { dup dup rmoveto dup -2 mul dup rlineto
+     2 mul dup 0 rmoveto dup neg exch rlineto
+   } bind def
+/dx { m x s } bind def
+% Splat symbol
+/dsp { m dup pl dup 0 exch rmoveto 0.707 mul x s
+     } bind def
+/RJ {
+ stringwidth neg exch neg exch
+ rmoveto
+} bind def
+/CS {
+ stringwidth
+ 2 div neg exch 2 div neg exch
+ rmoveto
+} bind def
+0.24 0.24 scale
+1 setlinecap
+
+	mark             
+	/ISOLatin1Encoding 
+	  8#000 1 8#054 {StandardEncoding exch get} for 
+	  /minus 
+	  8#056 1 8#217 {StandardEncoding exch get} for 
+	  /dotlessi 
+	  8#301 1 8#317 {StandardEncoding exch get} for 
+	  /space /exclamdown /cent /sterling /currency /yen /brokenbar /section 
+	  /dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen 
+	  /registered /macron /degree /plusminus /twosuperior /threesuperior /acute 
+	  /mu /paragraph /periodcentered /cedilla /onesuperior /ordmasculine 
+	  /guillemotright /onequarter /onehalf /threequarters /questiondown /Agrave 
+	  /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla /Egrave /Eacute
+	  /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis /Eth /Ntilde
+	  /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash /Ugrave 
+	  /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls /agrave /aacute 
+	  /acircumflex /atilde /adieresis /aring /ae /ccedilla /egrave /eacute 
+	  /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis /eth /ntilde
+	  /ograve /oacute /ocircumflex /otilde /odieresis /divide /oslash /ugrave 
+	  /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+	  /ISOLatin1Encoding where not {256 array astore def} if 
+	 cleartomark 
+
+	/makeISOEncoded 
+	{ findfont /curfont exch def 
+	  /newfont curfont maxlength dict def  
+	  /ISOLatin1 (-ISOLatin1) def
+	  /curfontname curfont /FontName get dup length string cvs def 
+	  /newfontname curfontname length ISOLatin1 length add string 
+    	 dup 0                  curfontname putinterval 
+    	 dup curfontname length ISOLatin1   putinterval 
+	  def 
+	  curfont   
+	  { exch dup /FID ne  
+    	{ dup /Encoding eq  
+    	  { exch pop ISOLatin1Encoding exch }  
+    	  if  
+    	  dup /FontName eq  
+    	  { exch pop newfontname exch }  
+    	  if  
+    	  exch newfont 3 1 roll put  
+    	}  
+    	{ pop pop }  
+    	ifelse  
+	  }  
+	  forall 
+	  newfontname newfont definefont 
+	} def 
+
+	/Times-Roman makeISOEncoded pop 
+	/Times-Bold makeISOEncoded pop 
+	/Times-Italic makeISOEncoded pop 
+	/Times-BoldItalic makeISOEncoded pop 
+	/Helvetica makeISOEncoded pop 
+	/Helvetica-Bold makeISOEncoded pop 
+	/Helvetica-Oblique makeISOEncoded pop 
+	/Helvetica-BoldOblique makeISOEncoded pop 
+s
+0.000000 0.000000 0.000000 setrgbcolor
+1 setlinewidth
+/Times-Italic-ISOLatin1 findfont 88 scalefont setfont
+[] 0 setdash
+2115 547 m
+2115 557 l
+2038 547 m
+2038 557 l
+1962 547 m
+1962 557 l
+1885 547 m
+1885 557 l
+1809 547 m
+1809 557 l
+1733 547 m
+1733 557 l
+1656 547 m
+1656 557 l
+1580 547 m
+1580 557 l
+1504 547 m
+1504 557 l
+1427 547 m
+1427 557 l
+1351 547 m
+1351 557 l
+1275 547 m
+1275 557 l
+1198 547 m
+1198 557 l
+1122 547 m
+1122 557 l
+1045 547 m
+1045 557 l
+969 547 m
+969 557 l
+893 547 m
+893 557 l
+816 547 m
+816 557 l
+740 547 m
+740 557 l
+664 547 m
+664 557 l
+587 547 m
+587 557 l
+511 547 m
+511 557 l
+435 547 m
+435 557 l
+s
+3 setlinewidth
+2115 547 m
+2115 567 l
+1962 547 m
+1962 567 l
+1809 547 m
+1809 567 l
+1656 547 m
+1656 567 l
+1504 547 m
+1504 567 l
+1351 547 m
+1351 567 l
+1198 547 m
+1198 567 l
+1045 547 m
+1045 567 l
+893 547 m
+893 567 l
+740 547 m
+740 567 l
+587 547 m
+587 567 l
+435 547 m
+435 567 l
+/Times-Italic-ISOLatin1 findfont 84 scalefont setfont
+/Helvetica-ISOLatin1 findfont 84 scalefont setfont
+s
+1 setlinewidth
+2115 477 m
+gsave
+2115 477 translate
+90 rotate
+0 -28  m
+(-120) RJ
+(-120) show
+grestore
+newpath
+1962 477 m
+gsave
+1962 477 translate
+90 rotate
+0 -28  m
+(-110) RJ
+(-110) show
+grestore
+newpath
+1809 477 m
+gsave
+1809 477 translate
+90 rotate
+0 -28  m
+(-100) RJ
+(-100) show
+grestore
+newpath
+1656 477 m
+gsave
+1656 477 translate
+90 rotate
+0 -28  m
+(-90) RJ
+(-90) show
+grestore
+newpath
+1504 477 m
+gsave
+1504 477 translate
+90 rotate
+0 -28  m
+(-80) RJ
+(-80) show
+grestore
+newpath
+1351 477 m
+gsave
+1351 477 translate
+90 rotate
+0 -28  m
+(-70) RJ
+(-70) show
+grestore
+newpath
+1198 477 m
+gsave
+1198 477 translate
+90 rotate
+0 -28  m
+(-60) RJ
+(-60) show
+grestore
+newpath
+1045 477 m
+gsave
+1045 477 translate
+90 rotate
+0 -28  m
+(-50) RJ
+(-50) show
+grestore
+newpath
+893 477 m
+gsave
+893 477 translate
+90 rotate
+0 -28  m
+(-40) RJ
+(-40) show
+grestore
+newpath
+740 477 m
+gsave
+740 477 translate
+90 rotate
+0 -28  m
+(-30) RJ
+(-30) show
+grestore
+newpath
+587 477 m
+gsave
+587 477 translate
+90 rotate
+0 -28  m
+(-20) RJ
+(-20) show
+grestore
+newpath
+435 477 m
+gsave
+435 477 translate
+90 rotate
+0 -28  m
+(-10) RJ
+(-10) show
+grestore
+newpath
+/Helvetica-ISOLatin1 findfont 84 scalefont setfont
+2355 547 m
+gsave
+2355 547 translate
+0 rotate
+0 0  m
+(    t   [1/m  ]) CS
+(    t   [1/m  ]) show
+grestore
+newpath
+435 547 m
+445 547 l
+435 685 m
+445 685 l
+435 823 m
+445 823 l
+435 960 m
+445 960 l
+435 1098 m
+445 1098 l
+435 1236 m
+445 1236 l
+435 1374 m
+445 1374 l
+435 1512 m
+445 1512 l
+435 1650 m
+445 1650 l
+435 1787 m
+445 1787 l
+435 1925 m
+445 1925 l
+435 2063 m
+445 2063 l
+435 2201 m
+445 2201 l
+435 2339 m
+445 2339 l
+435 2476 m
+445 2476 l
+435 2614 m
+445 2614 l
+435 2752 m
+445 2752 l
+s
+3 setlinewidth
+435 547 m
+455 547 l
+435 823 m
+455 823 l
+435 1098 m
+455 1098 l
+435 1374 m
+455 1374 l
+435 1650 m
+455 1650 l
+435 1925 m
+455 1925 l
+435 2201 m
+455 2201 l
+435 2476 m
+455 2476 l
+435 2752 m
+455 2752 l
+/Helvetica-ISOLatin1 findfont 84 scalefont setfont
+s
+1 setlinewidth
+381 547 m
+gsave
+381 547 translate
+0 rotate
+0 -28  m
+(0) RJ
+(0) show
+grestore
+newpath
+381 823 m
+gsave
+381 823 translate
+0 rotate
+0 -28  m
+(5) RJ
+(5) show
+grestore
+newpath
+381 1098 m
+gsave
+381 1098 translate
+0 rotate
+0 -28  m
+(10) RJ
+(10) show
+grestore
+newpath
+381 1374 m
+gsave
+381 1374 translate
+0 rotate
+0 -28  m
+(15) RJ
+(15) show
+grestore
+newpath
+381 1650 m
+gsave
+381 1650 translate
+0 rotate
+0 -28  m
+(20) RJ
+(20) show
+grestore
+newpath
+381 1925 m
+gsave
+381 1925 translate
+0 rotate
+0 -28  m
+(25) RJ
+(25) show
+grestore
+newpath
+381 2201 m
+gsave
+381 2201 translate
+0 rotate
+0 -28  m
+(30) RJ
+(30) show
+grestore
+newpath
+381 2476 m
+gsave
+381 2476 translate
+0 rotate
+0 -28  m
+(35) RJ
+(35) show
+grestore
+newpath
+381 2752 m
+gsave
+381 2752 translate
+0 rotate
+0 -28  m
+(40) RJ
+(40) show
+grestore
+newpath
+/Helvetica-ISOLatin1 findfont 84 scalefont setfont
+234 1649 m
+gsave
+234 1649 translate
+90 rotate
+0 0  m
+(Height of containment [m]) CS
+(Height of containment [m]) show
+grestore
+newpath
+0.000000 0.000000 1.000000 setrgbcolor
+5 setlinewidth
+495 547 m
+601 605 l
+796 664 l
+1025 722 l
+1250 781 l
+1451 839 l
+1617 898 l
+1742 956 l
+1840 1014 l
+1901 1073 l
+1947 1131 l
+1962 1190 l
+1977 1248 l
+1982 1307 l
+1982 1365 l
+1977 1423 l
+1982 1482 l
+1982 1540 l
+1987 1599 l
+1992 1657 l
+2003 1716 l
+2013 1774 l
+2023 1833 l
+2038 1891 l
+2053 1949 l
+2069 2008 l
+2079 2066 l
+2089 2125 l
+2099 2183 l
+2099 2242 l
+2084 2300 l
+2058 2358 l
+2023 2417 l
+1957 2475 l
+1875 2534 l
+1776 2592 l
+1662 2651 l
+s
+1 setlinewidth
+0.000000 0.000000 0.000000 setrgbcolor
+7 setlinewidth
+435 547 m
+2115 547 l
+435 547 m
+435 2752 l
+s
+1 setlinewidth
+/Helvetica-ISOLatin1 findfont 88 scalefont setfont
+/Symbol findfont 
+88 scalefont
+ setfont
+3 setlinewidth
+183 547 m
+259 547 l
+s
+1 setlinewidth
+3 setlinewidth
+221 767 m
+221 547 l
+245 719 m
+221 767 l
+197 719 l
+s
+1 setlinewidth
+/Symbol findfont 
+72 scalefont
+ setfont
+/Helvetica-ISOLatin1 findfont 72 scalefont setfont
+2504 597 m
+gsave
+2504 597 translate
+0 rotate
+0 -24  m
+(2) show
+grestore
+newpath
+/Helvetica-ISOLatin1 findfont 88 scalefont setfont
+/Symbol findfont 
+88 scalefont
+ setfont
+/Symbol findfont 
+72 scalefont
+ setfont
+/Helvetica-ISOLatin1 findfont 72 scalefont setfont
+129 569 m
+gsave
+129 569 translate
+0 rotate
+0 -24  m
+(z) show
+grestore
+newpath
+/Helvetica-ISOLatin1 findfont 88 scalefont setfont
+/Symbol findfont 
+88 scalefont
+ setfont
+/Symbol findfont 
+120 scalefont
+ setfont
+2153 613 m
+gsave
+2153 613 translate
+0 rotate
+0 -40  m
+(a) show
+grestore
+1500 150 moveto
+/Helvetica findfont
+100 scalefont
+setfont
+((b)) show
+grestore
+newpath
+/Symbol findfont 
+88 scalefont
+ setfont
+end
+showpage
+%%Trailer

@@ -1,0 +1,36 @@
+#ifndef SEQFILESC_H
+#define SEQFILESC_H
+
+#include "C30baroghelc.h"
+#include "C60baroghelc.h"
+#include "barelc.h"
+#include "baroghelBc.h"
+#include "concreteBc.h"
+#include "constrelcl.h"
+#include "constrelcu.h"
+#include "coupbclc.h"
+#include "coupmatl.h"
+#include "coupmatu.h"
+#include "couptop.h"
+#include "elementc.h"
+#include "fcsolver.h"
+#include "glasgowmatc.h"
+#include "globalc.h"
+#include "globmatc.h"
+#include "intpointsc.h"
+#include "isotrmatc.h"
+#include "lhsrhsc.h"
+#include "metrinit.h"
+#include "multiphasec.h"
+#include "o30bazantc.h"
+#include "onemediumc.h"
+#include "outdriverc.h"
+#include "pcsolver.h"
+#include "probdescc.h"
+#include "quadrilatc.h"
+#include "solverc.h"
+#include "threemediac.h"
+#include "sejtkrmatc.h"
+
+
+#endif

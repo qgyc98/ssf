@@ -1,0 +1,210 @@
+\documentclass[12pt]{article}
+\begin{document}
+
+\section{What is the Sparse Direct Solver ?}
+
+The sparse solver is based on sparse factorization of a symmetric nonzero pattern matrix. First step is the symbolic factorization of the matrix based on the Approximate Minimum Degree algorithm. The eventual memory requirements are determined during this phase. After the symbolic factorization is done, we can proceed to the numerical factorization based on $LDL^T$, $LL^T$ or $LU$ decomposition.
+Once the decomposition is evaluated we can solve the system several times for different RHS vectors by forward and back substitution.
+
+\section{ISolver methods}
+
+The sparse solver is controlled via the methods of interface ISolver. The list of its methods and the meaning of individual parmeters is stated here.
+
+\subsection{Initialize}
+\begin{verbatim}
+long Initialize
+(unsigned char run_code, eDSSolverType type = eDSSFactorizationLDLT);
+//run_code 
+// reseved parameter
+//type
+// eDSSFactorizationLDLT (0) - LDL^T factorization (default)
+// eDSSFactorizationLLT  (1) - LLT Cholesky factorization
+// eDSSFactorizationLU   (2) - LU factorization on symmetric pattern
+\end{verbatim}
+Fuction does the necessary intialization and enables the user to specify the type of matrix decomposition.
+
+\subsection{LoadMatrix}
+\begin{verbatim}
+// Copies the initial sparse matrix from user specified fields
+BOOL LoadMatrix 
+(ULONG neq,unsigned char block_size,double * a,ULONG * ci,ULONG * adr ) = 0;
+// neq - number of matrix rows
+// a   - double array containing the matrix nonzero entries (size adr[neq])
+// ci  - column indices of each nonzero entry (size adr[neq])
+// adr - indices pointing to start of each row (size neq+1)
+// block_size
+//   the size of the smallest allocatable block 
+//	 in the block sparse matrix (1,2,3..)
+
+// Copies the initial sparse matrix from special SparseMatrixF format.
+BOOL LoadMatrix (SparseMatrixF* sm,unsigned char block_size) = 0;
+// block_size
+//   the size of the smallest allocatable block 
+//	 in the block sparse matrix (1,2,3..)
+\end{verbatim}
+Copies the source matrix to the DSSolver object. The matrix must be stored in the sparse compressed row format. For the symmetric matrix the column indices in each row should be successively increasing between 0-th column and diagonal. The last entry must be the diagonal entry.
+
+\subsection{LoadMCN}
+\begin{verbatim}
+// Loads the "MatrixCodeNumbers" vector[n_blocks*block_size]
+BOOL LoadMCN (ULONG n_blocks,unsigned char block_size,long * mcn);
+// each entry in the vector[i] can be :
+// vector[i] >=  0  normal unknown	(row index in SparseMatrixF [zero-based])
+// vector[i] == -1  this entry is not used	(no corresp. row in SparseMatrixF)
+// vector[i] <= -2  unknown to be left uncondensed	
+//	( -vector[i]-2 is the zero-based row index in SparseMatrixF)
+
+//  Ex:
+	// 0,1,2,....... code numbers
+	// -1   ........ eliminated row
+	// -2, -3, -4 .. rows (0,1,2) ment to be left uncondensed 
+//  n_blocks		- number of blocks
+\end{verbatim}
+This information is not necessary for the direct solver. This array enables to reorder the unknowns for better match into matrix blocks. This affects the efficiency of the sparse solver and can have major influence to decomposition speed and also to memory consumption. 
+If we want to carry out static condensation of some matrix unknowns, this array includes information about which unknowns are to be left uncondensed. In such a situation this array is necessary.
+
+\subsection{Control of the factorization}
+
+Following three methods allow the user fully control each step of the sparse factorization. This enables the user to run the symbolic factorization just once and load different matrices of same sparsity patter to already allocated memory. This might be usefull for some nonlinear or incremetnal solutions.
+
+\begin{verbatim}
+// Creates the connectivity matrix 
+// Computes the MinimumDegree ordering
+// Allocates the memory for the SparseGrid matrix
+BOOL PreFactorize ( );
+\end{verbatim}
+
+\begin{verbatim}
+// Loads or reloads the numeric values of the sparse matrix 'sm' to 
+// the already allocated SparseGrid matrix 
+BOOL LoadNumbers (SparseMatrixF* sm);
+\end{verbatim}
+
+\begin{verbatim}
+// Runs the LDL factorization on the already allocated and loaded matrix
+BOOL ReFactorize ( );
+\end{verbatim}
+
+If we want to run the factorization just once, the three preceding methods are put together in single following method.
+
+\begin{verbatim}
+// This function unites the three previous function into one step
+// PreFactorize ( ) + LoadNubers( ) + ReFactorize ( )
+// This is usefull for single-pass solutions
+BOOL Factorize ( );
+\end{verbatim}
+
+\begin{verbatim}
+// When the matrix was factorized we can solve several A*r=f equations
+// if the pointers are equal (r==f) the result will overwrite the 
+// RHS vector (In that case the soultion is faster)
+// It is recomended that both vectors have size in a whole multiple 
+// of the 'block_size' or bigger
+BOOL Solve (double * r,double * f );
+\end{verbatim}
+
+\subsection{Data disposing methods}
+\begin{verbatim}
+// Disposes the solver internal data from the memory 
+// for us to be able to load another matrix.
+void Dispose();
+\end{verbatim}
+
+\begin{verbatim}
+// Calls the Dispose method.
+long Close ( );
+\end{verbatim}
+
+\subsection{Data tracking methods}
+\begin{verbatim}
+// enables the user to assign its own text output method
+void SetMT(MathTracer* MT);
+\end{verbatim}
+The MathTracer object contains methods for console text output, time measuremets and program flow decision invoked by potential reaching of a zero pivot.
+
+\begin{verbatim}
+virtual BOOL decomp() = 0;
+virtual void changedecomp() = 0;
+\end{verbatim}
+This pair of methods controls the state of internal variable decompID. The use of this variable is up to users demands. Usually serves for storing the infomration if the matrix was already factorized or not.
+
+\subsection{Static condensation}
+\begin{verbatim}
+// Carries out the statical condensation of unknowns which are 
+// marked by the MCN array.
+void condense(double *a,double *lhs,double *rhs,long tc);
+//  a - condensed matrix
+//  lhs - left hand side
+//  rhs - right hand side
+//  tc - type of computation
+//  tc=1 - return condensed matrix
+//  tc=2 - return part of left hand side
+//  tc=3 - return (Kii lhs = rhs) solution
+\end{verbatim}
+This method can be run only whit already assigned MCN array.
+
+\begin{verbatim}
+	// A few words to different ordering systems used during sparse PD solution
+	//
+	// A-order [neq]  
+	//		This is the order of data stored in user specified SparseMatrixF* sm.
+	//		Usually, we get RHS and return LHS in this order system.
+	//
+	// B-order [neq] -> [n_blocks*block_size]
+	//		You obtain B-order after applying MCN vector on A-order. 
+	//		MCN re-introduces removed lines and DOFs from certain nodes.
+	//
+	//	ex:		for (i=0;i<neq;i++) lhsA[i] = tmpB[mcn->order[i]];
+	//			for (i=0;i<neq;i++) tmpB[mcn->order[i]] = lhsA[i];
+	//
+	// C-order [neq]
+	//		This is such a permutaion of A order where all noncondensed nodes are on the end of 
+	//		the order.
+	//					dom_order
+\end{verbatim}
+
+\begin{verbatim}
+void GetA12block(double *pA12);
+\end{verbatim}
+
+
+\subsection{Matrix multiplication}
+\begin{verbatim}
+// c = A * b
+void MulMatrixByVector(double *b, double *c);
+\end{verbatim}
+
+
+\section{Typical usage of ISolver interface for a solution of sparse system}
+
+This is an easy example of loading the sparse matrix from file, instantiating the solver and obtaining the solution.
+
+\begin{verbatim}
+	// Load the sparse matrix from file
+	SparseMatrixF sm;
+	FILE* stream = NULL;
+	stream  = fopen("c:\\temp\\dss\\matrix.sm", "rb" );
+	sm.LoadMatrix(stream);
+	fclose(stream);
+
+	// Initialize the solver
+	ISolver* solver = new DSSolver();
+	unsigned char block_size = 2;
+	solver->Initialize(1);
+	solver->LoadMatrix(&sm,block_size);
+
+	// Prepare some right hand side vector
+	double* rhs = new double[100];	
+	for (i=0; i<100; i++) rhs[i] = 1.0;
+
+	// Factorize the matrix and obtain solution
+	solver->Factorize();
+	solver->Solve(rhs,rhs);
+
+	// Dipsose and end
+	solver->Close();
+	delete solver;
+	sm.Delete();
+\end{verbatim}
+
+\end{document}

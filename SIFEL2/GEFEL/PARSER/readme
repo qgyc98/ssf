@@ -1,0 +1,29 @@
+- 6.6. 2000
+   Prvni verze parseru. Je sebrana z baliku MTK 1.3.0, dale vyzaduje knihovnu qt verze 1.3 a vyssi
+  kvuli seznamu qlist. Pouziti je velmi jednoduche a funguje celkem bezproblemu.
+
+   Je nutne vlozit soubory eq.h a parser.h, ktere deklaruji tridy  variable, Parser a Equation.
+  Nejprve se zavola metoda Parser.TextToTree s retezcem pozadovane fce jako parametr. Tato metoda
+  vraci ukazatel na nove vytvorenou promennou typu Equation, ktera obsahuje rozklad funkce do
+  stromu. Dale trida Equation obsahuje odkaz na seznam Variables. Ten obsahuje odkazy na
+  jednotlive promenne nalezene parsingem. Pocet promennych se ziska Variables->count(),
+  promenna cislo i se ziska pres Variables->at(i), ktera vrati odkaz na promennou typu variable.
+  Trida variable ma dva datove cleny - retezec Name
+                                     - double  Value
+  Clen Value urcuje aktualni hodnotu promenne s nazvem Name v parsovanem retezci.
+
+   Hodnotu dane parsovane fce tedy ziskame tak, ze si nastavime hodnoty promennych ze seznamu
+  Variables v dane Equation a pak zavolame metodu Equation->Evaluate, ktera vrci double s
+  hodnotou parsovane fce pro aktualni hodnoty Variables.
+   Seznam vsech fci a operatoru, ktere jsou k dipozici je v souboru functext.h. Argumenty
+  goniometrickych fci jsou standardne v radianech, ale pomoci dat. clenu Equation.Radians
+  (typ bool) se da prepnout na stupne.
+
+   Cely priklad je v souboru main.cpp, kde se tiskne tabulka hodnot pro zadany interval a krok
+  pro funkci,ktera se zadava.
+
+   Co se tyka prekladu, tak je nutne pouzit knihovnu qt. Pro neznalce jako jsem 
+  ja, uvadim priklad radku jak prekladat :
+    g++ -g -L/usr/lib/qt-2.0.1/lib -lqt -I/usr/lib/qt-2.0.1/include *.cpp -o main
+   
+   Namety a chyby hlaste na obvyklou adresu koudelka@.cml.fsv.cvut.cz

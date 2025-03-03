@@ -1,0 +1,65 @@
+
+
+{\bf Numerical solution}\\
+
+\begin{eqnarray}\label{final_eq}
+\left[ \begin{array}{cc}
+\tenss{K}_{hh} & \tenss{K}_{hT} \\
+\tenss{K}_{Th} & \tenss{K}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_h \\
+\tenss{r}_{T}
+\end{array} \right\} + 
+\left[ \begin{array}{cc}
+\tenss{C}_{hh} & \tenss{C}_{hT} \\
+\tenss{C}_{Th} & \tenss{C}_{TT}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_h \\
+\dot{\tenss{r}}_{T}
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{q}_{h} \\
+\tenss{q}_{T}
+\end{array} \right\},
+\end{eqnarray}
+where
+\begin{eqnarray}
+\tenss{K}_{hh} = \int_{\Omega} \tenss{B}^T k_{hh} \tenss{B}{\rm d}\Omega,
+\qquad \tenss{K}_{hT} = \int_{\Omega} \tenss{B}^T k_{hT} \tenss{B}{\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{K}_{Th} = \int_{\Omega} \tenss{B}^T k_{Th} \tenss{B}{\rm d}\Omega,
+\qquad \tenss{K}_{TT} = \int_{\Omega} \tenss{B}^T k_{TT} \tenss{B}{\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{C}_{hh} = \int_{\Omega} \tenss{N}^T c_{hh}  \tenss{N} {\rm d}\Omega,\qquad
+\tenss{C}_{hT} = \int_{\Omega} \tenss{N}^T c_{hT}  \tenss{N} {\rm d}\Omega,\qquad
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{C}_{Th} = \int_{\Omega} \tenss{N}^T c_{Th}  \tenss{N} {\rm d}\Omega,\qquad
+\tenss{C}_{TT} = \int_{\Omega} \tenss{N}^T c_{TT}  \tenss{N} {\rm d}\Omega,\qquad
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{q}_h = \int_{\Gamma_2} \tenss{N}^T  \overline{q}^{h}{\rm d}\Gamma,\qquad
+\tenss{q}_T = \int_{\Gamma_2} \tenss{N}^T  \overline{q}_{T}{\rm d}\Gamma,\qquad
+\end{eqnarray}
+
+where
+\begin{eqnarray}
+ k_{hh} = ,
+\qquad k_{hT} = ,
+\end{eqnarray}
+\begin{eqnarray}
+ k_{Th} = ,
+\qquad k_{TT} = ,
+\end{eqnarray}
+\begin{eqnarray}
+ c_{hh} = ,
+\qquad c_{hT} = ,
+\end{eqnarray}
+\begin{eqnarray}
+ c_{Th} = ,
+\qquad c_{TT} = ,
+\end{eqnarray}

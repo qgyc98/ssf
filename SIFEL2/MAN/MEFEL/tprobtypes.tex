@@ -1,0 +1,44 @@
+\chapter{Type of mechanical problems}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linear static problems}
+\begin{equation}
+\mbf{K} \mbf{d} = \mbf{f}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Eigenvalue problems}
+\begin{equation}
+(\mbf{K}-\omega^2\mbf{M})\mbf{d}=\mbf{0}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Forced vibration problems}
+\begin{equation}
+\mbf{M}\nod{2}{\mbf{d}}{t} + \mbf{C}\od{\mbf{d}}{t} + \mbf{K}\mbf{d} = \mbf{f}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nonlinear static problems}
+\begin{equation}\label{eqnnonlinstat}
+\mbf{K}(\mbf{d}) \mbf{d} = \mbf{f}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Time dependent non-dynamic problems}
+\begin{equation}
+\mbf{K} \dot{\mbf{r}} = \dot{\mbf{f}} +
+\int_{V} \mbf{B}^T \mbf{D} \dot{\mbf{\varepsilon}}_{vp}\ {\rm d}V
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Earth pressure problems}
+Special case of nonlinear static problem, which is characterized by the equation
+\begin{equation}
+\mbf{K}(\mbf{d}) \mbf{d} = \mbf{f}(\mbf{d})
+\end{equation}
+It is usefull for solution earth pressures using General Lateral Pressure Theory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linear layered static problems}

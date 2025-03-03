@@ -1,0 +1,1563 @@
+\chapter{Application of the TRFEL}
+
+\section{The most common variables used in TRFEL}
+
+The most common and used variables and their notation are summarized in this section.
+This list is definitely not complete.
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+{\tt napfun} & number of approximated functions on the element
+\\ \hline
+{\tt nb} & number of blocks
+\\ \hline
+{\tt ndofe} & number of degrees of freedom defined on element
+\\ \hline
+{\tt ne} & number of nodes on element
+\\ \hline
+{\tt ned} & number of edges on element
+\\ \hline
+{\tt nned} & number of nodes on one edge
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{TRFEL data types}
+
+Description of TRFEL enumerate data types is summarized in this section. 
+The TRFEL enumerate data types are used in abundance in the code. They are defined
+in the file aliast.h.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf problemtypet}}
+\index{type!{\sf problemtypet}}
+\label{sectproblemtypet}
+
+This generalized data type defines type of transport problem.
+Admissible values of a variable of the {\sf problemtypet} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt stationary\_problem} & 50 & solution of stationary
+\\
+ & & linear problems
+\\ \hline
+{\tt nonstationary\_problem} & 60 & solution of nonstationary
+\\
+ & & linear problems
+\\ \hline
+{\tt nonlinear\_nonstationary\_problem} & 61 & solution of nonlinear
+\\
+ & & nonstationary problems
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf transmattert}}
+\index{type!{\sf transmattert}}
+\label{secttransmattert}
+
+This generalized data type defines type of transported materials (media).
+Admissible values of a variable of the {\sf transmattert} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt onemedium} & 1 & one medium is considered
+\\ \hline
+{\tt twomediacoup} & 10 & two media are considered
+\\ \hline
+{\tt threemediacoup} & 30 & three media are considered
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf mednamest}}
+\index{type!{\sf mednamest}}
+\label{sectmednamest}
+
+This generalized data type defines names of transported materials (media).
+Admissible values of a variable of the {\sf mednamest} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt heat} & 1 & heat is transported
+\\ \hline
+{\tt moisture} & 2 & moisture is transported
+\\ \hline
+{\tt heat\_moisture} & 10 & heat and moisture are transported
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf proptypet}}
+\index{type!{\sf proptypet}}
+\label{sectproptypet}
+
+This generalized data type defines names of assigned properties used in the transprep source files.
+Admissible values of a variable of the {\sf proptypet} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt boundarycondt} & 2 &
+\\ \hline
+{\tt crosssect} & 4 &
+\\ \hline
+{\tt eltypet} & 6 &
+\\ \hline
+{\tt matelt} & 7 &
+\\ \hline
+{\tt initcondt} & 11 &
+\\ \hline
+{\tt comcodnumt} & 12 &
+\\ \hline
+{\tt loadedget} & 13 &
+\\ \hline
+{\tt loadsource} & 15 &
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf elemtypet}}
+\index{type!{\sf elemtypet}}
+\label{sectelemtypet}
+
+This generalized data type defines type of finite element used in problem.
+Admissible values of a variable of the {\sf elemtypet} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt barlint} & 200 & onedimensional element with linear approximation functions
+\\ \hline
+{\tt barquadt} & 205 & onedimensional element with quadratic approximation functions
+\\ \hline
+{\tt trlint} & 210 & triangular element with linear approximation functions
+\\ \hline
+{\tt trlaxisym} & 211 & triangular element with linear approximation functions\\ & & for axisymmetric problems
+\\ \hline
+{\tt quadlint} & 215 & quadrilateral element with bi-linear approximation functions
+\\ \hline
+{\tt quadquadt} & 216 & quadrilateral element with bi-quadratic approximation functions
+\\ \hline
+{\tt quadlaxisym} & 217 & quadrilateral element with bi-linear approximation functions\\ & & for axisymmetric problems
+\\ \hline
+{\tt lineartett} & 220 & tetrahedral element with linear approximation functions
+\\ \hline
+{\tt linearhext} & 225 & hexahedral element with tri-linear approximation functions
+\\ \hline
+{\tt quadratichext} & 226 & hexahedral element with tri-quadratic approximation functions
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf mattypet}}
+\index{type!{\sf mattypet}}
+\label{sectmattypet}
+
+This generalized data type defines type of material.
+Admissible values of a variable of the {\sf mattypet} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt isotransmat} & 100 &
+\\ \hline
+{\tt cernyconcrete} & 101 &
+\\ \hline
+{\tt bazantpedersen} & 150 &
+\\ \hline
+{\tt pedersen} & 151 &
+\\ \hline
+{\tt kunzel} & 155 &
+\\ \hline
+{\tt concreteB} & 160 &
+\\ \hline
+{\tt baroghelB} & 161 &
+\\ \hline
+{\tt C60baroghelB} & 165 &
+\\ \hline
+{\tt C30baroghelB} & 166 &
+\\ \hline
+{\tt o30bazantB} & 167 &
+\\ \hline
+{\tt C60bazantB} & 168 &
+\\ \hline
+{\tt glasgow} & 170 &
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf crsectypet}}
+\index{type!{\sf crsectypet}}
+\label{sectcrsectypet}
+
+This generalized data type defines type of cross section.
+Admissible values of a variable of the {\sf crsectypet} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt nocrosssectiont} & 0 & no cross section
+\\ \hline
+{\tt crsec1dt} & 1 & cross section for 1D problems
+\\ \hline
+{\tt crsec2dt} & 2 & cross section for 2D problems
+\\ \hline
+{\tt crsec3dt} & 3 & cross section for 3D problems
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf strastret}}
+\index{type!{\sf strastret}}
+\label{sectstrastret}
+
+This generalized data type defines type of processed quantity.
+Admissible values of a variable of the {\sf strastret} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt grad} & 0 & gradients are computed
+\\ \hline
+{\tt flux} & 1 & fluxes are computed
+\\ \hline
+{\tt othert} & 2 & other values are computed
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf graphftt}}
+\index{type!{\sf graphftt}}
+\label{sectgraphftt}
+This generalized data type defines in the output driver which type of
+output graphics format is used.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt grftt\_no} & 0 & no graphics output
+\\ \hline
+{\tt grftt\_open\_dx} & 1 & OpenDX format
+\\ \hline
+{\tt grftt\_gid} & 3 & GID format
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Type {\sf prunkt}}
+\index{type!{\sf prunkt}}
+\label{sectprunkt}
+This generalized data type defines in the output diagrams type of
+printed unknowns. 
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt pr\_unknowns} & 1 & unknowns vector
+\\ \hline
+{\tt pr\_gradients} & 2 & gradients
+\\ \hline
+{\tt pr\_fluxes} & 3 & fluxes
+\\ \hline
+{\tt pr\_stepid} & 6 & step number
+\\ \hline
+{\tt pr\_apploadt} & 7 & load coefficient or time
+\\ \hline
+{\tt pr\_othert} & 8 & values of other array
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Types of transport problems}
+Type of transport problem is described by attribute {\it tprobt} of the class {\sf probdesct}. {\it tprobt}
+is a {\sf problemtypet} defined in the file aliast.h and it is described in Section \ref{sectproblemtypet}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computation of particular quantities}
+
+The computation of particular quantities is written in code, but now it is not used and not tested!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of gradients}
+\label{sectgradcomp}
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & action
+\\ \hline \hline
+{\it gradcomp} & 0 & do not compute strains
+\\ \hline
+{\it gradcomp} & 1 & compute strains
+\\ \hline
+\end{tabular}
+\label{tabgradcompcontr}
+\end{center}
+
+The code will be able to compute gradients at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of fluxes}
+\label{sectfluxcomp}
+
+Flux evaluation will be based on adopted strategy of decomposition of gradinet components
+into blocks. The decomposition is theoreticaly described in Section \ref{sectgencom} and the
+implementation is mentioned in Section \ref{sectgeninform}. The existence of several sets of
+integration points leads to application of interpolation methods. They are described in details
+in Section \ref{sectgeninform}.
+
+Computation of fluxes is controlled by attributes {\it fluxcomp} of the class
+{\sf probdesct}. Admissible values of the attributes are collected in the following table.
+
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & action
+\\ \hline \hline
+{\it fluxcomp} & 0 & do not compute fluxes
+\\ \hline
+{\it fluxcomp} & 1 & compute fluxes
+\\ \hline
+\end{tabular}
+\end{center}
+
+The code will be able to compute fluxes at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level. There is no connection between location where strains are computed and
+location where fluxes are computed.
+
+Flux computation requires computation of gradients at least at integration points.
+A choice gradcomp=0 and fluxcomp=1 leads
+to error because there are no data for flux evaluation. Averaging of gradients and averaging of fluxes
+are independent in the code. User must make decision which strategy should be used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of other quantities}
+\label{sectothercomp}
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & value & action
+\\ \hline \hline
+{\it othercomp} & 0 & do not other quantities
+\\ \hline
+{\it othercomp} & 1 & other quantities
+\\ \hline
+\end{tabular}
+\label{tabothercompcontr}
+\end{center}
+
+The code will be able to compute other quantities at various locations:
+\begin{itemize}
+\item{integration points,}
+\item{nodes of elements,}
+\item{points defined by users by coordinates.}
+\end{itemize}
+The choice of location can be different element from element and therefore control instances are read
+at element level.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Computation of element level matrices}
+This section is devoted to the description of particular finite elements. Notion characteristic
+matrix \index{matrix!characteristic} means any matrix of finite element. It can be for example
+conducitvity matrix, capacity matrix, geometric matrix and so on. All matrices are considered at element level.
+
+With respect to maximal universality, block structure of all characteristic matrices is used.
+Decomposition of geometric matrix and stiffness matrix of the material is described in Section \ref{sectgencom}.
+The stiffness matrix is obtained as the sum of contributions (see Equation (\ref{condmatr})).
+As was mentioned in Section \ref{sectgencom}, each contribution can be integrated by different integration
+scheme. This fact is important for example in case of underintegrated finite elements. Block structure of
+matrices allows application of various approximation functions for particular unknown functions.
+On the other hand, existence of several sets of integration points on one element produces difficulty because
+various blocks of data are computed at various points on element and some interpolation must be used. 
+
+....
+
+Knowledge of all quantities at all integration points is important because during numerical integration
+various quantities are required. But there is also another requirement arising from users of the software.
+Users usually do not require any quantities expressed at the integration points but at the nodes.
+These reasons provoke construction of interpolation of any quantity from any integration point to any other
+point on element. Evaluation of any quantity anywhere on element is simple if the nodal values are known.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Control of particular processes}
+
+This section contains subsections describing control of various processes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control of solver of systems of linear algebraic equations}
+\label{sectcontrlineqsolver}
+
+There are many possibilities of solution of systems of linear algebraic equations in the code. Basically,
+there are two strategies: direct or iterative method. An attribute {\it ssle} of the class {\sf probdesct}
+contains all necessary informations. The attribute {\it ssle} is an instance of the class {\sf slesolv} which
+is described in GEFEL.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control of solver of nonlinear algebraic equations}
+
+Only one method is implemented in the code at this time, the Newton-Raphson method.\index{Newton-Raphson method}
+
+\subsubsection{Control of the Newton-Raphson method}
+
+The Newton-Raphson method method requires several control parameters.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\it nii} & {\sf long} & maximum number of iterations in inner loop
+\\ \hline
+{\it err} & {\sf double} & required norm of vector of unbalanced fluxes
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Control of numerical integration of time dependent equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Control of deterministic and stochastic computations}
+\label{sectdetstochcontr}
+
+TRFEL enables stochastic computations which are based on simple Monte Carlo method.
+Set of randomly generated input data is created before application of TRFEL. Randomly
+means with respect to required probability densities and covariance matrices.
+Then TRFEL computes sequence of deterministic problems defined by input data from
+the set mentioned before. The TRFEL stores required output data which are then
+analysed by usual methods of theory of probability and mathematical statistics.
+
+Software for generation of random input data and for analysis of results is separated
+from the TRFEL and it creates independent library.
+
+Whether computation will be deterministic or stochastic is defined by attribute
+{\it stochasticcalc}\index{attribute!{\it stochasticcalc}} of the class {\sf probdesc}.
+If {\it stochasticcalc}=0, deterministic
+computation will be used.  If {\it stochasticcalc}=1, stochastic computation will be used.
+
+Stochastic computations in TRFEL are in process and are developed and tested now.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Definitions in the TRFEL}
+
+This section deals with various definitions in the code. There are mentioned definitions
+like definition of type of finite element, type of material model etc.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of finite element}
+
+List of available finite elements for mechanical problems is given here. Names of classes, their objects
+(instances) and basic data are mentioned. For theoretical description of particular finite elements
+see Section \ref{finitelements}.
+
+
+\subsubsection{Onedimensional element with linear approximation functions}
+\index{class!{\sf linbart}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf linbart}
+\\ \hline
+object name & {\it Lbt}
+\\ \hline
+theoretical description & Section \ref{linbart}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & (2 int. points), (2 int. points)
+\\ \hline
+DOF & $2 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\subsubsection{Onedimensional element with quadratic approximation functions}
+\index{class!{\sf quadbart}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadbart}
+\\ \hline
+object name & {\it Qbt}
+\\ \hline
+theoretical description & Section \ref{quadbart}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & (3 int. point), (3 int. points)
+\\ \hline
+DOF & $3 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Triangular element with linear approximation functions}
+\index{class!{\sf trlineart}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf trlineart}
+\\ \hline
+object name & {\it Ltt}
+\\ \hline
+theoretical description & Section \ref{trlint}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & (1 int. point), (3 int. points)
+\\ \hline
+DOF & $3 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Triangular axisymmetric element with linear approximation functions}
+\index{class!{\sf trlinaxisym}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf trlinaxisym}
+\\ \hline
+object name & {\it Ltat}
+\\ \hline
+theoretical description & Section \ref{trlaxt}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & (1 int. point), (3 int. points)
+\\ \hline
+DOF & $3 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Quadrilateral element with bi-linear approximation functions}
+\index{class!{\sf quadlineart}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadlineart}
+\\ \hline
+object name & {\it Lqt}
+\\ \hline
+theoretical description & Section \label{quadlint}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & ($2 \times 2$ points), ($2 \times 2$ points)
+\\ \hline
+DOF & $4 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Quadrilateral element with bi-quadratic approximation functions}
+\index{class!{\sf quadquadt}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadquadrilatt}
+\\ \hline
+object name & {\it Qqt}
+\\ \hline
+theoretical description & Section \label{quadquadt}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & ($3 \times 3$ points), ($3 \times 3$ points)
+\\ \hline
+DOF & $8 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Quadrilateral axisymmetric element with bilinear approximation functions}
+\index{class!{\sf quadlinaxisym}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadlinaxisym}
+\\ \hline
+object name & {\it Lqat}
+\\ \hline
+theoretical description & Section \ref{qualaxt}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & ($3 \times 3$ points), ($3 \times 3$ points)
+\\ \hline
+DOF & $8 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Tetrahedral element with linear approximation functions}
+\index{class!{\sf lintett}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf lintett}
+\\ \hline
+object name & {\it Ltett}
+\\ \hline
+theoretical description & Section \ref{lintett}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & (1 int. point), (4 int. points)
+\\ \hline
+DOF & $4 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Hexahedral element with tri-linear approximation functions}
+\index{class!{\sf linhext}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf linhext}
+\\ \hline
+object name & {\it Lht}
+\\ \hline
+theoretical description & Section \ref{linhext}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & ($2 \times 2 \times 2$ points), ($2 \times 2 \times 2$ points)
+\\ \hline
+DOF & $8 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Hexahedral element with quadratic approximation functions}
+\index{class!{\sf quadhext}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf quadhext}
+\\ \hline
+object name & {\it Qht}
+\\ \hline
+theoretical description & Section \ref{hexquadt}
+\\ \hline
+number of blocks & 2
+\\ \hline
+block components & $(k), (c)$
+\\ \hline
+numer. integration & ($3 \times 3 \times 3$ points), ($3 \times 3 \times 3$ points)
+\\ \hline
+DOF & $20 \times$number of transported media
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of material models}
+
+List of available material models for transport problems is given here. Names of classes, their objects
+(instances) and basic data are mentioned. For theoretical description of particular material models
+see Section \ref{matmodels}.
+
+\subsubsection{General description}
+
+Material properties can be defined on elements or on integration points. Default
+version is definition of the material properties on elements. Then the same material
+properties are defined at all integration points belonging to the element.
+
+Material models are split into several groups and various combinations can be used.
+
+\begin{center}
+\begin{tabular}{|l|}
+\hline
+material models for heat transfer
+\\ \hline
+material models for moisture transfer
+\\ \hline
+material models for coupled heat and moisture transfer
+\\ \hline \hline
+models for one medium transfer
+\\ \hline
+models for two media transfer
+\\ \hline
+models for three media transfer
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Material models for heat transfer}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf isotrmat}\index{class!{\sf isotrmat}}
+\\ \hline
+object name & {\it itrm}\index{instance!{\it isotransmat}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $T$ ... temperature (K)
+\\ \hline
+\underline{input parameters:} & 
+\\
+c & $C_{\rm eff}$ ...  effective specific heat (J/(K$\cdot$kg))
+\\
+k & $\lambda_{\rm eff}$ ...  effective heat conductivity (W/(m$\cdot$K))
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf cernymat}\index{class!{\sf cernymat}}
+\\ \hline
+object name & {\it cernym}\index{instance!{\it cernyconcrete}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $T$ ... temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+\\
+rho & $\rho$ ... density (kg/m$^3$)
+\\
+c & $C_{\rm eff}$ ... effective specific heat (J/(K$\cdot$kg))
+\\
+k & $\lambda_{\rm eff}$ ... effective heat conductivity (W/(m$\cdot$K))
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Material models for moisture transfer}
+
+
+\subsubsection{Material models for coupled heat and moisture transfer}
+
+\paragraph{}{\bf Two media transfer}
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf bazpedmat}\index{class!{\sf bazpedmat}}
+\\ \hline
+object name & {\it bazped}\index{instance!{\it bazantpedersen}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $w$, $T$ ... moisture content (kg/kg), temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+\\ rho & $\rho$ ...  
+\\ ceff & $c_{\rm eff}$ .. 
+\\ chieff & $\chi_{\rm eff}$ ... 
+\\ a\_0 & $a_0$ ... 
+\\ nn & $n$ ... 
+\\ phi\_c & $\phi_c$ ... 
+\\ delta\_wet & $\delta_{\rm wet}$ ... 
+\\ w\_h & $w_h$ ... 
+\\ n & $N$ ... 
+\\ a & $A$ ... 
+\\ ak & $A_k$ ... 
+\\ bk & $B_k$ ... 
+\\ wcr & $w_{\rm cr}$ ... 
+\\ wcap & $w_{\rm cap}$ ... 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf pedmat}\index{class!{\sf pedmat}}
+\\ \hline
+object name & {\it ped}\index{instance!{\it pedersen}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $w$, $T$ ... moisture content (kg/kg), temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+ \\ rho & $\rho$ ...  
+ \\ ceff & $c_{\rm eff}$ .. 
+ \\ chieff & $\chi_{\rm eff}$ ... 
+ \\ delta\_dry & $\delta_{\rm dry}$ ... 
+ \\ delta\_wet & $\delta_{\rm wet}$ ... 
+ \\ w\_98 & $w_{98}$ ... 
+ \\ w\_cap & $w_{\rm cap}$ ... 
+ \\ w\_cr & $w_{\rm cr}$ ... 
+ \\ w\_vac & $w_{\rm vac}$ ... 
+ \\ w\_h & $w_h$ ... 
+ \\ n & $N$ ... 
+ \\ a & $A$ ... 
+ \\ ak & $A_k$ ... 
+ \\ bk & $B_k$ ... 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf kunmat}\index{class!{\sf kunmat}}
+\\ \hline
+object name & {\it kun}\index{instance!{\it kunzel}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $h$, $T$ ... relative humidity (-), temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+ P \\ & P ...  
+ Mi \\ & Mi ... 
+ Lambda \\ & Lambda ... 
+ Rom \\ & Rom ... 
+ c \\ & c ... 
+ Kapa \\ & Kapa ... 
+ Lv \\ & Lv ... 
+ Smc \\ & Smc ... 
+ Mhmc \\ & Mhmc ... 
+ Mhrh \\ & Mhrh ... 
+ S \\ & S ... 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\paragraph{}{\bf Three media transfer}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf baroghelmat}\index{class!{\sf baroghelmat}}
+\\ \hline
+object name & {\it baroghel}\index{instance!{\it baroghelB}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $p^c$, $p^g$, $T$ ... capillary pressure (Pa), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+\\ ab & $a$ ... parameter (Pa)
+\\ bb & $b$ ... parameter (-)
+\\ c & $k_{0}$ ... intrinsic permeability (m$^2$)
+\\ lambdab & $\lambda_0$ ... thermal conductivity of dry material (W/(m$\cdot$K))
+\\ cpb & $C_{ps}$ ... specific heat of dry material (J/(K$\cdot$kg))
+\\ rhosb & $\rho_s$ ... dry density (apparent) (kg/m$^3$) 
+\\ phib & $\phi$ ... initial porosity (-) 
+\\ emod & $E$ ... Young's modulus(Pa)
+\\ nu & $\nu$ ... Poisson's ratio (-)
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf C30barmat}\index{class!{\sf C30barmat}}
+\\ \hline
+object name & {\it C30baroghel}\index{instance!{\it C30baroghelB}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $p^c$, $p^g$, $T$ ... capillary pressure (Pa), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+input parameters & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf C60barmat}\index{class!{\sf C60barmat}}
+\\ \hline
+object name & {\it C60baroghel}\index{instance!{\it C60baroghelB}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $p^c$, $p^g$, $T$ ... capillary pressure (Pa), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+input parameters & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf C60bazmat}\index{class!{\sf C60bazmat}}
+\\ \hline
+object name & {\it C60bazant}\index{instance!{\it C60bazantB}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $p^c$, $p^g$, $T$ ... capillary pressure (Pa), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+input parameters & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf o30bazmat}\index{class!{\sf o30bazmat}}
+\\ \hline
+object name & {\it o30bazant}\index{instance!{\it o30bazantB}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $p^c$, $p^g$, $T$ ... capillary pressure (Pa), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+input parameters & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf glasgowmat}\index{class!{\sf glasgowmat}}
+\\ \hline
+object name & {\it tench}\index{instance!{\it glasgow}}
+\\ \hline
+superior class & {\sf transmat}
+\\ \hline
+theoretical description & Section \ref{}
+\\ \hline
+unknowns & $\widetilde{\rho}_V$, $p^g$, $T$ ... concentration of water vapour (kg/m$^3$), 
+\\
+ & capillary gas pressure (Pa), temperature (K)
+\\ \hline
+\underline{input parameters:}  & 
+\\ rhoc & 
+\\ rhos & 
+\\ por0 & 
+\\ k0 & 
+\\ rhol0 & 
+\\ sssp & 
+\\ T0 & 
+\\ rhov0 & 
+\\ pginf & 
+\\ emmi & 
+\\ alph & 
+\\ hq & 
+\\ Crhoair & 
+\\ tfirestart & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of cross sections}
+
+The term cross section comes from the bars where properties of the elements in two
+directions orthogonal to the dominant direction have to be defined. The typical quantities
+are the area of cross section and density. Cross section in
+plane problems defines the thickness and density. The density is used only for material model 
+{\bf isotransmat}. \underline{For other material models, the density has to be set to 1.}
+
+
+Cross sections can be defined at nodes or at elements. Except of onedimensional finite
+elements (like bar) the cross section is defined at nodes. Particular
+properties are interpolated with help of approximation functions into elements.
+Onedimensional elements should contain own definition of cross section because
+e.g. one cross section in node is not generally enough for description of several
+bars connected to the node.
+
+
+\subsubsection{Cross section of 2D bars (1D problems)}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsection1d}\index{class!{\sf crsection1d}}
+\\ \hline
+object name & {\it cs1d}\index{instance!{\it cs1d}}
+\\ \hline
+superior class & {\sf transcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $a$, $\rho$ } area of cross section, density
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Cross section of plane problems (2D problems)}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsection2d}\index{class!{\sf crsection2d}}
+\\ \hline
+object name & {\it cs2d}\index{instance!{\it cs2d}}
+\\ \hline
+superior class & {\sf transcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $t$, $\rho$ } thickness, density
+\\ \hline
+\end{tabular}
+\end{center}
+
+\underline{The density for axisymmetric problems has to be set to 1.}
+
+\subsubsection{Cross section of 3D problems}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+class name & {\sf crsection3d}\index{class!{\sf crsection3d}}
+\\ \hline
+object name & {\it cs3d}\index{instance!{\it cs3d}}
+\\ \hline
+superior class & {\sf transcrsec}
+\\ \hline
+theoretical description &
+\\ \hline
+parameters & {\it $\rho$ } density
+\\ \hline
+\end{tabular}
+\end{center} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of boundary conditions}
+
+
+tady doplnit??!!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of internal source}
+
+
+tady doplnit??!!
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Definition of output}
+
+There are the following output possibilities in the TRFEL:
+\begin{itemize}
+\item output into a specified text file,
+\item output into a graphic postprocessor,
+\item output in the form of diagrams in text files.
+\end{itemize}
+Particular possibilities are described further.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output into a specified text file}
+Common output from a finite element code contains several quantities at nodes, integration points,
+etc. It is not necessary to print out all quantities in many cases. Only required values at
+required positions are usefull. Therefore, a tool for selection of quantities and positions
+is necessary. Such a tool is defined in the class {\sf outdrivert} located in the file outdrivert.cpp.
+It is important to notice that the numbering of any quantity must start from 1 despite the fact, that
+the code is written in the C language and uses numbering from 0. It is automatically recomputed in the
+code.
+
+All variables, quantities, nodes, elements, time steps, integration points, etc. in the finite element code have
+their identification number. There is the following list of options for simple selection of
+identification numbers:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+ 0 & no selection (none identification numbers is selected)
+\\ \hline
+ 1 & select all identification numbers
+\\ \hline
+ 2 & select range of identification numbers
+\\ \hline
+ 3 & select list of identification numbers
+\\ \hline
+ 4 & select period of identification numbers
+\\ \hline
+ 5 & select real range of identification numbers
+\\ \hline
+ 6 & select real list of identification numbers
+\\ \hline
+\end{tabular}
+\label{tabselect}
+\end{center}
+\end{table}
+
+The choices 0 (none identification numbers is selected) and 1 (all identification numbers) are clear
+and no special further description is necessary.
+
+
+The choice {\it range} has the following format:
+
+\begin{tabular}{l}
+{\it number of ranges}
+\\
+{\it the first index of the first range}
+\\
+{\it number of items in the first range}
+\\
+{\it the first index of the second range}
+\\
+{\it number of items in the second range}
+\\
+$\vdots$
+\\
+{\it the first index of the last range}
+\\
+{\it number of items in the last range}
+\\
+\end{tabular}
+
+
+The choice {\it list} has the following format:
+
+\begin{tabular}{l}
+{\it number of items}
+\\
+{\it the first item}
+\\
+{\it the second item}
+\\
+$\vdots$
+\\
+{\it the last item}
+\\
+\end{tabular}
+
+
+The choice {\it period} has the following format:
+
+\begin{tabular}{l}
+{\it number of periods}
+\\
+{\it number ...}
+\\
+\end{tabular}
+
+
+The choice {\it realrange} has the following format:
+
+\begin{tabular}{l}
+{\it number of real ranges}
+\\
+{\it the first index of the first range}
+\\
+{\it number of items in the first range}
+\\
+{\it the first index of the second range}
+\\
+{\it number of items in the second range}
+\\
+$\vdots$
+\\
+{\it the first index of the last range}
+\\
+{\it number of items in the last range}
+\\
+\end{tabular}
+
+
+The choice {\it reallist} has the following format:
+
+\begin{tabular}{l}
+{\it number of items}
+\\
+{\it the first item}
+\\
+{\it the second item}
+\\
+$\vdots$
+\\
+{\it the last item}
+\\
+\end{tabular}
+
+
+
+Output into a text file contains several blocks of data. Namely:
+\begin{itemize}
+\item block of quantities at nodes,
+\item block of quantities at integration points of finite elements,
+\item block of quantities at user defined points on finite elements.
+\end{itemize}
+
+\paragraph{}{\bf Block of quantities at nodes}
+
+This block contains output of any quantity defined at nodes. Not all quantities are available
+at nodes.
+
+Nodal quantities can be printed out at selected numbers of time steps. The first parameter defines this choice.
+\begin{itemize}
+\item[] {\it stept} ... 
+\end{itemize}
+
+The following quantities can be printed out at nodes:
+\begin{itemize}
+\item unknowns
+\item gradients (not implemented yet)
+\item fluxes (not implemented yet)
+\item quantities from the other array
+\end{itemize}
+
+Selection of nodes and components of quantities must be defined for
+all items from the previos list.
+
+Simple example of part of an input file is attached. All nodes and all components
+are considered here. 
+
+\begin{itemize}
+\item[]
+EXAM/TESTS/heat.out \# name of output file
+\item[]
+1 \# quantities from every time steps will be printed, all time steps are selected (1)
+\item[]
+1 1 \# selection of nodes where unknowns will be printed, all nodes
+are selected (1), all components of unknowns will be printed (1)
+\item[]
+0 \# selection of nodes where gradients will be printed, none node is selected (0), it means that gradients
+will not be printed
+\item[]
+0 \# selection of nodes where fluxes will be printed, none node is selected (0), it means that fluxes
+will not be printed
+\item[]
+0 \# selection of nodes where components of array other will be printed, none node is selected (0)
+\end{itemize}
+
+The second example shows various possibilities in node definitions and selection of particular components.
+
+\begin{itemize}
+\item[]
+EXAM/TESTS/heat.out \# name of output file
+\item[]
+4 5 \# quantities from every fifth time steps will be printed, a period of time step is selected (4), 
+every fifth time steps will be printed (5)
+\item[]
+3 1 5 1 \# selection of nodes where unknowns will be printed, nodes
+are defined by a list (3) with one item (1), node number (5),
+all components will be printed (1)
+\item[]
+0 \# selection of nodes where gradients will be printed, none node is selected (0), it means that gradients
+will not be printed
+\item[]
+0 \# selection of nodes where fluxes will be printed, none node is selected (0), it means that fluxes
+will not be printed
+\item[]
+1 1 \# selection of nodes where components of array other will be printed, all nodes
+are selected (1), all components of array other will be printed (1)
+\end{itemize}
+
+\paragraph{}{\bf Block of quantities at integration points of finite elements}
+
+This paragraph contains output of any quantity defined at integration points of finite elements.
+User can select an element or set of elements but cannot select particular integration point.
+Quantities at all integration points of selected elements are printed out.
+The block of quantities at integration points has a similar structure as the block with quantities at nodes.
+
+Quantities at integration points can be printed out at selected numbers of time steps. The first parameter defines this choice.
+\begin{itemize}
+\item[] {\it step}  ... 
+\end{itemize}
+
+The following quantities can be printed out at integration point:
+\begin{itemize}
+\item gradients (not implemented yet)
+\item fluxes (not implemented yet)
+\item quantities from the other array
+\end{itemize}
+
+Simple example of part of an input file is attached. All elements and all components
+are considered here. 
+
+\begin{itemize}
+\item[]
+4 5 \# quantities from every fifth time steps will be printed, a period of time step is selected (4), 
+every fifth time steps will be printed (5)
+\item[]
+0 \# selection of elements where gradients will be printed, none element is selected (0), it means that gradients
+will not be printed
+\item[]
+0 \# selection of elements where fluxes will be printed, none element is selected (0), it means that fluxes
+will not be printed
+\item[]
+0 \# selection of elements where components of array other will be printed, none element is selected (0)
+\end{itemize}
+
+
+The second example shows various possibilities in element definitions and selection of particular components.
+
+\begin{itemize}
+\item[]
+1 \# quantities from every time steps will be printed, all time steps are selected (1)
+\item[]
+0 \# selection of elements where gradients will be printed, none element is selected (0), it means that gradients
+will not be printed
+\item[]
+0 \# selection of elements where fluxes will be printed, none element is selected (0), it means that fluxes
+will not be printed
+1 \# selection of elements where components of array eqother will be printed, all elements are selected (1)
+\item[]
+2 2 1 2 5 3 \# printed components of the array eqother are defined by range description (2), there are two
+ranges (2), the first index of the first range (1), number of components (2),
+the first index of the second range (5), number of components (3),
+\end{itemize}
+
+
+\paragraph{}{\bf User defined points block}
+
+User defined points (UDP) block will specifie output of results at user defined points.
+This section is not completed in the code now!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output into graphic postprocessors}
+There are the following possibilities of output into a graphic posprocessor.
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+ 0 & no graphic output
+\\ \hline
+ 1 & OpenDX format
+\\ \hline
+ 3 & GID format
+\\ \hline
+\end{tabular}
+\end{center}
+
+In case of selection OpenDX or GID format, the next line have to contain file name,
+to which the output will be performed.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output in the form of diagrams in text files}
+
+In order to construct graphs between any variables (e.g. gradient-flux diagram,
+time-unknowns graph, etc.), special output is available.
+This output is available only for nonstationary problems. 
+Selected quantities for selected steps (time instances or numbers of iterations)
+are printed to text file. All quantities printed out at every step are located at one line.
+
+The first parameter defines the number of graphs which is equal to the number of auxiliary
+text files. In the case of one graph, name of text file folows. In the case of more than one graph,
+only one name has to be specified becuase the code will automatically generate auxiliary files
+with the specified name which is enlarged by a number of graph.
+
+Every graph has to be defined by the following form.
+The first parameter defines the number of quantities printed out (columns in the auxiliary file).
+The number of every iteration or time step, where the quantities will be printed is
+the second parameter.
+Values printed out in one column are defined by quantity position and quantity meaning.
+
+Position of a quantity contains two parts. The first part expresses the type of the position and the
+second part contains more detail description. In the following list, the second part starts after semicolon.
+\begin{itemize}
+\item[] 1 - node; then the number of required node follows,
+\item[] 2 - element; then the number of required element and local number of required integration point follow,
+local oredring of integration point can be found in definition of the finite element,
+\item[] 3 - the nearest node to point with defined coordinates; the coordinates $x,y,z$ follow, the nearest
+node to the required point is found automatically by the code.
+\end{itemize}
+ 
+The quantity is described by its meaning and by its index in some cases. The definition of quantity has the form
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+meaning & alias number & index
+\\ \hline \hline
+unknown & 1 & component id
+\\ \hline
+gradient & 2 & component id
+\\ \hline
+flux & 3 & component id
+\\ \hline
+step number (integer) & 6 &
+\\ \hline
+load coefficient or time (real) & 7 &
+\\ \hline
+values of other array & 8 & component id
+\\ \hline
+\end{tabular}
+\end{center}
+Types 1 (unknowns) can be used only in connection with nodes, not
+with elements. Therefore component id expresses the number of component at node, not the number of
+component in the global vector.
+
+\begin{itemize}
+\item[]
+2 \# number of graphs
+\item[]
+EXAM/TESTS/heat.dat \# name of auxiliary files, the code will generate the files heat.1.dat
+and heat.2.dat
+\item[]
+2 1 \# the first graph contains two quantities (columns) (2), quantities will be printed at every iteration step (1)
+\item[]
+1 5 1 1 \# quantity is located at node (1), node number (5), meaning of the quantity is unknowns (1), the first
+component is required (1)
+\item[]
+1 5 7 \# quantity is located at node (1), node number (5), meaning of the quantity is actual time (7)
+\item[]
+2 4 3 \# the second graph contains two quantities (columns) (2), quantities will be printed at every third
+iteration step (4 = period) (3 = every third time step)
+\item[]
+2 1 1 2 1 \# quantity is located at element (2), element number (1), local integration point number (1),
+meaning of the quantity is gradient (2), the first component is required (1)
+\item[]
+2 1 1 3 1 \# quantity is located at element (2), element number (1), local integration point number (1),
+meaning of the quantity is flux (3), the first component is required (1)
+\end{itemize}

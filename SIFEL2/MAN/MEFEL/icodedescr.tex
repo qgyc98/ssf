@@ -1,0 +1,189 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Description of the code}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Allocation and Initiation}
+
+The MEFEL starts with function mefel\_init, where all data are read
+from input file or files and many of objects and arrays are allocated.
+
+The main objects of the code are allocated at the beginning
+of the function mefel\_init.
+\begin{center}
+\begin{tabular}{ll}
+Mp  = new probdesc;  & problem description
+\\
+Gtm = new gtopology; & general topology
+\\
+Mt  = new mechtop; & mechanical topology
+\\
+Mm  = new mechmat; & mechamical materials
+\\
+Mc  = new mechcrsec; & mechanical cross sections
+\\
+Mb  = new mechbclc; & mechanical boundary conditions
+\\
+Outdm = new outdriverm; & description of output
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+\item
+Mp--$>$read (in); - reads problem description
+
+\item
+Mt--$>$read (in); - reads mechanical topology
+
+\item
+Ndofm = Gtm--$>$codenum\_generation (Out); - generates code numbers
+
+\item
+Mm--$>$read (in); - reads mechanical materials
+	
+\item
+Mm--$>$init\_ip\_1 (); - initiates variables on integration points, namely, stress/strain state,
+number of strain/stress components
+
+\item
+Mc--$>$read (in); - reads mechanical cross sections
+
+\item
+Mb--$>$read (in); - reads mechanical boundary conditions, it means
+prescribed displacements, forces, moments
+
+\item
+Lsrs--$>$alloc (); - allocates arrays lhs (array with solution),
+rhs (array with right hand side of the system of equations),
+w (array containing eigenvalues)
+ 
+\item
+Lsrs--$>$initcond (in); - reads initial conditions
+
+\item
+Outdm--$>$read(in); - reads description of output from the code, namely description
+of output to the output file, file for graphical postprocessors (e.g. GiD) and
+diagrams
+
+\item
+Mm--$>$init\_ip\_2 (); - allocates arrays on integration points, namely array
+for strains, stresses, other values, nonlocal values;
+function also allocates the array tempr for storage of temperatures
+
+\item
+Mt--$>$alloc\_nodes\_arrays (); - allocates arrays on nodes for
+strains, stresses, other values
+
+\item
+Mt--$>$give\_maxncompstr(Mm--$>$max\_ncompstrn, Mm--$>$max\_ncompstre); - determines
+maximum number of strain/stress components on integration points
+it is used for output
+
+\item
+Mt--$>$give\_maxncompo(Mm--$>$max\_nncompo, Mm--$>$max\_encompo); - determines
+maximum number of components in array other on integration points
+it is used for output
+
+\item
+Mt--$>$elemprescdisp (); - determines elements influenced by prescribed
+displacements, it is used for assembling of nodal forces
+
+
+\item
+Mm--$>$alloceigstrains (); - allocates array eigstrains 
+
+\item
+Mm--$>$alloctempstrains (); - allocates array tempstrains
+
+\item
+Mt--$>$nodedisplacements (); - allocates array nodedispl
+
+
+
+
+
+\end{itemize}
+
+
+
+\section{??}
+
+Eigenstrains are strains which are not originated by stresses.
+They can be defined by relation
+\begin{eqnarray}
+\sigma = E (\varepsilon - \varepsilon_{eig})
+\end{eqnarray}
+Meaning of eigenstrains may be various. The code has subroutines
+which compute nodal forces caused by eigenstrains.
+
+The class mechmat contains arrays eigstrains and tempstrains.
+The array eigstrains is intended for prescribed eigenstrains
+while the array tempstrains stores strains caused by temperature.
+The temperature strains are
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Finite Elements}
+\index{finite elements}
+
+This section deals with description of implementation of finite elements in the MEFEL code.
+Theoretical background about finite elements applied in mechanics is summarized in
+Section \ref{finitelements}. Characteristic matrices and vectors of nodal values are in the
+centre of attention of this section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Characteristic matrices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Nodal vectors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Vectors of line, surface and volume loads}
+
+\subsubsection{Vectors of temperature loads}
+
+\subsubsection{Vectors of eigenstrain loads}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Strains}
+
+Strain evaluation is optional for
+\begin{itemize}
+\item
+linear statics ({\sf problemtype} {\it linear\_statics})
+\item
+eigendynamics ({\sf problemtype} {\it eigen\_dynamics})
+\item
+forced dynamics ({\sf problemtype} {\it forced\_dynamics})
+\end{itemize}
+In all other types of problems, strains are evaluated.
+Strains are primarily evaluated at integration points. Decomposition of strain
+components into blocks leads to general situation where different numbers of
+integration points are used. Therefore, only part of strain components are
+evaluated at particular integration points and remaining components have to
+be interpolated from other integration points. The situation is depicted in
+Figure \ref{}.
+
+Typical example is linear quadrilateral finite element for plane stress problems
+where the different integrations are used in order to remove hourglas problems.
+The normal strains $\varepsilon_x$ and $\varepsilon_y$ should be integrated
+at 4 integration points while the shear strain $\gamma_{xy}$ should be integrated
+at one integration point only. For details about this topic see reference \ref{}.
+
+
+
+
+Finite elements contain several functions for strain evaluation and they are
+described in the following text.
+
+\begin{itemize}
+\item
+{\sf mainip\_strains}: this function computes only appropriate strain components
+\end{itemize}

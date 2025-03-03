@@ -1,0 +1,29 @@
+Installation
+============
+
+You have several options:
+
+1) If you want to create library in the source directory 
+
+	Type 'make lib'
+
+2) If you want to install this library, edit (if necessary) lines
+
+	DIR_INCLUDE = $$HOME/include
+	DIR_LIB = $$HOME/lib
+
+   in 'Makefile'. Then you have three options:
+
+	a) Type 'make install-all' to install all possibilities
+	b) Type 'make install' to install object library
+	c) Type 'make install-fast'  to install inlining header files
+
+3) Optional: Type 'make all' or 'make test' to create executable test file.
+
+Uninstallation
+==============
+
+1. Type 'make uninstall' in the source directory
+
+
+

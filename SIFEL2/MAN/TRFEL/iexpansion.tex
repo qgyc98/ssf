@@ -1,0 +1,923 @@
+\chapter{Expansion of the TRFEL}
+\section{Implementation of new finite element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation of new material model and theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new arbitrary model and theory}
+The main aims of any material model and theory in the code are
+\begin{itemize}
+\item{evaluation of correct fluxes for trial gradients,}
+\item{assemblage of the matrices of conductivity coefficients, $\mbf{D}$.}
+\item{assemblage of capacity coefficients, $\mbf{C}$.}
+\item{assemblage of right-hand side (if it is needed), $\mbf{f}$.}
+\end{itemize}
+
+Gradients and fluxes and uknown variables are stored at integration points. The actual gradients and actual unknown variables 
+are computed by any solver implemented in the code and stored at integration points. 
+
+Every material model must contain the following functions:
+\begin{itemize}
+\item{
+{\sf void newmaterial::read (FILE *in)}
+\newline reads necessary data of the model, {\it in} is pointer to the input file,
+}
+\item{
+{\sf double newmaterial::condcoeff (double x, long ipp)}
+\newline assembles the conductivity coefficient ($k$) for unknown variable $x$, 
+{\it x} denotes unknown variable (conductivity coefficient is generaly function of unknown variable $x$)
+{\it ipp} denotes the number of integration point, {\it ido} stands for the
+}
+
+\item{
+{\sf double newmaterial::capcoeff (double x, long ipp)}
+\newline assembles the capacity coefficient ($c$) for unknown variable $x$,
+{\it x} denotes unknown variable (capacity coefficient is generaly function of unknown variable $x$)
+{\it ipp} denotes the number of integration point
+}
+
+\item{
+{\sf void newmaterial::flux (long ipp)}
+\newline computes correct flux for computed gradient, if flux is not a function of conductivity matrix,
+{\it ipp} denotes the number of integration point
+}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new model for one medium transfer}
+
+Needed functions:
+\begin{itemize}
+\item{
+{\sf void newmaterial::read (FILE *in)}
+\newline reads necessary data of the model
+}
+\item{
+{\sf double newmaterial::condcoeff (double x, long ipp)}
+\newline assembles the conductivity coefficient ($k$) for unknown variable
+}
+
+\item{
+{\sf double newmaterial::capcoeff (double x, long ipp)}
+\newline assembles the capacity coefficient ($c$) for unknown variable
+}
+
+\item{
+{\sf void newmaterial::flux (long ipp)}
+\newline computes correct flux for computed gradient, if flux is not a function of conductivity matrix (coefficient).
+This function is not needed, if the flux is defined with this mentioned (standard) way.
+For example, heat flux is defined (see eq. \eqref{fourier}) using conductivity coefficient (Fourier's law):
+\begin{equation}
+\tenss{q} = - \tenss{\chi}_{\rm eff} {\rm grad} T.\nonumber
+\end{equation}
+}
+\end{itemize}
+
+optional:
+\begin{itemize}
+\item 
+{\sf void bound\_nodval (double \&new\_nodval,double \&bv,double trr,long nn,long bc)}
+\newline assembles new value prescribed on the boundary for media transfer (Cauchy's boundary condition)
+
+\item 
+{\sf void trans\_coeff (double \&trc,long nn,long bc)}
+\newline assembles new transfer coeffcient on the boundary for media transfer (Cauchy's boundary condition)
+
+\item 
+{\sf void bound\_flux (double \&flux,double \&bv,double trr,long nn,long bc)}
+\newline assembles correct flux on the boundary for media transfer (Cauchy's boundary condition)
+
+doplnit???\\
+
+
+Explanation???\\
+
+\end{itemize}
+
+\subsubsection {Implementing new class of new model for one medium transfer}
+This section describes what the user needs when implements new material model or theory
+to TRFEL. 
+
+First of all, user needs the problem derived in FEM form \eqref{onemed} in \ref{onemedtrans}:
+
+\begin{eqnarray}
+\tenss{K}_{11}\tenss{r}_1 + \tenss{C}_{11}\dot{\tenss{r}}_1 = {\tenss{q}}_1,\nonumber
+\end{eqnarray}
+where matrix $\tenss{K}$ is the general conductivity matrix (it contains conductivity coefficients), 
+$\tenss{C}$ is the general capacity matrix (it contains capacity coefficients), respectively.
+
+Each new material or theory means the user should found new class with name of material model or theory {\sf mymatmodel}.
+This class should contain material parameters as a data members of this class. 
+
+In addition the folowing functions should be defined :
+
+\begin{itemize}
+{\sf
+\item
+void read(FILE* in)
+\item
+double condcoeff (double x, long ipp)
+\item
+double capcoeff (double x, long ipp)
+\item
+void flux (long ipp)\\\\
+{\rm optional:}
+\item 
+{void bound\_nodval (double \&new\_nodval,double \&bv,double trr,long nn,long bc)}
+\item 
+{void trans\_coeff (double \&trc,long nn,long bc)}
+\item 
+{void bound\_flux (double \&flux,double \&bv,double trr,long nn,long bc)}
+}
+\end{itemize}
+
+Function {\sf void read (FILE* in)} reads necessary material parameters from input file {\it in}.\\
+
+Function {\sf double condcoeff (double x, long ipp)} assembles material conductivity coefficient for given
+integration point and material type. The first parameter {\it x} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point.\\
+
+Function {\sf double capcoeff (double x, long ipp)} assembles material capacity coefficient for given
+integration point and material type. The first parameter {\it x} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point.\\
+
+Function {\sf void flux (long ipp)} computes flux for nonlinear material model. Parameter
+{\it ipp} is integration point number where the flux should be evaluated.
+
+Function should work following way:
+\begin{itemize}
+\item
+Takes reached gradients ${\rm grad}_{ij}$ and reached {\sf eqother} values in the integration point number
+{\it ipp} (See class {\sf transmat, intpoint}). 
+\item
+Computes appropriate fluxes and stores them into fluxes array in the integration point.
+\end{itemize}
+
+Optional function:\\
+
+Function {\sf void bound\_nodval (double \&new\_nodval,double \&bv,double trr,long nn,long bc)}
+assembles new value prescribed on the boundary for media transfer (Cauchy's boundary condition)\\
+
+doplnit???\\
+
+Function {\sf void trans\_coeff (double \&trc,long nn,long bc)}
+assembles new transfer coeffcient on the boundary for media transfer (Cauchy's boundary condition)\\
+
+ 
+doplnit???\\
+
+Function {\sf void bound\_flux (double \&flux,double \&bv,double trr,long nn,long bc)}
+assembles correct flux on the boundary for media transfer (Cauchy's boundary condition)
+
+doplnit???\\
+
+
+Explanation???\\
+
+
+\subsubsection {Including new model class to TRFEL files}
+Thus the new class {\sf mymatmodel} is written to files  mymatmodel.cpp${\rm |}$h. Now the user should
+include this class to the TRFEL. Here is list of files which have to be modified:\\
+
+{\bf alias.t}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that the name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the plasticity class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the TRFEL.\\
+
+doplnit upravit???\\
+
+
+{\bf transmat.h}\\
+This file contains declaration of the {\sf transmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf mymatmodel} to the {\sf transmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf mypmatmodel} class or insert include file with {\sf mymatmodel} class declaration.\\
+
+{\bf transmat.cpp}
+\begin{itemize}
+\item {\sf void transmat::readmatchar (FILE *in)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf mymatmodel} should be included at the begining
+of transmat.cpp\\
+
+In function {\sf transmat::readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf mymatmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYMATMODEL materials \%ld",numtype);\\
+      MYMATMODELPT = new MYMATMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYMATMODEL material in function\\
+                   transmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYMATMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYMATMODEL with name of the new class {\sf mymatmodel} and MYMATMODELPT with
+name of the pointer which has been used in the {\sf transmat} class declaration in the file transmat.hpp. This
+statement block the first allocates array with new material then folows loop where the number of sets of the
+parameters is read and then the {\sf read} function for the given material type is called.\\
+
+{\bf onemedium.cpp}
+\begin{itemize}
+\item {\sf double med1::double cond\_k (long ipp)}
+\item {\sf double med1::double cap\_c (long ipp)}
+\item {\sf void med1::rhs\_f\_vec\_nodval (double \&new\_nodval,double \&bv,double trr,long nn,long bc,long ipp)}
+\item {\sf void med1::rhs\_f\_matrix (double \&trc,long nn,long bc,long ipp)}
+\item {\sf void med1::rhs\_f\_flux (double \&new\_nodval,double \&bv,double trr,long nn,long bc,long ipp)}
+
+\end{itemize}
+
+
+In function {\sf double med1::double cond\_k (long ipp)}
+
+doplnit upravit???\\
+
+
+In function {\sf double med1::double cap\_c (long ipp)}
+
+doplnit upravit???\\
+
+In function {\sf void med1::rhs\_f\_vec\_nodval (double \&new\_nodval,double \&bv,double trr,long nn,long bc,long ipp)}
+
+doplnit upravit???\\
+
+In function {\sf void med1::rhs\_f\_matrix (double \&trc,long nn,long bc,long ipp)}
+
+doplnit upravit???\\
+
+In function {\sf void med1::rhs\_f\_flux (double \&new\_nodval,double \&bv,double trr,long nn,long bc,long ipp)}
+
+doplnit upravit???\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new model for two media transfer}
+
+Needed functions:
+\begin{itemize}
+\item{
+{\sf void newmaterial::read (FILE *in)}
+\newline reads necessary data of the model
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_11 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{11}$) for first unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_11 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the capacity coefficient ($c_{11}$) for first unknown variable of first unknown variable
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_12 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{12}$) for first unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_12 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the capacity coefficient ($c_{12}$) for first unknown variable of second unknown variable
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_21 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{21}$) for second unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_21 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the capacity coefficient ($c_{21}$) for second unknown variable of first unknown variable
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_22 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{22}$) for second unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_22 (double x$_1$, double x$_2$, long ipp)}
+\newline assembles the capacity coefficient ($c_{22}$) for second unknown variable of second unknown variable
+}
+
+
+
+\item{
+{\sf void newmaterial::flux\_1 (long ipp)}
+\newline computes correct flux for first unknown of all (2) computed gradients
+}
+
+doplnit upravit???
+
+\item{
+{\sf void newmaterial::flux\_2 (long ipp)}
+\newline computes correct flux for second unknown of all (2) computed gradients
+}
+
+doplnit upravit???
+
+
+\end{itemize}
+
+
+\subsubsection {Implementing new class of new model for two media transfer}
+This section describes what the user needs when implements new material model or theory
+to TRFEL. First of all user need derived ... equation FEM like in section 1.
+
+doplnit upravit???
+
+
+Each new material means the user should found new class with name of plasticity model {\sf mymatmodel}.
+This class should contain material parameters as a data members of this class. 
+
+In addition the folowing methods should be defined :
+
+doplnit upravit???
+
+\begin{itemize}
+{\sf
+\item
+read(FILE* in)
+\item
+void matstiff (matrix \&d, long ipp)
+\item
+void nlstresses (long ipp, long im, long ido)
+}
+\end{itemize}
+
+Function {\sf void matstiff (matrix \&d, long ipp, long ido)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. The last parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type. User may use standard 
+stiffness matrix for linear elastic material or when it is available may use tangent stiffness matrix (it will reduce
+number of iteration steps).\\
+
+Function {\sf void nlstresses (long ipp, long im, long ido)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Parameter {\it im} is index of material type
+in the array {\sf tm} for given integration point. Parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type.
+
+Function should work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf eqother} values in the integration point number
+{\it ipp} (See class {\sf transmat, intpoint}). For plasticity models should contain reached plastic
+strains $\varepsilon^{pl}_{ij}$ and parametr $\gamma$ for cutting plane method.
+\item
+Call stress-return function built in {\sf transmat} i.e {\sf cutting\_plane} with parameters filled from
+previous step. This method computes appropriate stresses and stores them into stress array in the
+integration point.
+\item
+Store result plastic strains and coefficient $\gamma$ and possible another values to the {\sf other}
+array in the integration point. 
+\end{itemize}
+For example see {\sf drprag::nlstresses(long ipp, long im, long ido)} in the file drprag.cpp.\\
+
+Function {\sf void updateval (long ipp, long im, long ido)} copies values of {\sf other} array to
+the eqother array in case that equilibrium for current step is reached. Parameter {\it ipp} is
+integration point number whose the {\sf eqother} array should be updated. Parameter {\it im} denotes
+index material type in the array {\sf tm} of given integration point. {\it ido} is index in the
+{\sf other/eqother} array of the given integration point, from where the updated internal variables are stored.
+
+
+\subsubsection {Including new model class to TRFEL files}
+Thus the new class {\sf mymatmodel} is written to files  mymatmodel.cpp${\rm |}$h. Now the user should
+include this class to the TRFEL. Here is list of files which have to be modified:\\
+
+{\bf alias.t}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that the name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the plasticity class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the TRFEL.\\
+
+{\bf transmat.h}\\
+This file contains declaration of the {\sf transmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf mymatmodel} to the {\sf transmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf mypmatmodel} class or insert include file with {\sf mymatmodel} class declaration.\\
+
+{\bf transmat.cpp}\\
+\begin{itemize}
+\item {\sf void transmat::readmatchar (FILE *in)}
+\item {\sf void transmat::matcond (matrix \&d,long ipp,long ri,long ci,long ncomp)}
+\item {\sf double transmat::capcoeff (long ipp,long ri,long ci)}
+\item {\sf void transmat::computenlfluxes (long lcid,long ipp)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf mymatmodel} should be included at the begining
+of transmat.cpp\\
+
+In function {\sf transmat::readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf mymatmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYMATMODEL materials \%ld",numtype);\\
+      MYMATMODELPT = new MYMATMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYMATMODEL material in function\\
+                   transmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYMATMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYMATMODEL with name of the new class {\sf mymatmodel} and MYMATMODELPT with
+name of the pointer which has been used in the {\sf transmat} class declaration in the file transmat.hpp. This
+statement block the first allocates array with new material then folows loop where the number of sets of the
+parameters is read and then the {\sf read} function for the given material type is called.\\
+
+In function {\sf void transmat::matcond (matrix \&d,long ipp,long ri,long ci,long ncomp)}
+
+doplnit upravit???
+
+
+In function {\sf double transmat::capcoeff (long ipp,long ri,long ci)}
+
+
+doplnit upravit???
+
+
+In function {\sf void transmat::computenlfluxes (long lcid,long ipp)}
+
+
+doplnit upravit???
+
+
+{\bf twomedia.cpp}\\
+\begin{itemize}
+\item {\sf double med2::double cond\_kcc (long ipp)}
+\item {\sf double med2::double cap\_cc (long ipp)}
+\item {\sf double med2::double cond\_kct (long ipp)}
+\item {\sf double med2::double cap\_ct (long ipp)}
+\item {\sf double med2::double cond\_ktc (long ipp)}
+\item {\sf double med2::double cap\_tc (long ipp)}
+\item {\sf double med2::double cond\_ktt (long ipp)}
+\item {\sf double med2::double cap\_tt (long ipp)}
+
+doplnit prave strany a toky ???
+
+\end{itemize}
+
+In function {\sf double med2::double cond\_kcc (long ipp)}
+
+doplnit upravit???
+
+
+In function {\sf double med2::double cap\_cc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cond\_kct (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_ct (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cond\_ktc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_tc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cond\_ktt (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_tt (long ipp)}
+
+doplnit upravit???
+
+
+doplnit prave strany a toky ???
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implementation of new model for three media transfer}
+
+
+Needed functions:
+\begin{itemize}
+\item{
+{\sf void newmaterial::read (FILE *in)}
+\newline reads necessary data of the model
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_11 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{11}$) for first unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_11 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{11}$) for first unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_12 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{12}$) for first unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_12 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{12}$) for first unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_13 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{13}$) for first unknown variable of third unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_13 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{13}$) for first unknown variable of third unknown variable
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_21 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{21}$) for second unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_21 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{21}$) for second unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_22 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{22}$) for second unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_22 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{22}$) for second unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_23 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{23}$) for second unknown variable of third unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_23 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{23}$) for second unknown variable of third unknown variable
+}
+
+
+
+\item{
+{\sf double newmaterial::cond\_coeff\_31 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{31}$) for third unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_31 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{31}$) for third unknown variable of first unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_32 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{32}$) for third unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_32 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{32}$) for third unknown variable of second unknown variable
+}
+
+\item{
+{\sf double newmaterial::cond\_coeff\_33 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the conductivity coefficient ($k_{33}$) for third unknown variable of third unknown variable
+}
+
+\item{
+{\sf double newmaterial::cap\_coeff\_33 (double x$_1$, double x$_2$, double x$_3$, long ipp)}
+\newline assembles the capacity coefficient ($c_{33}$) for third unknown variable of third unknown variable
+}
+
+
+
+
+\item{
+{\sf void newmaterial::flux\_1 (long ipp)}
+\newline computes correct flux for first unknown of all (3) computed gradients
+}
+
+doplnit upravit???
+
+
+\item{
+{\sf void newmaterial::flux\_2 (long ipp)}
+\newline computes correct flux for second unknown of all (3) computed gradients
+}
+
+doplnit upravit???
+
+
+\item{
+{\sf void newmaterial::flux\_3 (long ipp)}
+\newline computes correct flux for third unknown of all (3) computed gradients
+}
+
+doplnit upravit???
+
+
+\end{itemize}
+
+\subsubsection {Implementing new class of new model for three media transfer}
+
+\subsubsection {Including new model class to TRFEL files}
+
+This section describes what the user needs when implements new material model or theory
+to TRFEL. First of all user need derived ... equation FEM like in section 1.
+
+doplnit upravit???
+
+
+Each new material means the user should found new class with name of plasticity model {\sf mymatmodel}.
+This class should contain material parameters as a data members of this class. 
+
+In addition the folowing methods should be defined :
+
+doplnit upravit???
+
+\begin{itemize}
+{\sf
+\item
+read(FILE* in)
+\item
+void matstiff (matrix \&d, long ipp)
+\item
+void nlstresses (long ipp, long im, long ido)
+}
+\end{itemize}
+
+Function {\sf void matstiff (matrix \&d, long ipp, long ido)} assemble material stiffness matrix for given
+integration point and material type. The first parameter {\it d} is allocated matrix which will be
+filled up with values. The second parameter is integration point number which should be used for
+access characteristic values in the integration point. The last parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type. User may use standard 
+stiffness matrix for linear elastic material or when it is available may use tangent stiffness matrix (it will reduce
+number of iteration steps).\\
+
+Function {\sf void nlstresses (long ipp, long im, long ido)} computes stresses for nonlinear material. Parameter
+{\it ipp} is integration point number where the stresses should be evaluated. Parameter {\it im} is index of material type
+in the array {\sf tm} for given integration point. Parameter {\it ido} stands for index of the first 
+internal variable in the array {\sf other} of given integration point for given material type.
+
+Function should work following way:
+\begin{itemize}
+\item
+Take reached strains $\varepsilon_{ij}$ and reached {\sf eqother} values in the integration point number
+{\it ipp} (See class {\sf transmat, intpoint}). For plasticity models should contain reached plastic
+strains $\varepsilon^{pl}_{ij}$ and parametr $\gamma$ for cutting plane method.
+\item
+Call stress-return function built in {\sf transmat} i.e {\sf cutting\_plane} with parameters filled from
+previous step. This method computes appropriate stresses and stores them into stress array in the
+integration point.
+\item
+Store result plastic strains and coefficient $\gamma$ and possible another values to the {\sf other}
+array in the integration point. 
+\end{itemize}
+For example see {\sf drprag::nlstresses(long ipp, long im, long ido)} in the file drprag.cpp.\\
+
+Function {\sf void updateval (long ipp, long im, long ido)} copies values of {\sf other} array to
+the eqother array in case that equilibrium for current step is reached. Parameter {\it ipp} is
+integration point number whose the {\sf eqother} array should be updated. Parameter {\it im} denotes
+index material type in the array {\sf tm} of given integration point. {\it ido} is index in the
+{\sf other/eqother} array of the given integration point, from where the updated internal variables are stored.
+
+
+\subsubsection {Including new model class to TRFEL files}
+Thus the new class {\sf mymatmodel} is written to files  mymatmodel.cpp${\rm |}$h. Now the user should
+include this class to the TRFEL. Here is list of files which have to be modified:\\
+
+{\bf alias.t}\\
+So called material alias {\sf mattype} have to be added. Alias means the substitutive shortcut
+for C++ enumaration integer number. Decision which number and name for its alias depends on the user.
+Only restrictions are that the name and number have to be unique in the {\sf mattype} scope. Also note
+the name haven't to be same as the name of the plasticity class. This aliases are used in the
+{\tt switch} statements as values for {\tt case}. Numeric value of the aliases are used in the input
+files for the TRFEL.\\
+
+{\bf transmat.h}\\
+This file contains declaration of the {\sf transmat} class. This class contains also pointers to arrays for each
+material class. Thus the user have to include new class {\sf mymatmodel} to the {\sf transmat} class declaration.
+The name of the pointer is arbitrary expecting used names of course. Note that the user should use predeclaration
+of {\sf mypmatmodel} class or insert include file with {\sf mymatmodel} class declaration.\\
+
+{\bf transmat.cpp}\\
+\begin{itemize}
+\item {\sf void transmat::readmatchar (FILE *in)}
+\item {\sf void transmat::matcond (matrix \&d,long ipp,long ri,long ci,long ncomp)}
+\item {\sf double transmat::capcoeff (long ipp,long ri,long ci)}
+\item {\sf void transmat::computenlfluxes (long lcid,long ipp)}
+\end{itemize}
+Note that include file with full class declaration for given {\sf mymatmodel} should be included at the begining
+of transmat.cpp\\
+
+In function {\sf transmat::readmatchar (FILE *in)} the actual values of material parameters for given material type. This function
+contains {\tt switch} statement where the new {\tt case} for the  {\sf mymatmodel} would be included.
+It is possible to take part of {\tt case} statement from another material and copy it into new {\tt case} and then
+make some modification. Folowing lines shows example of such a new {\tt case} :\\
+{\tt
+      if (Mespr==1)  fprintf (stdout,"$\backslash$n number of MYMATMODEL materials \%ld",numtype);\\
+      MYMATMODELPT = new MYMATMODEL [numtype];\\
+      for (j = 0; j $<$ numtype; j++){\\
+        k = numtype + 1;\\
+        fscanf (in,"\%ld",\&k);\\
+        if ((k $>$ numtype) $\mid\mid$ (k $<$ 1))\\
+        {\\
+          fprintf (stderr, "$\backslash$n$\backslash$n wrong number of MYMATMODEL material in function\\
+                   transmat::readmatchar (\%s, line \%d).$\backslash$n",\_\_FILE\_\_,\_\_LINE\_\_);\\
+        }\\
+        MYMATMODELPT[k - 1].read (in);\\
+      }\\
+      break;\\
+}
+
+Where user should replace MYMATMODEL with name of the new class {\sf mymatmodel} and MYMATMODELPT with
+name of the pointer which has been used in the {\sf transmat} class declaration in the file transmat.hpp. This
+statement block the first allocates array with new material then folows loop where the number of sets of the
+parameters is read and then the {\sf read} function for the given material type is called.\\
+
+In function {\sf void transmat::matcond (matrix \&d,long ipp,long ri,long ci,long ncomp)}
+
+doplnit upravit???
+
+
+In function {\sf double transmat::capcoeff (long ipp,long ri,long ci)}
+
+
+doplnit upravit???
+
+
+In function {\sf void transmat::computenlfluxes (long lcid,long ipp)}
+
+
+doplnit upravit???
+
+
+{\bf threemedia.cpp}\\
+\begin{itemize}
+\item {\sf double med3::double cond\_kcc (long ipp)}
+\item {\sf double med3::double cap\_cc (long ipp)}
+\item {\sf double med3::double cond\_kcg (long ipp)}
+\item {\sf double med3::double cap\_cg (long ipp)}
+\item {\sf double med3::double cond\_kct (long ipp)}
+\item {\sf double med3::double cap\_ct (long ipp)}
+
+\item {\sf double med3::double cond\_kgc (long ipp)}
+\item {\sf double med3::double cap\_gc (long ipp)}
+\item {\sf double med3::double cond\_kgg (long ipp)}
+\item {\sf double med3::double cap\_gg (long ipp)}
+\item {\sf double med3::double cond\_kgt (long ipp)}
+\item {\sf double med3::double cap\_gt (long ipp)}
+
+\item {\sf double med3::double cond\_ktc (long ipp)}
+\item {\sf double med3::double cap\_tc (long ipp)}
+\item {\sf double med3::double cond\_ktg (long ipp)}
+\item {\sf double med3::double cap\_tg (long ipp)}
+\item {\sf double med3::double cond\_ktt (long ipp)}
+\item {\sf double med3::double cap\_tt (long ipp)}
+
+doplnit prave strany a toky ???
+
+\end{itemize}
+
+
+
+In function {\sf double med2::double cond\_kcc (long ipp)}
+
+doplnit upravit???
+
+
+In function {\sf double med2::double cap\_cc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cond\_kcg (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cap\_cg (long ipp)}
+
+
+doplnit upravit???
+
+
+In function {\sf double med2::double cond\_kct (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_ct (long ipp)}
+
+doplnit upravit???
+
+
+In function {\sf double med3::double cond\_kgc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cap\_gc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cond\_kgg (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cap\_gg (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cond\_kgt (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cap\_gt (long ipp)}
+
+
+doplnit upravit???
+
+
+
+In function {\sf double med2::double cond\_ktc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_tc (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cond\_ktg (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med3::double cap\_tg (long ipp)}
+
+doplnit upravit???
+
+
+
+In function {\sf double med2::double cond\_ktt (long ipp)}
+
+doplnit upravit???
+
+In function {\sf double med2::double cap\_tt (long ipp)}
+
+doplnit upravit???
+
+
+doplnit prave strany a toky ???
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Kombinace materialovych modelu}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Rozsireni o jedno medium}

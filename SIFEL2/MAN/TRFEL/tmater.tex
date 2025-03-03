@@ -1,0 +1,371 @@
+\chapter{Material models}
+\label{matmodels}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{General strategy}
+
+Transport processes are based on gradients of suitable variables and on fluxes of mentioned variables.
+Connection between gradients and fluxes guarantees constitutive laws. Consider transport of one medium,
+e.g. heat. Basic variable is temperature. Gradient of temperature is denoted
+\begin{equation}
+\mbf{g} = {\rm grad}\ T = \left(\ppd{T}{x},\ \ppd{T}{y},\ \ppd{T}{z}\right)^T\ , \ \ \ \ \
+g_i = \ppd{T}{x_i}\ .
+\end{equation}
+Flux of heat is defined by Fourier's law
+\begin{equation}
+\mbf{q} = \mbf{D} \mbf{g}\ ,\ \ \ \ \ \
+q_i = D_{ij} g_j\ ,
+\end{equation}
+where $\mbf{D}$ denotes matrix of material coefficients. The simplest Fourier's law uses diagonal matrix $\mbf{D}$
+where conduction coefficients are located on the diagonal.
+Flux of any quantity is used in conservation law which has form
+\begin{equation}
+{\rm div} \mbf{q} = 0\ ,\ \ \ \ \ \
+\ppd{q_i}{x_i} = 0\ .
+\end{equation}
+
+Previously described strategy is valid when one medium is transported. In case of several, say $n$, transported media,
+the situation is more complicated. Each of $n$ media has its own macroscopic quantity which defines state of the medium
+and is denoted as $f_i$. Gradient of each quantity can be computed and is denoted as
+\begin{equation}
+\mbf{g}^i = {\rm grad}\ f_i\ ,\ \ \ \ \ \
+g_j^i = \ppd{f_i}{x_j}\ .
+\end{equation}
+Superscript denotes the quantity and subscript denotes the component.
+Fluxes of particular quantities are linear combinations of gradients multiplied by material coefficients.
+They can be expressed as
+\begin{equation}
+\mbf{q}^i = \sum_{j=1}^n \mbf{D}_j^i \mbf{g}^j\ ,\ \ \ \ \
+q_j^i = D_{jk}^m g_k^m\ .
+\end{equation}
+The constitutive matrix $\mbf{D}_j^i$ defines interaction between the $i$-th flux and the $j$-th gradient.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Media transfer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{One medium transfer}
+\label{onemedtrans}
+{\bf System of equations:}
+
+\begin{eqnarray}\label{onemed}
+\tenss{K}_{11}\tenss{r}_1 + \tenss{C}_{11}\dot{\tenss{r}}_1 = {\tenss{q}}_1
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Two media transfer}
+
+{\bf System of equations:}
+
+\begin{eqnarray}
+\left[ \begin{array}{cc}
+\tenss{K}_{11} & \tenss{K}_{12} \\
+\tenss{K}_{21} & \tenss{K}_{22}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_1 \\
+\tenss{r}_{2}
+\end{array} \right\} + 
+\left[ \begin{array}{cc}
+\tenss{C}_{11} & \tenss{C}_{12} \\
+\tenss{C}_{21} & \tenss{C}_{22}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_1 \\
+\dot{\tenss{r}}_{1}
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{q}_{1} \\
+\tenss{q}_{2}
+\end{array} \right\}.
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Three media transfer}
+
+{\bf System of equations:}
+
+\begin{eqnarray}
+\left[ \begin{array}{ccc}
+\tenss{K}_{11} & \tenss{K}_{12} & \tenss{K}_{13} \\
+\tenss{K}_{21} & \tenss{K}_{22} & \tenss{K}_{23} \\
+\tenss{K}_{31} & \tenss{K}_{32} & \tenss{K}_{33}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_1 \\
+\tenss{r}_2 \\
+\tenss{r}_3
+\end{array} \right\} + 
+\left[ \begin{array}{ccc}
+\tenss{C}_{11} & \tenss{C}_{12} & \tenss{C}_{13} \\
+\tenss{C}_{21} & \tenss{C}_{22} & \tenss{C}_{23} \\
+\tenss{C}_{31} & \tenss{C}_{32} & \tenss{C}_{33}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_1 \\
+\dot{\tenss{r}}_2 \\
+\dot{\tenss{r}}_3
+\end{array} \right\} = 
+\left\{ \begin{array}{c}
+\tenss{q}_1 \\
+\tenss{q}_2 \\
+\tenss{q}_3
+\end{array} \right\}.
+\end{eqnarray}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{List of material models}
+{\bf List of implemented models for heat and moisture transfer}
+
+\begin{itemize}
+\item{\bf isotransmat}\\ 
+- calculates properties of general isotropic material for linear one medium heat or moisture transfer 
+(constant conductivity/permeability and capacity)
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/isotrmat.cpp\\
+         & /TRFEL/SRC/isotrmat.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf cernyconcrete}\\ 
+- computes conductivity and capacity coefficients for fiber concrete for one medium heat transfer (one medium, $t$ ... temperature [$^\circ$C])\\
+- data measured in the laboratory of the Department of Physics of the Faculty of Civil Engineering CTU Prague
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/cerny\_concrete.cpp\\
+         & /TRFEL/SRC/cerny\_concrete.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf bazantpedersen}\\ 
+- computes conductivity and capacity matrices general material for two media coupled heat and moisture transfer (two media - $w$ ... water content [kg/kg], $t$ ... temperature [K])\\
+- the theory is based on Lewis' and Schrefler's theory - theory of multi-phase porous medium\\
+- water vapor permeability is from Bazant and Najjar (1972)~\cite{bazant_n}\\
+- sorption isotherm and hydraulic conductivity is from Pedersen (1990)~\cite{pedersen}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/bazped.cpp\\
+         & /TRFEL/SRC/bazped.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf pedersen}\\ 
+- computes conductivity and capacity matrices general material for two media coupled heat and moisture transfer (two media - $w$ ... water content [kg/kg], $t$ ... temperature [K])\\
+- the theory is based on Lewis' and Schrefler's approach - theory of multi-phase porous medium\\
+- water vapor permeability is from Pedersen (1990)~\cite{pedersen}\\
+- sorption isotherm and hydraulic conductivity is from Pedersen (1990)~\cite{pedersen}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/pedersen.cpp\\
+         & /TRFEL/SRC/pedersen.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf kunzel}\\ 
+- computes conductivity and capacity matrices general material for two media coupled heat and moisture transfer (two media - $h$ ... relative humidity [-], $t$ ... temperature [K])\\
+- the theory is based on K${\rm\ddot{u}}$nzel and Kiessl approach~\cite{kunzel}\\
+- water vapor permeability is from\\
+- sorption isotherm and hydraulic conductivity is from
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/kunzel.cpp\\
+         & /TRFEL/SRC/kunzel.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf models for concrete}\\ 
+- computes conductivity and capacity matrices for three media fully coupled heat and moisture transfer in concrete 
+(three media - $pc$ ... capillary pressure [Pa], $pg$ capillary gas pressure ... [Pa], $t$ ... temperature [K])\\
+- the theory is based on Lewis' and Schrefler's approach - theory of multi-phase porous medium\\
+- all of listed models are from Department of Constructions and Transportation Engineering, University of Padua~\cite{pesavento}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/baroghelB.cpp\\
+         & /TRFEL/SRC/baroghelB.h\\
+         & /TRFEL/SRC/C30baroghel.cpp\\
+         & /TRFEL/SRC/C30baroghel.h\\
+         & /TRFEL/SRC/C60baroghel.cpp\\
+         & /TRFEL/SRC/C60baroghel.h\\
+         & /TRFEL/SRC/C60bazant.cpp\\
+         & /TRFEL/SRC/C60bazant.h\\
+         & /TRFEL/SRC/concreteB.cpp\\
+         & /TRFEL/SRC/concreteB.h\\
+         & /TRFEL/SRC/o30bazant.cpp\\
+         & /TRFEL/SRC/o30bazant.h
+\\ \hline
+related files & /TRFEL/SRC/constrel.cpp\\
+              & /TRFEL/SRC/constrel.h\\
+              & /TRFEL/SRC/multiphase.cpp\\
+              & /TRFEL/SRC/multiphase.h
+\\ \hline
+notes & not working at high temperatures (still tested) 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\item{\bf glasgow}\\ 
+- computes conductivity and capacity matrices for three media fully coupled heat and moisture transfer in concrete 
+(three media - $\widetilde{\rho}_V$ ... concentration of water vapor [kg/m$^3$], $pg$ capillary gas pressure ... [Pa], $t$ ... temperature [K])\\
+- the theory is based on Tenchev approach~\cite{tenchev} and \cite{glas}(\textsf {http://cml.fsv.cvut.cz/\~{}sifel}).
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/glasgowmat.cpp\\
+         & /TRFEL/SRC/glasgowmat.h
+\\ \hline
+related files &
+\\ \hline
+notes &  not working at high temperatures (still tested) 
+\\ \hline
+\end{tabular}
+\end{center}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Models for heat transfer}
+\subsection{Models for effective heat conductivity and capacity}
+\input{cerny_concrete.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Models for moisture transfer}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Models for moisture storage function}
+\input{moisture_storage_models.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Models for water vapor permeability}
+\input{permeability_models.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Models for hydraulic conductivity}
+\input{hydraulic_cond_models.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Models for coupled heat and moisture transfer}
+\input{lewis_theory.tex}
+\input{glasgow.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coupled heat and moisture transfer in non-deforming porous medium - simplified solution (two unknowns)}
+\subsubsection{Lewis' and Schrefler's approach - theory of multi-phase porous medium\\
+- unknowns = $w$ [kg/kg] moisture content, $T$ [K] temperature}
+\input{lewis_two.tex}
+\subsubsection{K\"unzel' approach\\- unknowns = $h$ [-] relative humidity, $T$ [K] temperature}
+The paper containing a review of K\"unzel's and Kiessl's approach is available\\ on \textsf {http://cml.fsv.cvut.cz/\~{}sifel} 
+(click on REFERENCES).\\
+\input{kunzel.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fully coupled heat and moisture transfer in non-deforming porous medium - three unknowns}
+\subsubsection{Lewis' and Schrefler's approach - theory of multi-phase porous medium\\
+- unknowns = $p^c$ [Pa] capillary pressure, $p^g$ [Pa] capillary gas pressure, $T$ [K] temperature}
+\input{lewis_three.tex}
+
+\subsubsection{Glasgow approach - theory of multi-phase porous medium\\
+- unknowns = $\widetilde{\rho_v}$ [kg/m$^3$] mass concentration of water vapor, 
+$p^g$ [Pa] capillary gas pressure, $T$ [K] temperature}
+\input{glasgow_three.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Material models for concrete}
+\input{concrete_models.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Combination of material models}
+
+It is possible to combine relations for material models in a system of equations of transport problems.
+It must fulfill following rules:
+\begin{itemize}
+\item{relations for material model must be derived from the same approach (theory)}
+\item{relations for material model must be derived for the same unknowns}
+\item{something else ...}
+\end{itemize}
+For example, if you compute drying of concrete specimen made from high performance concrete C60, 
+you are using the theory of multi-phase porous medium (Lewis' and Schrefler's approach). 
+You decided that every equations and relations will be set for C60 concrete, 
+but relations for C30 concrete will be better to use for describing heat transfer.
+In this case you are using following system of equations for three unknowns 
+$p^c$ [Pa] capillary pressure, $p^g$ [Pa] capillary gas pressure and $T$ [K] temperature
+
+\begin{eqnarray}
+\left[ \begin{array}{ccc}
+\tenss{K}_{cc}{\rm(C60)} & \tenss{K}_{cg}{\rm(C60)} & \tenss{K}_{cT}{\rm(C60)} \\
+\tenss{K}_{gc}{\rm(C60)} & \tenss{K}_{gg}{\rm(C60)} & \tenss{K}_{gT}{\rm(C60)} \\
+\tenss{K}_{Tc}{\rm(C30)} & \tenss{K}_{Tg}{\rm(C30)} & \tenss{K}_{TT}{\rm(C30)}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\tenss{r}_c \\
+\tenss{r}_g \\
+\tenss{r}_T
+\end{array} \right\} &+& \nonumber\\ 
+\left[ \begin{array}{ccc}
+\tenss{C}_{cc}{\rm(C60)} & \tenss{C}_{cg}{\rm(C60)} & \tenss{C}_{cT}{\rm(C60)} \\
+\tenss{C}_{gc}{\rm(C60)} & \tenss{C}_{gg}{\rm(C60)} & \tenss{C}_{gT}{\rm(C60)} \\
+\tenss{C}_{Tc}{\rm(C30)} & \tenss{C}_{Tg}{\rm(C30)} & \tenss{C}_{TT}{\rm(C30)}
+\end{array} \right]
+\left\{ \begin{array}{c}
+\dot{\tenss{r}}_c \\
+\dot{\tenss{r}}_g \\
+\dot{\tenss{r}}_T
+\end{array} \right\} &=& 
+\left\{ \begin{array}{c}
+\tenss{q}_c \\
+\tenss{q}_g \\
+\tenss{q}_T
+\end{array} \right\}.
+\end{eqnarray}
+

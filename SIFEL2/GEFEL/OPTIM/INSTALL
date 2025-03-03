@@ -1,0 +1,28 @@
+Installation
+============
+
+1) Create your own directory, e.g. 'mkdir YOUR_DIRECTORY', for your
+problem wherever you want to. Recommended is to use particular EXAM
+directory (i.e. MEFEL/EXAM etc.) for this purpose.
+
+2) Copy template file 'SIFEL/PRG/GEFEL/OPTIM/user_obj_funct.cpp' to your
+directory from previous step. You can rename this file. Add your
+problem/objective function in this file. Comments where to add your
+lines are in the file. Also you can look at examples in GEFEL/EXAM.
+
+3)a) If you don't want to type long paths to all scripts, that are
+needed hereafter, go to the top SIFEL directory and type 
+'. sifel_shell_var.sh' - this will add needed paths into the system
+(shell) PATH variable.
+
+b) Run script 'optim_install.sh' from 'SIFEL/PRG/GEFEL/OPTIM/' to
+install your problem into particular source directory, e.g. type
+'optim_install.sh your_file.cpp ../../SRC/' if you are in the
+'SIFEL/PRG/MEFEL/EXAM/YOUR_DIRECTORY/' directory.
+
+4) Check if there is a file "parameters.cfg" in directory from where
+you will be running program, i.e MEFEL, GEFEL etc. If not, copy it
+from GEFEL/OPTIM.
+
+5) Run appropriate program with your data, e.g. 
+   "mefel EXAM/YOUR_DIRECTORY/your_data.in"

@@ -1,0 +1,22 @@
+#
+# This is sample input file for 
+# basic optimization in GEFEL
+#
+#
+
+Problem       1
+Algorithm     1
+CallsLimit 1000
+
+Dim 1
+
+#
+# Each line includes min, max 
+# and precision for each variable
+#
+SECTION Domain
+-10. 10. 0.
+END
+
+Precision      1e-10
+ReturnToDomain 1

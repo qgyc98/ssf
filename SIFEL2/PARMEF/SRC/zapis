@@ -1,0 +1,361 @@
+Makefile:17: variable MPI_HOME is set to default value /usr/local/mpi
+make[1]: Entering directory `/home/jk/SIFEL/PRG/MEFEL/SRC'
+make[2]: Entering directory `/home/jk/SIFEL/PRG/GEFEL'
+make[3]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[3]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/OPTIM'
+make[4]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[4]: Nothing to be done for `all'.
+make[4]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[4]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/RANDY'
+make[4]: Nothing to be done for `all'.
+make[4]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/RANDY'
+make[3]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/OPTIM'
+rm -f gefel
+g++ -o gefel gefel.o  -L./OPTIM -L./RANDY/ -L./CMLFILE -L. -loptim -lrandy -lcmlfile -lgef -lm
+
+ gefel was successfully created
+
+make[2]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL'
+make[2]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/OPTIM'
+make[3]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/CMLFILE'
+make[3]: Entering directory `/home/jk/SIFEL/PRG/GEFEL/RANDY'
+make[3]: Nothing to be done for `all'.
+make[3]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/RANDY'
+make[2]: Leaving directory `/home/jk/SIFEL/PRG/GEFEL/OPTIM'
+make[1]: Leaving directory `/home/jk/SIFEL/PRG/MEFEL/SRC'
+make[1]: Entering directory `/home/jk/SIFEL/PRG/PARGEF'
+Makefile:17: variable MPI_HOME is set to default value /usr/local/mpi
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/jk/SIFEL/PRG/PARGEF'
+g++ -c -g -Wall  -I/usr/local/mpi/include -I../../GEFEL/ -I../../GEFEL/PARSER/ -I../../MEFEL/SRC/ -I../../PARGEF/ hpssolver.cpp
+In file included from hpssolver.cpp:3:
+/usr/local/mpi/include/mpi.h: In function `void 
+   par_solve_stochastic_problem(stochdriver*)':
+/usr/local/mpi/include/mpi.h:30: error: parse error before string constant
+In file included from /usr/local/mpi/include/mpidefs.h:49,
+                 from /usr/local/mpi/include/mpi.h:239,
+                 from hpssolver.cpp:3:
+/usr/local/mpi/include/mpio.h:117: error: non-local function `int 
+   MPI_File_read_at(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:119: error: non-local function `int 
+   MPI_File_read_at_all(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:121: error: non-local function `int 
+   MPI_File_write_at(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:123: error: non-local function `int 
+   MPI_File_write_at_all(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:136: error: non-local function `int 
+   MPI_File_read(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:138: error: non-local function `int 
+   MPI_File_read_all(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:140: error: non-local function `int 
+   MPI_File_write(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:142: error: non-local function `int 
+   MPI_File_write_all(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:160: error: non-local function `int 
+   MPI_File_read_shared(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:162: error: non-local function `int 
+   MPI_File_write_shared(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:168: error: non-local function `int 
+   MPI_File_read_ordered(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:170: error: non-local function `int 
+   MPI_File_write_ordered(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:177: error: non-local function `int 
+   MPI_File_read_at_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:180: error: non-local function `int 
+   MPI_File_write_at_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:183: error: non-local function `int 
+   MPI_File_read_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:186: error: non-local function `int 
+   MPI_File_write_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:189: error: non-local function `int 
+   MPI_File_read_ordered_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:192: error: non-local function `int 
+   MPI_File_write_ordered_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:241: error: non-local function `int 
+   MPIO_Test(ADIOI_RequestD**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:242: error: non-local function `int 
+   MPIO_Wait(ADIOI_RequestD**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:305: error: non-local function `int 
+   PMPI_File_read_at(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:307: error: non-local function `int 
+   PMPI_File_read_at_all(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:309: error: non-local function `int 
+   PMPI_File_write_at(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:311: error: non-local function `int 
+   PMPI_File_write_at_all(ADIOI_FileD*, long long int, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:324: error: non-local function `int 
+   PMPI_File_read(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:326: error: non-local function `int 
+   PMPI_File_read_all(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:328: error: non-local function `int 
+   PMPI_File_write(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:330: error: non-local function `int 
+   PMPI_File_write_all(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:348: error: non-local function `int 
+   PMPI_File_read_shared(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:350: error: non-local function `int 
+   PMPI_File_write_shared(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:356: error: non-local function `int 
+   PMPI_File_read_ordered(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:358: error: non-local function `int 
+   PMPI_File_write_ordered(ADIOI_FileD*, void*, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:365: error: non-local function `int 
+   PMPI_File_read_at_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:368: error: non-local function `int 
+   PMPI_File_write_at_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:371: error: non-local function `int 
+   PMPI_File_read_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:374: error: non-local function `int 
+   PMPI_File_write_all_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:377: error: non-local function `int 
+   PMPI_File_read_ordered_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:380: error: non-local function `int 
+   PMPI_File_write_ordered_end(ADIOI_FileD*, void*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:415: error: non-local function `int 
+   PMPIO_Test(ADIOI_RequestD**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpio.h:416: error: non-local function `int 
+   PMPIO_Wait(ADIOI_RequestD**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+In file included from hpssolver.cpp:3:
+/usr/local/mpi/include/mpi.h:317: error: non-local function `int 
+   MPI_Recv(void*, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:318: error: non-local function `int 
+   MPI_Get_count(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, int, 
+   int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:329: error: non-local function `int 
+   MPI_Wait(MPIR_HANDLE**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:330: error: non-local function `int 
+   MPI_Test(MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:332: error: non-local function `int 
+   MPI_Waitany(int, MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:333: error: non-local function `int 
+   MPI_Testany(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:334: error: non-local function `int 
+   MPI_Waitall(int, MPIR_HANDLE**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:335: error: non-local function `int 
+   MPI_Testall(int, MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:336: error: non-local function `int 
+   MPI_Waitsome(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:337: error: non-local function `int 
+   MPI_Testsome(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:338: error: non-local function `int 
+   MPI_Iprobe(int, int, int, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:339: error: non-local function `int MPI_Probe(int, 
+   int, int, par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses 
+   local type `par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:341: error: non-local function `int 
+   MPI_Test_cancelled(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, 
+   int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:349: error: non-local function `int 
+   MPI_Sendrecv(void*, int, int, int, int, void*, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:350: error: non-local function `int 
+   MPI_Sendrecv_replace(void*, int, int, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:368: error: non-local function `int 
+   MPI_Get_elements(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, 
+   int, int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:474: error: non-local function `int 
+   MPI_Status_f2c(MPI_Fint*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:475: error: non-local function `int 
+   MPI_Status_c2f(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, 
+   MPI_Fint*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:497: error: non-local function `int 
+   MPI_Status_set_cancelled(par_solve_stochastic_problem(stochdriver*)::MPI_Status*,
+   int)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:498: error: non-local function `int 
+   MPI_Status_set_elements(par_solve_stochastic_problem(stochdriver*)::MPI_Status*,
+   int, int)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:507: error: non-local function `int 
+   PMPI_Recv(void*, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:508: error: non-local function `int 
+   PMPI_Get_count(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, int, 
+   int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:519: error: non-local function `int 
+   PMPI_Wait(MPIR_HANDLE**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:520: error: non-local function `int 
+   PMPI_Test(MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:522: error: non-local function `int 
+   PMPI_Waitany(int, MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:523: error: non-local function `int 
+   PMPI_Testany(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:524: error: non-local function `int 
+   PMPI_Waitall(int, MPIR_HANDLE**, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:525: error: non-local function `int 
+   PMPI_Testall(int, MPIR_HANDLE**, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:526: error: non-local function `int 
+   PMPI_Waitsome(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:527: error: non-local function `int 
+   PMPI_Testsome(int, MPIR_HANDLE**, int*, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:528: error: non-local function `int 
+   PMPI_Iprobe(int, int, int, int*, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:529: error: non-local function `int 
+   PMPI_Probe(int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:531: error: non-local function `int 
+   PMPI_Test_cancelled(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, 
+   int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:539: error: non-local function `int 
+   PMPI_Sendrecv(void*, int, int, int, int, void*, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:540: error: non-local function `int 
+   PMPI_Sendrecv_replace(void*, int, int, int, int, int, int, int, 
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:558: error: non-local function `int 
+   PMPI_Get_elements(par_solve_stochastic_problem(stochdriver*)::MPI_Status*, 
+   int, int*)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:671: error: non-local function `int 
+   PMPI_Status_set_cancelled(par_solve_stochastic_problem(stochdriver*)::MPI_Status*,
+   int)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+/usr/local/mpi/include/mpi.h:672: error: non-local function `int 
+   PMPI_Status_set_elements(par_solve_stochastic_problem(stochdriver*)::MPI_Status*,
+   int, int)' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::MPI_Status'
+In file included from hpssolver.cpp:4:
+pglobal.h:34: error: non-local variable `
+   par_solve_stochastic_problem(stochdriver*)::pprobdesc*Pmp' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::pprobdesc'
+pglobal.h:37: error: non-local variable `
+   par_solve_stochastic_problem(stochdriver*)::psolver*Psol' uses local type `
+   par_solve_stochastic_problem(stochdriver*)::psolver'
+make: *** [hpssolver.o] Error 1

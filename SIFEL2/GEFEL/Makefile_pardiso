@@ -1,0 +1,124 @@
+# Generated Automatically From Makefile.In By Configure.
+################################################################
+#
+#  Makefile for mechcode
+# 
+################################################################
+
+.SUFFIXES:      .cpp
+
+SHELL           = /bin/sh
+
+CC              = g++
+
+DEFS            =
+#CFLAGS          =  -g -Wall
+#CFLAGS          = -Wall
+CFLAGS          = -O3
+#CFLAGS          = -O3 -ansi
+#CFLAGS          = -g
+
+INCLUDES        =
+AR              = ar
+ARFLAGS         = -rcs
+RM              = rm -f
+DEPEND          = makedepend
+
+### DIRs
+INCLUDES = -I./OPTIM/ -I./RANDY/ -I./CMLFILE/ -I/opt/intel/mkl/8.0.1/lib/32 -I.
+
+### Libs
+DIR_LIBS 	= -L./OPTIM -L./RANDY/ -L./CMLFILE -L./PARDISO -L.
+LOC_LIBS	= -loptim -lrandy -lcmlfile -lgef -lgoto_coppermine32p-r1.00 -lpardiso_GNU_IA32
+SYS_LIBS        = -lm -lpthread
+
+LIBS = $(DIR_LIBS) $(LOC_LIBS) $(SYS_LIBS)
+
+
+GEFEL           = gefel
+
+
+
+#
+#  You probably don't need to change anything below here.
+#
+
+####################################################################
+#  List of object files
+
+OBJS = basefun.o cr.o densemat.o difcalc.o dskyline.o eigsol.o elemmat.o floatsub.o fuzzygen.o fuzzynum.o gadaptivity.o gelement.o gfunct.o gmatrix.o gnode.o gphase.o gtopology.o import_T3d.o intools.o intp.o least_square.o lgnode.o mathem.o matrix.o obj_funct.o obj_funct_gefel.o ordering.o pardiso.o scr.o siftop.o skyline.o slesolv.o tablefunct.o tensor.o timecontr.o vector.o
+
+OBJS_PARSER = ./PARSER/equ.o ./PARSER/moremath.o ./PARSER/parser.o ./PARSER/tree.o
+OBJS_LAPACK = ./LAPACK/spallocate.o ./LAPACK/spbuild.o ./LAPACK/spfactor.o ./LAPACK/spoutput.o ./LAPACK/spsolve.o ./LAPACK/sputils.o
+OBJS_SPARSE = ./SPARSE/BigMatrix.o ./SPARSE/DSSolver.o  ./SPARSE/DenseMatrixArithmeticsNN.o  ./SPARSE/IntArrayList.o ./SPARSE/MathTracer.o ./SPARSE/SparseConectivityMtx.o  ./SPARSE/SparseGridMtx.o  ./SPARSE/SparseGridMtxLDL.o ./SPARSE/SparseGridMtxLL.o ./SPARSE/SparseGridMtxLU.o ./SPARSE/SparseGridMtxPD.o  ./SPARSE/SparseMatrixF.o
+OBJS_PARDISO = ./PARDISO/dgetf2.o ./PARDISO/dgetrf.o ./PARDISO/dlaev2.o ./PARDISO/dlaswp.o ./PARDISO/dpotf2.o ./PARDISO/dpotrf.o ./PARDISO/ilaenv.o ./PARDISO/s_cmp.o ./PARDISO/tstiee.o ./PARDISO/zgetf2.o ./PARDISO/zgetrf.o ./PARDISO/zlacgv.o ./PARDISO/zlaev2.o ./PARDISO/zlaswp.o ./PARDISO/zpotf2.o ./PARDISO/zrot.o ./PARDISO/zsyr.o
+
+
+GOBJS = gefel.o
+
+####################################################################
+#  List of source files
+#
+
+SRCS = basefun.cpp cr.cpp densemat.cpp difcalc.cpp dskyline.cpp eigsol.cpp elemmat.cpp floatsub.cpp fuzzygen.cpp fuzzynum.cpp gadaptivity.cpp gefel.cpp gelement.cpp gfunct.cpp gmatrix.cpp gnode.cpp gphase.cpp gtopology.cpp import_T3d.cpp intools.cpp intp.cpp least_square.cpp lgnode.cpp mathem.cpp matrix.cpp obj_funct.cpp obj_funct_gefel.cpp ordering.cpp pardiso.cpp scr.cpp siftop.cpp skyline.cpp slesolv.cpp tablefunct.cpp tensor.cpp timecontr.cpp vector.cpp
+
+SRCS_PARSER = ./PARSER/equ.cpp ./PARSER/moremath.cpp ./PARSER/parser.cpp ./PARSER/tree.cpp
+SRCS_LAPACK = ./LAPACK/spallocate.cpp ./LAPACK/spbuild.cpp ./LAPACK/spfactor.cpp ./LAPACK/spoutput.cpp ./LAPACK/spsolve.cpp ./LAPACK/sputils.cpp
+SRCS_SPARSE = ./SPARSE/BigMatrix.cpp ./SPARSE/DSSolver.cpp  ./SPARSE/DenseMatrixArithmeticsNN.cpp  ./SPARSE/IntArrayList.cpp ./SPARSE/MathTracer.cpp ./SPARSE/SparseConectivityMtx.cpp  ./SPARSE/SparseGridMtx.cpp  ./SPARSE/SparseGridMtxLDL.cpp ./SPARSE/SparseGridMtxLL.cpp ./SPARSE/SparseGridMtxLU.cpp ./SPARSE/SparseGridMtxPD.cpp  ./SPARSE/SparseMatrixF.cpp
+
+####################################################################
+#  Targets
+#
+
+all: libgef.a $(GEFEL)
+
+libgef.a: $(OBJS_PARSER) $(OBJS_LAPACK) $(OBJS_SPARSE) $(OBJS_PARDISO) $(OBJS)
+	$(RM) $@
+	$(AR) $(ARFLAGS) libgef.a $(OBJS_PARSER) $(OBJS_LAPACK) $(OBJS_SPARSE) $(OBJS) $(LIB_INTEL)
+
+$(GEFEL): $(GOBJS) libgef.a cmlfile optim 
+	$(RM) $@
+	$(CC) -o $@ $(GOBJS) $(DEFS) $(LIBS)
+	@echo -e "\n gefel was successfully created\n"
+
+clean:
+	@( $(RM) libgef.a $(GEFEL) *.o core )
+	@(cd ./CMLFILE; make -s clean )
+	@(cd ./RANDY; make -s clean )
+	@(cd ./OPTIM; make -s clean )
+
+####################################################################
+#  Module targets
+#
+
+cmlfile:
+	@(cd ./CMLFILE; make -k )
+
+optim:
+	@(cd ./OPTIM; make -k )
+
+####################################################################
+#  Suffix rules
+#
+
+.cpp.o:
+	$(CC) -c $(CFLAGS) $(DEFS) $(INCLUDES) $(@D)/$(<F) -o $(@D)/$(@F)
+
+####################################################################
+#  Dependencies
+#
+
+depend:
+	$(DEPEND) $(DEFS) $(INCLUDES) $(SRCS)
+	$(DEPEND) $(DEFS) $(INCLUDES) $(SRCS_PARSER) $(SRCS_LAPACK) $(SRCS_SPARSE) -a
+ 
+dependclean:
+	(t="/tmp/t_$$" ; sed 1,/"DO\ NOT\ DELETE"/p Makefile -n > t ; mv t Makefile)
+
+
+
+
+
+####################################################################
+# DO NOT DELETE
+

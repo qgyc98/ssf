@@ -1,0 +1,252 @@
+\chapter{Numerical solution of nonlinear problems}
+\label{numsolofnonlin}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Method of solution}
+
+Coupled mechanical and transport processes after discretization by finite element method are described by system of
+ordinary differential equations which can be written in the form
+\begin{eqnarray}\label{final_eq_short}
+\mbf{K}\mbf{r} + \mbf{C} \od{\mbf{r}}{t} = \mbf{F},
+\end{eqnarray}
+where $\mbf{K}$ is stiffness-conductivity matrix, $\mbf{C}$ is capacity matrix, $\mbf{r}$ is the vector of nodal values
+and $\mbf{F}$ is vector of prescribed forces and fluxes.
+Numerical solution of system of ordinary differential equations (\ref{final_eq_short}) is based on expressions
+for unknown values collected in the vector $\mbf{r}$ at time $n+1$
+\begin{equation}\label{defdn}
+\mbf{r}_{n+1} = \mbf{r}_n + \Delta t \mbf{v}_{n+\alpha}\ ,
+\end{equation}
+where the vector $\mbf{v}_{n+\alpha}$ has form
+\begin{equation}\label{defvn}
+\mbf{v}_{n+\alpha} = (1-\alpha)\mbf{v}_n + \alpha \mbf{v}_{n+1}\ .
+\end{equation}
+The vector $\mbf{v}$ contains time derivatives of unknown variables (time derivatives of the vector $\mbf{r}$).
+The equation (\ref{final_eq_short}) is expressed in time $n+1$ and with help of previously defined vectors
+one can find
+\begin{equation}\label{diskr}
+\left(\mbf{C} + \Delta t \alpha \mbf{K}\right)\mbf{v}_{n+1} = \mbf{F}_{n+1} -
+\mbf{K}\left(\mbf{r}_n + \Delta t (1-\alpha)\mbf{v}_n\right)
+\end{equation}
+This formulation is suitable because explicit or implicit computational scheme can be set by parameter $\alpha$.
+Advantage of the explicit algorithm is based on possible efficient solution of the system of equations because
+parameter $\alpha$ can be equal to zero and capacity matrix $\mbf{C}$ can be diagonal. Therefore the solution
+of the system is extremely easy. The disadvantage of such method is its conditional stability. It means, that
+the time step must satisfy stability condition what usually leads to very short time step.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|lll|}
+\hline
+Initial vectors                 & \hspace{5mm} & $\mbf{r}_0, \mbf{v}_0$
+\\
+(defined by initial conditions) & &
+\\[3mm] \hline
+do until & & $i \leq n$
+\\
+ & & ($n$ is number of time steps)
+\\[3mm]
+predictor & & $\tilde{\mbf{r}}_{i+1} = \mbf{r}_i + (1-\alpha)\Delta t \mbf{v}_i$
+\\[3mm]
+right hand side vector & & $\mbf{y}_{i+1} = \mbf{f}_{i+1} - \mbf{K}\tilde{\mbf{r}}_{i+1}$
+\\[3mm]
+matrix of the system & & $\mbf{A} = \mbf{C} + \alpha \Delta t \mbf{K}$
+\\[3mm]
+solution of the system & & $\mbf{v}_{i+1} = \mbf{A}^{-1} \mbf{y}_{i+1}$
+\\[3mm]
+new approximation & & $\mbf{r}_{i+1} = \tilde{\mbf{r}}_{i+1} + \alpha \Delta t \mbf{v}_{i+1}$
+\\[3mm] \hline
+\end{tabular}
+\caption{Algorithm for linear problem.}
+\label{linalgtab}
+\end{center}
+\end{table}
+
+Previously described algorithm is valid for linear problems and one system of linear
+algebraic equations must be solved in every time step. The situation is more complicated for
+nonlinear problems where nonlinear system of algebraic equations must be solved in every time
+step. The high complexity of the problems leads to the application of the Newton-Raphson method
+as the most popular method for such cases.
+
+There are several possibilities how to apply and implement solver of nonlinear algebraic
+equations. We prefer equilibrium of forces and fluxes (computed and prescribed) in nodes. This strategy is
+based on the equation
+\begin{equation}\label{fluxequilib}
+\mbf{f}_{int} + \mbf{f}_{ext} = \mbf{0}
+\end{equation}
+where vectors $\mbf{f}_{int}$ and $\mbf{f}_{ext}$ contain internal values and prescribed values.
+With respect of nonlinear feature of material laws used in
+the analysis, the equation (\ref{fluxequilib}) is not valid after computation of new values
+from the equations summarized in Table \ref{linalgtab}. There are nonequilibriated forces and fluxes which
+must be suppressed.
+
+When new values in nodes are computed, the strains and gradients of approximated functions can be established.
+It is done with help of matrices $\mbf{B}_{\varepsilon}$ and $\mbf{B}_{g}$ where particular partial derivatives are collected.
+Concise expression of strains and gradients are written as
+\begin{equation}
+\mbf{g} = \mbf{B}_{g} \mbf{r}\ ,\ \ \ \ \
+\mbf{\varepsilon} = \mbf{B}_{\varepsilon} \mbf{r}\ .
+\end{equation}
+New stresses and fluxes are obtained from constitutive relations
+\begin{equation}
+\mbf{\sigma} = \mbf{D}_{\sigma} \mbf{\varepsilon}\ ,\ \ \ \ \
+\mbf{q} = \mbf{D}_{q} \mbf{g}\ ,
+\end{equation}
+where $\mbf{D}_{\sigma}$ is the stiffness matrix of the material and $\mbf{D}_{q}$ is the matrix of conductivity
+coefficients.
+Real nodal forces and discrete fluxes on element are computed from the relations
+\begin{equation}
+\mbf{f}_{int}^{e} = \int_{\Omega_e} \mbf{B}^T_{\varepsilon} \mbf{\sigma} {\rm d}\Omega_e\ ,\ \ \ \ \
+\mbf{f}_{int}^{e} = \int_{\Omega_e} \mbf{B}^T_{g} \mbf{q} {\rm d}\Omega_e\ .
+\end{equation}
+They are compared with the prescribed nodal forces and discrete fluxes and their differences create
+the vector of residuals $\mbf{R}$. Increments of the vector $\mbf{v}$ are computed from the equation
+\begin{equation}\label{incr}
+\left(\mbf{C} + \Delta t \alpha \mbf{K}\right)\Delta \mbf{v}_{n+1} = \mbf{R}\ .
+\end{equation}
+If the matrices $\mbf{\mbf{C}}$ and $\mbf{\mbf{K}}$ are updated after every computation of new increment
+from equation (\ref{incr}), the full Newton-Raphson method is used. If the matrices are updated only once
+after every time step, the modified Newton-Raphson method is used.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Numerical difficulties}
+
+Transport processes lead to very general systems of algebraic equations. In mechanical
+problems, the finite element method results into symmetric systems of equations (it is not
+true e.g. for nonassociated theory of plasticity). The system is usually positive definite.
+
+In contrary, the transport processes lead to nonsymmetric indefinite systems. It means
+that usual methods like $\mbf{LDL}^T$ decomposition does not work for such problems and more
+general $\mbf{LU}$ decomposition must be used. It seems to us that there are problems where
+the pivoting is necessary. In this article we describe only examples where pivoting is not
+used and the elimination methods work. Our first tests with iterative methods indicate also
+difficulties. Usual conjugate gradient method must be replaced by GMRES method and suitable
+preconditioner must be find and used. GMRES without preconditioner has serious troubles and we
+have found several examples which the method has not solved because of convergence deterioration.
+
+One possible solution of numerical difficulties can be based on appropriate choice of units
+used in material models. Other strategy can start from suitable scaling of the matrix.
+
+\chapter{Climat conditions}
+
+\section{Heat flux density}
+climatcond.cpp line 1078
+give\_heat\_flux 
+
+climatcond.cpp line 1534
+condit\_vapour\_diffusion\_heat\_flux
+
+$T_E$ - exterior temperature
+$T$ unknown temperature of structure
+$T_p$ average auxiliary temperature
+\begin{eqnarray}
+T_p = \frac{1}{2}(T_E + T)
+\end{eqnarray}
+$T_0=273.15$ K Reference temperature for enthalpy (0 C)
+$h_v$ is the specific enthalpy of water vapor
+\begin{eqnarray}
+h_v = c_v (T_p-T_0) + h_{v,0}
+\end{eqnarray}
+$h_{v,0}=2256000.0$ J - specific enthalpy of water vapour at 0 C
+$c_v = 1617$ is the specific heat capacity of water vapour
+\begin{eqnarray}
+q = - h_v q_{diff}
+\end{eqnarray}
+
+
+climatcond.cpp line 2093
+condit\_vapour\_diffusion\_moisture\_flux
+
+$p_{v,sat}$ - pressure of saturated water vapour of exterior
+\begin{eqnarray}
+p_{v,sat} = e^{23.5771 - \frac{4042.9}{T_e - 37.58}}
+\end{eqnarray}
+$T_e$ temperature of eterier
+
+water vapour pressure of exterier
+\begin{eqnarray}
+p_{v,e} = p_{v,sat} \varphi_{e}
+\end{eqnarray}
+$\varphi_{e}$ relative humidity of exterior
+moisture flux density for $p_{v,e}<p_v$
+\begin{eqnarray}
+q = \beta (p_v - p_{v,e})
+\end{eqnarray}
+$p_v$ water vapout pressure in structure (unknown)
+moisture flux density for $p_{v,e}>p_v$
+\begin{eqnarray}
+q = \frac{w_{sat} - w}{w_{sat}}\beta (p_v - p_{v,e})
+\end{eqnarray}
+$w$ is the volumetric moisture content (m$^3$/m$^3$),
+$w_{sat}$ is the saturated volumetric moisture content (m$^3$/m$^3$),
+
+climatcond.cpp line 1281
+condit\_heat\_flux
+
+\begin{eqnarray}
+q = \alpha (T - T_e)
+\end{eqnarray}
+$T$ unknown temperature
+$T_e$ temperature of exterior
+
+\subsection{heat flux generated by moisture}
+
+\begin{eqnarray}
+q &=& - h_v q_{diff} = (c_v (T_p-T_0) + h_{v,0}) \left(\frac{w_{sat} - w}{w_{sat}}\beta (p_v - p_{v,e})\right) =
+\\
+&=& \left(c_v (\frac{1}{2}(T_E + T)-T_0) + h_{v,0}\right)\left(\frac{w_{sat} - w}{w_{sat}}\beta (p_v - p_{v,e})\right) =
+\\
+&=& \left((c_v (\frac{1}{2}(T_E + T)-T_0) + h_{v,0})\frac{w_{sat} - w}{w_{sat}}\beta\right)(p_v - p_{v,e})
+\end{eqnarray}
+
+
+\section{Moisture flux density}
+
+climatcond.cpp 1556
+give\_moisture\_flux 
+
+climatcond.cpp 1685
+condit\_rain\_moisture\_flux
+
+\begin{eqnarray}
+q_a = \beta_r (w_{sat}-w)
+\end{eqnarray}
+$\beta_r$ exchange coefficient connected with rain
+$w$ is the volumetric moisture content (m$^3$/m$^3$),
+$w_{sat}$ is the saturated volumetric moisture content (m$^3$/m$^3$),
+\begin{eqnarray}
+q_r = k_w k_r r
+\end{eqnarray}
+$r$ (l/m$^2$/s) amount of water per square meter per second caused by rain
+$k_w$ coefficient connected with wind
+$k_r$ coefficient connected with rain
+
+moisture flux for $q_r<q_a$
+\begin{eqnarray}
+q = q_r
+\end{eqnarray}
+else
+\begin{eqnarray}
+q = q_a
+\end{eqnarray}
+
+
+climatcond.cpp 1685
+condit\_vapour\_diffusion\_moisture\_flux
+vize v\'{y}\v{s}e
+
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}
+\begin{eqnarray}
+\end{eqnarray}

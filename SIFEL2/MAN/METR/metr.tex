@@ -1,0 +1,50 @@
+\documentclass[12pt]{book}
+\usepackage{graphics,epsfig}
+\usepackage{amsmath}
+\newcommand{\mbf}[1]{\mbox{\boldmath$#1$}}
+% definice zlomku
+\newcommand{\del}[2]{\mbox{$\displaystyle\frac{#1}{#2}$}}
+% definice prvni parcialni derivace funkce
+\newcommand{\ppd}[2]{\del{\partial{#1}}{\partial{#2}}}
+% definice druhe parcialni derivace funkce podle x a y
+\newcommand{\dpd}[3]{\del{\partial^{2}\>\!\!{#1}}{\partial{#2}\ \partial{#3}}}
+% definice n-te parcialni derivace funkce
+\newcommand{\npd}[3]{\del{\partial^{#1}\>\!\!{#2}}{\partial{#3}^{#1}}}
+% definice prvni derivace funkce
+\newcommand{\od}[2]{\del{{\rm d}\>\!{#1}}{{\rm d}{#2}}}
+% definice n-te obycejne derivace funkce
+\newcommand{\nod}[3]{\del{{\rm d}^{#1}\>\!\!{#2}}{{\rm d}{#3}^{#1}}}
+\newcommand{\tenss}[1]{\mbox{\boldmath$#1$}} 
+% A second-order tensor
+\newcommand{\ii}[0]{{\'{\i}}}
+% dlouhe i
+\newcommand{\bs}[1]{\bf \textit{#1}}
+\usepackage{makeidx}
+\makeindex
+
+\setcounter{secnumdepth}{4}
+\setcounter{totalnumber}{4}
+\oddsidemargin=5mm
+\evensidemargin=5mm
+\textwidth=160mm
+\topmargin=-2.0cm
+\textheight=250mm
+\headheight=1.5cm
+
+
+\begin{document}
+\tableofcontents
+\chapter{Introduction}
+METR is part of SIFEL (SImple Finite ELement) system dealing with
+coupled transport and mechanical problems...
+
+
+\part{Theoretical part}
+%\input{tproblem.tex}
+\input{icodedescr.tex}
+%\printindex
+%\part{Pre- and Post-processor}
+%\input{igeninputfile.tex}
+%\input{ipostproc.tex}
+%\input{biblio.tex}
+\end{document}

@@ -1,0 +1,411 @@
+Mesh generators :
+
+Directory SIFEL/PREP/GENER contains several files with mesh generators.
+All generators use JKTK output format thus the switch 0 should be used
+in the preprocessor file (mechprep, transprep).
+
+
+2D GENERATORS :
+---------------
+
+2D generators gnerate rectangular domain with regular mesh. User may enter
+number of elements in the x and y direction and length and height of domain.
+All nodes on the boundaries have assigned extra property number so the nodes
+on the left boundary have assigned property number 0, nodes on the top boundary
+have assigned property number 1, nodes on the right boundary have assigned
+property number 2 and nodes on the bottom boundary have assigned property
+number 3. Rest of nodes have assigned property number 4.
+User may enter whether generator should print edge numbers on the elements.
+Edge numbers are used in case that user would like to use edge load oon the elements
+(MEFEL) or heat flux or heat transfer (TRFEL). The user have to set up
+read_edge_number switch to the vlaue 1 in the preprocessor file (mechprep, transprep).
+Edge on the left has number 1, on the top has number 2, on the right has number 3 and
+on the bottom has number 4.
+
+Usage of each program is :
+
+program_name param1 param2 param3 param4 param5 param6
+
+where :
+
+param1 is output file name
+param2 is length in the x direction
+param3 is height in the y direction
+param4 is number of elements in the x direction
+param5 is number of elements in the y direction
+param6 is switch which controls whether edge numbers on the elements are printed
+          (0 = not print, 1 = print)
+
+gensifquad.cpp  - this program generates mesh with quadrilateral elements (linear aproximation).
+gensifquadq.cpp - this program generates mesh with quadrilateral elements (quadratic aproximation).
+gensiftria.cpp  - this program generates mesh with triangle elements (linear aproximation)
+
+
+3D generators :
+---------------
+
+gensifhex.cpp
+
+This generator generates prism domain with regular mesh with hexagonal elements (linear aproximation).
+Behaviour is similar as 2D generators, but edge numbers are not printed and properties of nodes
+are assigned following way:
+Nodes in the area with x = 0 has assigned property number 0,
+Nodes in the area with x = length in x direction has assigned property number 2
+Nodes in the area with z = 0 has assigned property number 3,
+Nodes in the area with z = length in z direction has assigned property number 1
+Rest of nodes has property number 4.
+Usage of each program is :
+
+program_name param1 param2 param3 param4 param5 param6 param7
+
+where :
+
+param1 is output file name
+param2 is length in the x direction
+param3 is length in the y direction
+param4 is length in the z direction
+param5 is number of elements in the x direction
+param6 is number of elements in the y direction
+param7 is number of elements in the z direction
+          (0 = not print, 1 = print)
+
+gensifhexq.cpp
+
+This generator generates prism or tube domain with regular mesh with hexagonal elements (quadratic aproximation).
+Behaviour is similar as 2D generators, but edge numbers are not printed and properties of nodes are
+assigned following way:
+Nodes with x coordinate x = 0 has assigned property number 0, rest of nodes has assigned property number 1
+Usage of each program is :
+
+program_name 1 param1 param2 param3 param4 param5 param6 param7
+
+generates prism where :
+
+param1 is output file name
+param2 is length in the x direction
+param3 is length in the y direction
+param4 is length in the z direction
+param5 is number of elements in the x direction
+param6 is number of elements in the y direction
+param7 is number of elements in the z direction
+
+program_name 2 param1 param2 param3 param4 param5 param6 param7 param8
+
+generates tube where :
+
+param1 is output file name
+param2 is radius
+param3 is length
+param4 is thick
+param5 is number of elements in the radius direction
+param6 is number of elements in the length direction
+param7 is number of elements in the thick direction
+param8 is angel of tube segment.
+
+Parallel 2D generators :
+-----------------------
+
+pargenquad.cpp
+
+ This generator produces similar mesh as the gensifquad, but divides rectangular domain to given
+number of rectangular subdomains. In addition program generates preprocessor files.
+Domain will have on the left edge supports and the right edge will be loaded with given load.
+Positive global node numbers are assigned  only on the edges between subdomains. Nodes inside subdomians
+have assigned zero.
+ Input for this program is data file with folowing structure :
+
+Ndx    = number of rectangular subdomains in the x direction
+Ndy    = number of rectangular subdomains in the y direction
+dimx,1 = length of 1. subdomain in the x direction
+nex,1  = number of generated elements of 1. subdomain in the x direction
+.
+.
+.
+dimx,ndx = length of ndx-th subdomain in the x direction
+nex,ndx  = number of generated elements of ndx-th subdomain in the x direction
+dimy,1   = length of 1. subdomain in the y direction
+ney,1    = number of generated elements of 1. subdomain in the y direction
+.
+.
+.
+dimy,ndy  = length of ndy-th subdomain in the y direction
+ney,ndy   = number of generated elements of ndy-th subdomain in the y direction
+ofname    = name of output files wtihout any extension, program automatically adds numbers to file names and
+            extension .top for the topology and .pr for the preprocessor file
+auxfname  = name of auxiliary file for the nonlinear statics
+tmplfname = name of template preprocessor file. Structure of the file will be described later
+Edgn      = Switch for output Edge numbers in the topology file. Set to value 0 when edge numbers shouldn't be printed.
+            set to value 1 when edge numbers should be printed. Edge numbers are used togeather with elements with edge
+ load.
+            So value 1 is usually used when the template file conatains edge load.
+Ndofn     = number of dofs in nodes
+f1,1      = value of force load in the 1. direction for load case 1
+.
+.
+.
+fnodfn,1  = value of force load in the ndofn-th direction for load case 1
+.
+.
+.
+.
+.
+f1,n      = value of force load in the 1. direction for load case n
+.
+.
+.
+fnodfn,n  = value of force load in the ndofn-th direction for load case n
+
+Number of load cases is specified in the template file.
+
+Example of data file :
+Given rectangular domain with dimension 34 units in the x direction
+and 8 units in the y direction. It should be divided to the 2 subdomains
+in each direction. Each subdomain should be divided by the regular mesh to
+the 4 elements, 2 elements in the each direction.
+
+Subdomain numbering :
+
+^ y
+|
+|
++-------+-------+----------+----------+
+|       |       "          |          |
+|       |       "          |          |
++-------+-------+----------+----------+
+|   2   |       "    4     |          |
+|       |       "          |          |
++=======+=======+==========+==========+
+|       |       "          |          |
+|       |       "          |          |
++-------+-------+----------+----------+
+|       |       "          |          |
+|  1    |       "    3     |          |
++-------+-------+----------+----------+  -------> x
+
+
+Element numbering :
+
+^ y
+|
+|
++-------+-------+----------+----------+
+|   2   |  4    "    2     |    4     |
+|       |       "          |          |
++-------+-------+----------+----------+
+|   1   |  3    "    1     |    3     |
+|       |       "          |          |
++=======+=======+==========+==========+
+|       |       "          |          |
+|  2    |   4   "    2     |    4     |
++-------+-------+----------+----------+
+|       |       "          |          |
+|  1    |   3   "    1     |    3     |
++-------+-------+----------+----------+  -------> x
+
+
+Local node numbering :
+
+^ y
+|
+|
+3-------6-------9	3---------6----------9
+|       |       |	|         |          |
+|       |       |	|         |          |
+2-------5-------8	2---------5----------8
+|       |       |	|         |          |
+|       |       |	|         |          |
+1=======4=======7	1=========4==========7
+
+3=======6=======9	3=========6==========9
+|       |       |	|         |          |
+|       |       |	|         |          |
+2-------5-------8	2---------5----------8
+|       |       |	|         |          |
+|       |       |	|         |          |
+1-------4-------7	1---------4----------7  -------> x
+
+Global node numbering :
+
+^ y
+|
+|
+0-------0-------7	7---------0----------0
+|       |       |	|         |          |
+|       |       |	|         |          |
+0-------0-------6	6---------0----------0
+|       |       |	|         |          |
+|       |       |	|         |          |
+1=======2=======5	5=========4==========7
+
+1=======2=======5	5=========6==========9
+|       |       |	|         |          |
+|       |       |	|         |          |
+0-------0-------4	4---------0----------8
+|       |       |	|         |          |
+|       |       |	|         |          |
+0-------0-------3	3---------0----------7  -------> x
+
+
+Boundary condition :
+
+^ y
+|
+|
+#-------+-------+----------+----------+ <-- -100
+#       |       "          |          |
+#       |       "          |          |
+#-------+-------+----------+----------+ <-- -100
+#   2   |       "    4     |          |
+#       |       "          |          |
+#=======+=======+==========+==========+ <-- -100
+#       |       "          |          |
+#       |       "          |          |
+#-------+-------+----------+----------+ <-- -100
+#       |       "          |          |
+#  1    |       "    3     |          |
+#-------+-------+----------+----------+ <-- -100   ------> x
+
+# - means prescribed value = 0.0 in the each direction
+
+Data file looks like follow :
+
+2 2
+14 2
+20 2
+4  2
+4  2
+MYEXAM/exam
+DATA/graph
+templex
+0
+2
+-100.0 0.0
+
+Template preprocessor file :
+This file is used for generating preprocessor files for each subdomain. It contains all common
+data about subdomains. For example problem description, number of load cases, materials, cross-section, load.
+pargenquad only assigns boundary conditions for subdomains.
+
+Example of template preprocessor file
+dbmat#             file with database of materials
+dbcrs#             file with database of cross-sections
+begin
+# Here is problem desciption
+Muj job
+1
+1
+0 0 0 0 0 0
+1 1
+end
+1  #number of load cases
+begin
+# This section assigns nodal properties common for each subdomain
+# property 1 = nodes on the lef edge
+# property 2 = nodes between lef and right edges
+# property 3 = nodes on the right edge
+1 ndofn 2
+1 crsec 10 1
+2 ndofn 2
+2 crsec 10 1
+3 ndofn 2
+3 crsec 10 1
+end
+
+begin
+# This section assigns element properties common for each subdomain
+# Each element has property 0.
+0 eltype 5 21 10
+0 sscomp 5 1
+0 mater 1 1 1
+end
+
+
+pargenbrick.cpp
+
+Same as pargenquad but it divides 3D prism domain to given number of prism subdomains.
+Global node numbers are numbered in the same way as the pargenquad. It means on the common edges
+between subdomains are generated positive global node numbers else global node number is zero.
+The first are generated subdomains in the z direction, then are generated in the y direction and
+then in the x direction. Elements are generated in the same way as subdomains.
+
+
+Input for this program is data file with folowing structure :
+
+Ndx    = number of rectangular subdomains in the x direction
+Ndy    = number of rectangular subdomains in the y direction
+Ndz    = number of rectangular subdomains in the z direction
+dimx,1 = length of 1. subdomain in the x direction
+nex,1  = number of generated elements of 1. subdomain in the x direction
+.
+.
+.
+dimx,ndx = length of ndx-th subdomain in the x direction
+nex,ndx  = number of generated elements of ndx-th subdomain in the x direction
+dimy,1   = length of 1. subdomain in the y direction
+ney,1    = number of generated elements of 1. subdomain in the y direction
+.
+.
+.
+dimy,ndy  = length of ndy-th subdomain in the y direction
+ney,ndy   = number of generated elements of ndy-th subdomain in the y direction
+dimz,1   = length of 1. subdomain in the z direction
+nez,1    = number of generated elements of 1. subdomain in the z direction
+.
+.
+.
+dimz,ndz  = length of ndz-th subdomain in the z direction
+nez,ndz   = number of generated elements of ndz-th subdomain in the z direction
+ofname    = name of output files wtihout any extension, program automatically adds numbers to file names and
+            extension .top for the topology and .pr for the preprocessor file
+auxfname  = name of auxiliary file for the nonlinear statics
+tmplfname = name of template preprocessor file. Structure of the file will be described later
+fx,1      = value of force load in the x direction for load case 1
+fy,1      = value of force load in the y direction for load case 1
+fz,1      = value of force load in the z direction for load case 1
+.
+.
+.
+.
+.
+fx,nlc    = value of force load in the x direction for load case nlc
+fy,nlc    = value of force load in the y direction for load case nlc
+fz,nlc    = value of force load in the z direction for load case nlc
+
+
+pargenquadd.cpp, pargenbrickd
+
+Programs are same as pargenquad and pargenbrick but global node numbering is
+modificated for DP-FETI. So the nodes on the common edges have assigned positive global numbers and
+nodes in the common corners of subdomains have assigned negative global numbers.
+
+
+pargenquadt.cpp
+
+Program is same as the pargenquad but it has been modified for PARTRFEL. The modification lies in the
+boundary condition. Input file has ame format but section with load was replaced with section of
+boundary condition. Template preprocessor file should be in the TRFEL preprocessor format. Number of load
+cases this time means number of transported media.
+Here is example of input file domain divided to the 12 subdomains
+(4 in the x direction and 3 in the y direction) :
+
+4 3
+0.125 38
+0.125 38
+0.125 38
+0.125 38
+0.166666666666 50
+0.166666666666 50
+0.166666666666 50
+rbrno
+EXAM/rbrno
+templ4pddds
+1
+0.007639 0.012857
+290.0 290.0
+
+The last two lines contain boundary condition for the first and second transported medium
+
+pargentria.cpp and pargentriad.cpp
+
+Programs are same as the pargenquad and pargenquadd but they genrate linear tringles instead of quadrilaterals.
+Input file format is same as in the pargenquad(d).

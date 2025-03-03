@@ -1,0 +1,225 @@
+\chapter{Structure of input file}
+
+There are many tools for generation of input files for TRFEL code. These tools
+suppress importance of input files because user can create them without exact
+knowledge of their structure. But efficient work with the code is based on
+good knowledge of the input file.
+
+\section{Main parts}
+
+There are several main parts of input file:
+
+\begin{itemize}
+\item{part containing general information about solved problem}
+\item{part defining nodes of finite element mesh}
+\item{part defining elements of finite element mesh}
+\item{part defining boundary conditions}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{General information}
+
+The first part contains basic data about solved problem. Attributes of the class {\sf probdesc}
+are read there. The first part can be divided into part independent on type of problem and part
+dependent on it.
+
+\subsection{Part independent on problem type}
+
+This part of input file is common for all implemented problems in the TRFEL. Attributes read
+in this part are summarized in the following table.
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+attribute & description
+\\ \hline
+{\it name} & description of solved problem, serves only for user
+\\
+{\it outfile} & name of the output file (with path)
+\\
+{\it Mespr} & indicator of message printing
+\\
+ & {\it Mespr}=0 - no print, {\it Mespr}=1 - print of control data
+\\
+{\it grout} & indicator of graphic output
+\\
+ & {\it grout}=0 - no graphic output, {\it grout}=1 - graphic output
+\\
+{\it tprob} & type of problem, see Section \ref{sectproblemtype}
+\\
+{\it straincomp} & computation of strains, see Section \ref{sectstraincomp}
+\\
+{\it strainaver} & strain averaging, see Section \ref{sectstraincomp}
+\\
+{\it stresscomp} & computation of stresses, see Section \ref{sectstresscomp}
+\\
+{\it stressaver} & stress averaging, see Section \ref{sectstresscomp}
+\\
+{\it reactcomp} & computation of reactions, see Section \ref{sectreactcomp}
+\\
+{\it adaptivity} & application of adaptivity analysis
+\\
+{\it stochasticcalc} & deterministic/stochastic indicator, see Section \ref{sectdetstochcontr}
+\\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Parts dependent on type of problem}
+
+Other attributes of the class {\sf probdesc} depend on type of problem. Particular cases
+are described in following subsections.
+
+\subsubsection{Linear static problem}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+attribute & description
+\\ \hline
+{\it tstorsm} & type of storage of stiffness matrix, see Section \ref{}
+\\
+{\it ssle} & controller of solver of systems of linear equations, see Section \ref{}
+\\ \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Nonlinear static problem}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+attribute & description
+\\ \hline
+{\it tnlinsol} & type of solver of system of nonlinear equations, see Section \ref{sectnonlinsolvertype}
+\\ \hline
+\multicolumn{2}{c}{arc-lenght method}
+\\ \hline
+{\it nial} & maximum number of increments
+\\
+{\it niilal} & maximum number of iterations in inner loop
+\\
+{\it erral} & required norm of vector of unbalanced forces
+\\
+{\it dlal} & length of the arc at the beginning
+\\
+{\it dlminal} & minimum length of the arc
+\\
+{\it dlmaxal} & maximum length of the arc
+\\
+{\it psial} & control parameter of displacement-loading
+\\
+{\it hdbackupal} & control of backup and recover of arc-length, see Section \ref{sectcontracrmet}
+\\
+{\it displnorm} & type of norm used for increments of displacements, see Section \ref{sectdisplacementnorm}
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Part defining nodes}
+
+Part of input file defining nodes of finite element mesh has simple structure. Nodes are described by attributes
+of the class {\sf mechtop}. There are several quantities defined at nodes: coordinates, number of degrees of
+freedom at node, type of cross section (see Section \ref{sectcrsectype}) and local coordinate system.
+
+Total number of nodes is stored in attribute {\it nn} of the class {\sf mechtop}.
+Each node is defined by one row in input file. There are following data: number of node (node id), all three coordinates
+(that is $x,\ y,$ and $z$, for all problems including onedimensional), number of degrees of freedom defined at node,
+type of cross section a local coordinate system.
+
+Example of a typical line has form
+
+\noindent
+{\tt 5  3.0 2.0 0.0   2  10 1  0}
+
+\noindent
+5 is number of node, coordinates of node are $x=3.0,\ y=2.0,\ z=0.0$, there are 2 DOFs at node, type of
+cross section is 10 (plane stress cross section), id of cross section is 1, 0 means no local coordinate
+system. If local coordinate system is required, zero is exchanged by 2 or 3 which indicate number of vectors
+of local basis. In such case components of basis vectors must be written.
+
+Number of constrained nodes is stored in attribute {\it ncn} of the class {\sf mechtop}.
+Constrained nodes are mentioned at a special list. One constrained node is described by one row.
+There are following data: number of node (node id), indicators of support. Number of indicators
+is equal to number of DOFs at node. 0 means constrained DOF, 1 means free DOF.
+
+All part defining nodes has form similar to this example:
+
+\begin{center}
+{\tt
+\begin{tabular}{lllllllll}
+9 &              &              &     &   &    &   &
+\\
+1 & 0.0          & 0.0          & 0.0 & 2 & 10 & 1 & 0
+\\
+2 & -0.632455532 & 1.897366596  & 0.0 & 2 & 10 & 1 & 0
+\\
+3 &-1.264911064  & 3.794733192  & 0.0 & 2 & 10 & 1 & 0
+\\
+4 & 2.846049894  & 0.9486832981 & 0.0 & 2 & 10 & 1 & 0
+\\
+5 & 2.213594362  & 2.846049894  & 0.0 & 2 & 10 & 1 & 0
+\\
+6 & 1.58113883   & 4.74341649   & 0.0 & 2 & 10 & 1 & 0
+\\
+7 & 5.692099788  & 1.897366596  & 0.0 & 2 & 10 & 1 & 0
+\\
+8 & 5.059644256  & 3.794733192  & 0.0 & 2 & 10 & 1 & 0
+\\
+9 & 4.427188724  & 5.692099788  & 0.0 & 2 & 10 & 1 & 0
+\\
+\\
+3 &              &              &     &   &    &   &
+\\
+1 & 0            & 0            &     &   &    &   &
+\\
+2 & 0            & 0            &     &   &    &   &
+\\
+3 & 0            & 0            &     &   &    &   &
+\\
+\end{tabular}
+}
+\end{center}
+
+where 9 nodes are defined and 3 of them are supported.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Generation of input file}
+
+%\section{Possibilities}
+
+\section{File with topology}
+Topology file should contain all informations about used finite element mesh.
+It means nodes and elements. The nodes are described by their 3 coordinates
+(3 coordinates must be always used) and by a property. The property serves
+for definition of many values like the thickness of plate, density of material etc.
+The elements are described by the number of nodes of element and by a property.
+The property serves for definition of element type, material type etc. The topology
+file does not contain type of finite element (like triangular element with linear
+approximation functions for plane stress) but it contains only geometrical
+informations (it is triangular element with 3 nodes). The type of finite element
+is defined during preprocessing phase.
+
+\section{Example}
+
+Compute displacements of a brick which is clamped at one face and loaded at the
+opossite one. The sizes of the brick are 10 m ($x$ direction), 2 m ($y$ direction) and
+3 m ($z$ direction). There are 6 elements along the $x$ direction, 2 elements
+along the $y$ direction and 3 elements along the $z$ direction.
+
+This very simple mesh could be generated by our simple generator ghex from the
+PRG/PREP/GENER
+
+The statement is
+
+ghex brick.top 10 2 3 \hspace{4mm} 6 2 3
+
+There are 84 nodes and 36 elements. The nodes are divided into 5 groups with respect
+to their property. All finite elements have property 0.
+
+

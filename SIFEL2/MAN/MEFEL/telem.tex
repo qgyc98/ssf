@@ -1,0 +1,661 @@
+\chapter{Finite elements for mechanical problems}
+\label{finitelements}
+\index{finite elements}
+
+The finite element method is a numerical method for solution of academic as well as real world problems.
+Derivation of basic equations, matrices and vectors can be done in several ways. One possibility is
+the Galerkin method which is shortly described in the following section. For more details about the
+finite element method or for introduction into the method, see references
+\cite{belytschko:nonlin}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Galerkin method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Galerkin method is used for derivation of basic matrices and vectors
+
+
+\section{General comments}
+\label{sectgencom}
+Central notion of finite element method applied in mechanical problem is stiffness matrix.
+Derivation of general stiffness matrix can be done with help of Ritz or Galerkin method.
+There are many ways how to compute stiffness matrices. One strategy of evaluation of
+stiffness matrix is mentioned in this section.
+
+
+The stiffness matrix \index{matrix!stiffness} of any finite element can be expressed in form
+\begin{equation}
+\mbf{K} = \int_{\Omega_e} \mbf{B}^T \mbf{D} \mbf{B} {\rm d}\Omega_e\ ,
+\end{equation}
+where $\mbf{B}$ denotes geometric matrix, $\mbf{D}$ stands for stiffness matrix of the material
+and $\Omega_e$ denotes one finite element. Both matrices generally depend on coordinates and therefore
+evaluation of the integral must be done numerically. The stiffness matrix is computed
+\begin{equation}
+\mbf{K} = \sum_{i=1}^{n} \mbf{B}_i^T \mbf{D}_i \mbf{B}_i w_i J_i\ ,
+\end{equation}
+where $n$ is the number of integration points, $w_i$ denotes the $i$-th weigth, $\mbf{B}_i$ denotes
+geometric matrix \index{matrix!geometric} evaluated at the $i$-th integration point,
+$\mbf{D}_i$ denotes the stiffness matrix of the material \index{matrix!stifness of material} evaluated at the
+$i$-th integration point and $J_i$ stands for Jacobian evaluated at the $i$-th integration point.
+
+Consider decomposition of the geometric matrix into several blocks. Such decomposition is enforced
+in the finite element method very often with respect to various approximation functions for particular
+unknowns etc. Decomposition can be written in form
+\begin{equation}
+\mbf{B} = \left(\begin{array}{c}
+\mbf{B}_1
+\\
+\mbf{B}_2
+\\
+\vdots
+\\
+\mbf{B}_{n_b}
+\end{array}\right)\ ,
+\end{equation}
+where $n_b$ means the number of blocks.
+Let the number of DOFs defined on finite element is $n_d$ and the number of strain components is $n_s$.
+The geometric matrix $\mbf{B}$ is from the space $R^{n_s \times n_d}$. Particluar blocks of the geometric
+matrix are defined as $\mbf{B}_i \in R^{n_{s_i} \times n_d}$, where simple equality
+$\sum_{i=1}^{n_b} n_{s_i} = n_s$ holds. With respect to the decomposition of the geometric matrix the
+stiffness matrix of the material is also decomposed
+\begin{equation}
+\mbf{D} = \left(\begin{array}{cccc}
+\mbf{D}_{11}    & \mbf{D}_{12} & \ldots & \mbf{D}_{1n_b}
+\\
+\mbf{D}_{21}    & \mbf{D}_{22} &        & \vdots
+\\
+\vdots          &              & \ddots &
+\\
+\mbf{D}_{n_b 1} & \ldots       &        & \mbf{D}_{n_b n_b}
+\end{array}\right)\ .
+\end{equation}
+From the previous text follows that block $\mbf{D}_{ij}$ is from the space $R^{n_{s_i} \times n_{s_j}}$
+The stiffness matrix of the finite element has form
+\begin{equation}\label{eqstiffmatblock}
+\mbf{K} = \int_{\Omega_e} \sum_{i=1}^{n_b} \sum_{j=1}^{n_b} \mbf{B}_i^T \mbf{D}_{ij} \mbf{B}_j {\rm d}\Omega_e\ .
+\end{equation}
+Analysis of the previous relation leads to the aim that the matrix $\mbf{K}$ is from the space $R^{n_d \times n_d}$
+because $\mbf{B}_i^T \in R^{n_d \times n_{s_i}}$, $\mbf{D}_{ij} \in R^{n_{s_i} \times n_{s_j}}$ and
+$\mbf{B}_j \in R^{n_{s_j} \times n_d}$.
+
+Integration of the sum from equation (\ref{eqstiffmatblock}) cannot be done directly in general cases and therefore
+numerical integration is used. Before application of numerical integration, let equation (\ref{eqstiffmatblock}) is
+rewrite into the form
+\begin{equation}\label{eqstiffmatblock2}
+\mbf{K} = \sum_{i=1}^{n_b} \sum_{j=1}^{n_b} \int_{\Omega_e} \mbf{B}_i^T \mbf{D}_{ij} \mbf{B}_j {\rm d}\Omega_e\ ,
+\end{equation}
+where summation and integration were exchanged. The last formulation is better for numerical integration which can be
+written as
+\begin{equation}\label{eqstiffmatblockint}
+\mbf{K} = \sum_{i=1}^{n_b} \sum_{j=1}^{n_b} \left(\sum_{l=1}^{m_{ij}}
+\mbf{B}_i^T(\mbf{\xi}_l) \mbf{D}_{ij}(\mbf{\xi}_l) \mbf{B}_j(\mbf{\xi}_l) J(\mbf{\xi}_l) w_l\right)\ ,
+\end{equation}
+where $m_{ij}$ denotes the number of integration points used for the $ij$-th contribution. $\mbf{\xi}_l$
+denotes coordinates (original or transformed) of the $l$-th integration point. From Equation (\ref{eqstiffmatblockint})
+is clear, that particular contributions $i,j$ can be integrated by different integration scheme.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{List of implemented finite elements}
+\begin{itemize}
+\item{2D bar element}
+\item{2D beam element}
+\item{plane triangular element with linear approximation functions}
+\item{plane triangular element with quadratic approximation functions}
+\item{plane triangular element with rotational degrees of freedom}
+\item{plane quadrilateral element with bi-linear approximation functions}
+\item{plane quadrilateral element with bi-quadratic approximation functions}
+\item{plane quadrilateral element with rotational degrees of freedom}
+\item{subparametric plane triangular element with quadratic approximation functions and linear shape functions}
+\item{plate element -- constant curve triangle}
+\item{triangular plate element based on discerete Kirchhoff theory}
+\item{dst element}
+\item{quadrilateral plate element based on discerete Kirchhoff theory}
+\item{shell triangular element}
+\item{tetrahedral element with linear approximation functions}
+\item{hexahedral element with tri-linear approximation functions}
+\item{hexahedral element with tri-quadratic approximation functions}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrilateral element for plane stress/strain ana\-lysis with bilinear approximation functions}
+\label{sectrectelemlinfunct}
+\index{element!quadrilateral!bi-linear}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & $u,v$
+\\ \hline
+\end{tabular}
+
+Approximation functions
+\begin{equation}
+N_1^{(1)} = \del{1}{4}(1+\xi)(1+\eta)\ ,
+\end{equation}
+\begin{equation}
+N_2^{(1)} = \del{1}{4}(1-\xi)(1+\eta)\ ,
+\end{equation}
+\begin{equation}
+N_3^{(1)} = \del{1}{4}(1-\xi)(1-\eta)\ ,
+\end{equation}
+\begin{equation}
+N_4^{(1)} = \del{1}{4}(1+\xi)(1-\eta)\ .
+\end{equation}
+For more details about approximation functions see GEFEL ??
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrilateral element for plane stress/strain ana\-lysis with biquadratic approximation functions}
+\index{element!quadrilateral!bi-quadratic}
+\label{sectrectelemquadfun}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & $u,v$
+\\ \hline
+\end{tabular}
+
+Approximation functions
+\begin{equation}
+N_1^{(2)} = \del{1}{4}(1+\xi)(1+\eta)(\xi+\eta-1)\ ,
+\end{equation}
+\begin{equation}
+N_2^{(2)} = \del{1}{4}(1-\xi)(1+\eta)(\eta-\xi-1)\ ,
+\end{equation}
+\begin{equation}
+N_3^{(2)} = \del{1}{4}(1-\xi)(1-\eta)(-\xi-\eta-1)\ ,
+\end{equation}
+\begin{equation}
+N_4^{(2)} = \del{1}{4}(1+\xi)(1-\eta)(\xi-\eta-1)\ ,
+\end{equation}
+\begin{equation}
+N_5^{(2)} = \del{1}{2}(1-\xi^2)(1+\eta)\ ,
+\end{equation}
+\begin{equation}
+N_6^{(2)} = \del{1}{2}(1-\xi)(1-\eta^2)\ ,
+\end{equation}
+\begin{equation}
+N_7^{(2)} = \del{1}{2}(1-\xi^2)(1-\eta)\ ,
+\end{equation}
+\begin{equation}
+N_8^{(2)} = \del{1}{2}(1+\xi)(1-\eta^2)\ .
+\end{equation}
+For more details about approximation functions see GEFEL ??
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrilateral element for plane stress/strain ana\-lysis with rotational degrees of freedom}
+\index{element!quadrilateral!with rot. DOFs}
+\label{sectrecelemrotdof}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 2
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy})$
+\\ \hline
+numer. integration & ($2 \times 2$ points), (1 int. point)
+\\ \hline
+nodal DOF & 2 displacements: $u$ in $x$ direction and $v$ in $y$ direction
+\\ \cline{2-2}
+ & 1 rotation around $z$ axis
+\\ \cline{2-2}
+ & $u,v,\omega_z$
+\\ \hline
+\end{tabular}
+
+Approximation functions
+\begin{equation}
+N_1^{\omega, u} = \del{l_4}{16}n_x^{(4)}(1+\xi)(1-\eta^2) - \del{l_1}{16}n_x^{(1)}(1-\xi^2)(1+\eta)\ ,
+\end{equation}
+\begin{equation}
+N_2^{\omega, u} = \del{l_1}{16}n_x^{(1)}(1-\xi^2)(1+\eta) - \del{l_2}{16}n_x^{(2)}(1-\xi)(1-\eta^2)\ ,
+\end{equation}
+\begin{equation}
+N_3^{\omega, u} = \del{l_2}{16}n_x^{(2)}(1-\xi)(1-\eta^2) - \del{l_3}{16}n_x^{(3)}(1-\xi^2)(1-\eta)\ ,
+\end{equation}
+\begin{equation}
+N_4^{\omega, u} = \del{l_3}{16}n_x^{(3)}(1-\xi^2)(1-\eta) - \del{l_4}{16}n_x^{(4)}(1+\xi)(1-\eta^2)\ ,
+\end{equation}
+\begin{equation}
+N_1^{\omega, v} = \del{l_4}{16}n_y^{(4)}(1+\xi)(1-\eta^2) - \del{l_1}{16}n_y^{(1)}(1-\xi^2)(1+\eta)\ ,
+\end{equation}
+\begin{equation}
+N_2^{\omega, v} = \del{l_1}{16}n_y^{(1)}(1-\xi^2)(1+\eta) - \del{l_2}{16}n_y^{(2)}(1-\xi)(1-\eta^2)\ ,
+\end{equation}
+\begin{equation}
+N_3^{\omega, v} = \del{l_2}{16}n_y^{(2)}(1-\xi)(1-\eta^2) - \del{l_3}{16}n_y^{(3)}(1-\xi^2)(1-\eta)\ ,
+\end{equation}
+\begin{equation}
+N_4^{\omega, v} = \del{l_3}{16}n_y^{(3)}(1-\xi^2)(1-\eta) - \del{l_4}{16}n_y^{(4)}(1+\xi)(1-\eta^2)\ ,
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Triangular element for plate problem ba\-sed on Mindlin theory --- CCT}
+%\markright{CCT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{element!triangular!plate - CCT}
+\label{sectcctelem}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 2
+\\ \hline
+block components & $(\kappa_{xx},\kappa_{yy},\kappa_{xy}), (\gamma_{xz},\gamma_{yz})$
+\\ \hline
+numer. integration & (3 int. points), (1 int. point)
+\\ \hline
+nodal DOF & 1 deflection and 2 rotations around $x$ and $y$ axes
+\\ \cline{2-2}
+ & $w, \phi_x, \phi_y$
+\\ \hline
+\end{tabular}
+
+Approximation functions are
+\begin{equation}
+N_1^{(w)} = L_1\ ,
+\end{equation}
+\begin{equation}
+N_2^{(w)} = L_2\ ,
+\end{equation}
+\begin{equation}
+N_3^{(w)} = L_3\ ,
+\end{equation}
+
+\begin{equation}
+N_1^{(\phi)} = L_1 L_2 \del{l_{12}}{2}s_y^{12} - L_3 L_1 \del{l_{31}}{2}s_y^{31}\ ,
+\end{equation}
+\begin{equation}
+N_2^{(\phi)} = L_2 L_3 \del{l_{23}}{2}s_y^{23} - L_1 L_2 \del{l_{12}}{2}s_y^{12}\ ,
+\end{equation}
+\begin{equation}
+N_3^{(\phi)} = L_3 L_1 \del{l_{31}}{2}s_y^{31} - L_2 L_3 \del{l_{23}}{2}s_y^{23}\ ,
+\end{equation}
+
+\begin{equation}
+N_1^{(\chi)} = L_3 L_1 \del{l_{31}}{2}s_x^{31} - L_1 L_2 \del{l_{12}}{2}s_x^{12}\ ,
+\end{equation}
+\begin{equation}
+N_2^{(\chi)} = L_1 L_2 \del{l_{12}}{2}s_x^{12} - L_2 L_3 \del{l_{23}}{2}s_x^{23}\ ,
+\end{equation}
+\begin{equation}
+N_3^{(\chi)} = L_2 L_3 \del{l_{23}}{2}s_x^{23} - L_3 L_1 \del{l_{31}}{2}s_x^{31}\ .
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Triangular plate element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{element!triangular!DKT}
+\label{sectdktplate}
+
+Batoz, Bathe, Ho - Int. Journ. for Num. Meth. in Eng vol. 15 1980
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 1
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+
+Triangular plate DKT element of type {\tt dktelem} with rotational of the normal to the 
+undeformed surface. This rotational vary quadratically over element where ... are the nodal
+values and at the mid-nodes. W varies cubically along the sides. Kirchhoff theory is
+imposed at discrete the mid-nodes.
+
+\begin{equation}
+\phi_s + \od{w}{\mbf{s}} = 0
+\end{equation}
+where $\mbf{s}$ is vector of side.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{DST element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{sectdstelem}
+\index{element!triangular!DST} Batoz, Katili - Int. Journ. for Num. Meth. in Eng vol. 35 1992
+
+\begin{tabular}{|l|l|}
+\hline
+class name & dstelem
+\\ \hline
+object name & Dst
+\\ \hline
+location & MEFEL/SRC/dst.cpp,
+\\
+ & MEFEL/SRC/dst.h
+\\ \hline
+number of blocks & 3
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy}),(\gamma_{xz}),(\gamma_{yz})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+
+Triangular plate DST element of type {\tt dstelem} with the displacement field and strain-displacement relations 
+are obtained with the Mindlin hypothesis. Nodal DOF are rotational of the normal to the  undeformed surface and displacement w. 
+This element is based on the bending stiffness matrix and the shear stiffness matrix with independent strains gamma 
+constant per element. Gamma is expressed in terms of fi using the moment equilibrium equations and the constitutive relations.
+
+\begin{equation}
+\ppd{m_x}{x} + \ppd{m_{xy}}{y} - T_x = 0
+\end{equation}
+\begin{equation}
+\ppd{m_{xy}}{x} + \ppd{m_y}{y} + T_y = 0
+\end{equation}
+where $m_x, m_y m_{xy} T_x T_y$ are bending moments and shear forces.
+
+Rotational vary quadratically over element where 
+\begin{eqnarray}
+\phi_x &=& \sum_{i=1}^{3} N_i\phi_{xi}+\sum_{k=4}^{6} P_k\sin{k}\alpha_{k}\\
+\phi_y &=& \sum_{i=1}^{3} N_i\phi_{yi}+\sum_{k=4}^{6} P_k\cos{k}\alpha_{k}
+\end{eqnarray}
+where $N_1=r, N_2=1-r-s, N_3=s, P_4=4r(1-r-s)s, P_5=(1-r-s)r, P_6=4rs$
+and $k=4,5,6 $ are sides (mid-nodes) between nodes $i=1,2,3$.
+
+
+$w$ through element is not obtained from formulation. Only nodal displacement is imposed at discrete the mid-nodes from 
+constant constrains.
+Indetermined parameters $\alpha_{k}$ are obtained from the following constraints at each mid-point:
+\begin{equation}
+\gamma_s = \od{w}{\mbf{s}} + \phi_{s}
+\end{equation}
+where $\mbf{s}$ is vector of side.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrilateral plate element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{element!quadrilateral!Q4}  Roufael - Computers \& structural vol. 54/5 1995
+\label{sectq4elem}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 2
+\\ \hline
+block components & $(\kappa_x,\kappa_y,\kappa_{xy}),(\gamma_{xz},\gamma_{yz})$
+\\ \hline
+nodal DOF & $w,\phi_x,\phi_y$
+\\ \hline
+\end{tabular}
+
+Quadrilateral plate Q4 element of type {\tt q4plate} with the displacement field and strain-displacement relations 
+are obtained with the Mindlin hypothesis. This element is based on the bending stiffness matrix and the shear stiffness
+matrix with independent strains gamma. 
+Nodal DOF are rotational of the normal to the undeformed surface and displacement w and Four independent unknown parameters. 
+The shape function are three'th-order for $\phi_x$, $\phi_y$, and four'th-order for w. 
+\begin{eqnarray}
+1 + x + y + xy + x^2 + y^2 + x^2y + xy^2 + x^3 + y^3 + x^3y + xy^3 + 0 + 0 + 0 + 0 &=& w\\
+0 + 0 + 0 + 0  + 2x + 0  + 2xy + y^2  + 3x^2 + 0   + 3x^2y + y^3 +  1 + y + 0 + 0 &=& \phi_x\\
+0 + 0 + 0 + 0  + 0  + 2y + x^2  + 2xy + 0   + 3y^2 + x^3  + 3xy^2 + 0 + 0 + 1 + x &=& \phi_y
+\end{eqnarray}
+Four independent unknown parameters is expressed in terms of using constant strains $\gamma$ per side of The element.
+
+\begin{equation}
+\gamma_s = \od{w}{\mbf{s}} + \phi_{s}
+\end{equation}
+where $\mbf{s}$ is vector of side.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Argyris's triangular plate element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{eqnarray}
+1
+\\
+x,y
+\\
+x^2,xy,y^2
+\\
+x^3,x^2y,xy^2,y^3
+\\
+x^4,x^3y,x^2y^2,xy^3,y^4
+\\
+x^5,x^4y,x^3y^2,x^2y^3,xy^4,y^5
+\end{eqnarray}
+
+\begin{eqnarray}
+N_i(x,y) &=& 1 c_{i,1} + x c_{i,2} + y c_{i,3} + x^2 c_{i,4} + xy c_{i,5} + y^2 c_{i,6} +
+\\
+&+& x^3 c_{i,7} + x^2y c_{i,8} + xy^2 c_{i,9} + y^3 c_{i,10} +
+\\
+&+& x^4 c_{i,11} + x^3y c_{i,12} + x^2y^2 c_{i,13} + xy^3 c_{i,14} + y^4 c_{i,15} +
+\\
+&+& x^5 c_{i,16} + x^4y c_{i,17} + x^3y^2 c_{i,18} + x^2y^3 c_{i,19} + xy^4 c_{i,20} + y^5 c_{i,21}
+\end{eqnarray}
+
+Auxiliary matrix
+\begin{eqnarray}
+\mbf{E} = (1,x,y,x^2,xy,y^2,x^3,x^2y,xy^2,y^3,x^4,x^3y,x^2y^2,xy^3,y^4,x^5,x^4y,x^3y^2,x^2y^3,xy^4,y^5)
+\end{eqnarray}
+is $\mbf{E} \in R^{1 \times 21}$.
+Matice b\'{a}zov\'{y}ch funkc\'{\i}
+\begin{eqnarray}
+\mbf{N}(x,y) = \mbf{E} \mbf{C}
+\end{eqnarray}
+je typu $\mbf{N} \in R^{1 \times 21}$ a $\mbf{C}$ je matice koeficient\accent23 u
+$\mbf{C} \in R^{21 \times 21}$.
+Pruhybov\'{a} plocha je d\'{a}na funkc\'{\i}
+\begin{eqnarray}
+w(x,y) = \mbf{N}(x,y) \mbf{d} = \mbf{E} \mbf{C} \mbf{d}
+\end{eqnarray}
+kde $\mbf{d} \in R^{21}$.
+
+\begin{eqnarray}
+\mbf{E} = (1, x, y, x^2, xy, y^2, x^3, x^2y, xy^2, y^3, x^4, x^3y, x^2y^2, xy^3, y^4, x^5, x^4y, x^3y^2, x^2y^3, xy^4, y^5)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{E}_x = (0, 1, 0, 2x, y, 0, 3x^2, 2xy, y^2, 0, 4x^3, 3x^2y, 2xy^2, y^3, 0, 5x^4, 4x^3y, 3x^2y^2, 2xy^3, y^4, 0)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{E}_{xx} = (0, 0, 0, 2, 0, 0, 6x, 2y, 0, 0, 12x^2, 6xy, 2y^2, 0, 0, 20x^3, 12x^2y, 6xy^2, 2y^3, 0, 0)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{E}_y = (0, 0, 1, 0, x, 2y, 0, x^2, 2xy, 3y^2, 0, x^3, 2x^2y, 3xy^2, 4y^3, 0, x^4, 2x^3y, 3x^2y^2, 4xy^3, 5y^4)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{E}_{yy} = (0, 0, 0, 0, 0, 2, 0, 0, 2x, 6y, 0, 0, 2x^2, 6xy, 12y^2, 0, 0, 2x^3, 6x^2y, 12xy^2, 20y^3)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{E}_{xy} = (0, 0, 0, 0, 1, 0, 0, 2x, 2y, 0, 0, 3x^2, 4xy, 3y^2, 0, 0, 4x^3, 6x^2y, 6xy^2, 4y^3, 0)
+\end{eqnarray}
+
+\begin{eqnarray}
+\mbf{E}(x_1,y_1) \mbf{c}_1 &=& 1\ ,
+\\
+\mbf{E}_x(x_1,y_1) \mbf{c}_1 &=& 0\ ,
+\\
+\mbf{E}_y(x_1,y_1) \mbf{c}_1 &=& 0\ ,
+\\
+\mbf{E}_{xx}(x_1,y_1) \mbf{c}_1 &=& 0\ ,
+\\
+\mbf{E}_{xy}(x_1,y_1) \mbf{c}_1 &=& 0\ ,
+\\
+\mbf{E}_{yy}(x_1,y_1) \mbf{c}_1 &=& 0\ ,
+\\
+\end{eqnarray}
+
+\begin{eqnarray}
+\mbf{S} \mbf{C} = \mbf{I}
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Triangular shell element}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\index{element!triangular!shell}
+\label{secttrshellelem}
+
+\begin{tabular}{|l|l|}
+\hline
+number of blocks & 3
+\\ \hline
+block components & $(\varepsilon_{xx},\varepsilon_{yy}), (\gamma_{xy}), (\kappa_x,\kappa_y,\kappa_{xy})$
+\\ \hline
+nodal DOF & $u,v,w,\phi_x,\phi_y,\phi_z$
+\\ \hline
+\end{tabular}
+
+Triangular shell element of type {\tt shelltr} is composition of two finite
+elements. The first element is triangular plane stress element with rotational
+degrees of freedom (plelemrotlt). The second element is triangular plate element
+based on discrete Kirchhoff theory (dktelem).
+Composition of previously mentioned finite elements is possible only in local
+coordinate system connected with shell element which will be denoted as E-system.
+Plane and plate elements are defined in $xy$ plane and $z$ coordinate is constantly equal to zero.
+There are also another local coordinate systems connected with nodes which will be
+denoted as N-systems. They are used for modelling of complicated boundary conditions.
+
+Generally, the transformation from local to global coordinate system is described
+\begin{equation}\label{shelltransf}
+\mbf{r}_g = \mbf{T} \mbf{r}_l
+\end{equation}
+where $\mbf{r}_g$ is vector in global system, $\mbf{r}_l$ is vector in local system and
+$\mbf{T}$ is transformation matrix. Inverse relation to (\ref{shelltransf}) has form
+\begin{equation}\label{shelltransfinv}
+\mbf{r}_l = \mbf{T}^T \mbf{r}_g
+\end{equation}
+
+Matrix describing transformation from E-system to global one is denoted as $\mbf{T}_E$
+and matrix between N-system in $i$th node and global system is denoted as $\mbf{T}_{N_i}$.
+Similarly, variables connected with E-system have subscript $E$, variables connected with
+N-system in $i$th node have subscript $N_i$.
+
+Equilibrium conditions in E-system are written in form
+\begin{equation}
+\mbf{K}_E \mbf{r}_E = \mbf{f}_E
+\end{equation}
+\begin{equation}
+\mbf{K}_E \mbf{T}^T_E \mbf{r}_g = \mbf{T}_E^T \mbf{f}_g
+\ \ \ \Rightarrow \ \ \
+\mbf{T}_E \mbf{K}_E \mbf{T}^T_E \mbf{r}_g = \mbf{f}_g
+\end{equation}
+Equilibrium conditions in global system are written
+\begin{equation}
+\mbf{K}_g \mbf{r}_g = \mbf{f}_g
+\end{equation}
+where $\mbf{K}_g=\mbf{T}_E \mbf{K}_E \mbf{T}^T_E$ is stiffness matrix in global system.
+
+Nodal local coordinate systems are used for example for description of complicated boundary conditions.
+Equilibrium conditions are then written in nodal coordinate systems
+\begin{equation}
+\mbf{K}_g \mbf{T}_{N} \mbf{r}_N = \mbf{T}_{N} \mbf{f}_N
+\end{equation}
+where transformation matrix $\mbf{T}_{N}$ has form
+\begin{equation}
+\mbf{T}_{N} = \left(\begin{array}{ccc}
+\mbf{T}_{N_1} & \mbf{0} & \mbf{0}
+\\
+\mbf{0} & \mbf{T}_{N_2} & \mbf{0}
+\\
+\mbf{0} & \mbf{0} & \mbf{T}_{N_3}
+\end{array}\right)
+\end{equation}
+Some of matrices $\mbf{T}_{N_i}$ may be equal to identity matrix when
+the global coordinate system is used in particular node.
+Finally, conditions in nodal systems are
+\begin{equation}
+\mbf{T}_{N}^T \mbf{K}_g \mbf{T}_{N} \mbf{r}_N = \mbf{f}_N
+\end{equation}
+
+
+Resulting equilibrium conditions are written in form
+\begin{equation}
+\mbf{T}_{N}^T \mbf{T}_E \mbf{K}_E \mbf{T}^T_E \mbf{T}_{N} \mbf{r}_N = \mbf{f}_N
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrilateral element with bi-linear approximation functions for axisymmetric problems}
+\label{secthexlinelem}
+\index{element!quadrilateral!tri-linear axisymmetric}
+
+\subsection{Edge load and resulting nodal forces}
+Increased attention should be devoted to preprocessing in case of computation of nodal
+forces caused by distributed load. Constant load parallel to axis of symmetry leads to
+linearly changing load along radius direction. Therefore, nodal forces are computed as
+integral of linear function multiplied by basis functions over appropriate edge.
+
+\begin{eqnarray}
+F_i &=& \del{1}{3} f_i l + \del{1}{6} f_j l
+\\
+F_j &=& \del{1}{6} f_j l + \del{1}{3} f_j l
+\end{eqnarray}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hexahedral element with tri-linear approximation functions}
+\label{secthexlinelem}
+\index{element!hexahedral!tri-linear}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hexahedral element with tri-quadratic approximation functions}
+\label{secthexquadelem}
+\index{element!hexahedral!tri-quadratic}
+
+\begin{eqnarray}
+\label{bf3kn1}
+N_{1}^{(2)} &=& \del{1}{8} (1 + \xi) (1 + \eta) (1 + \zeta)
+(\xi + \eta + \zeta - 2)
+\\ \label{bf3kn2}
+N_{2}^{(2)} &=& \del{1}{8} (1 - \xi) (1 + \eta) (1 + \zeta)
+(- \xi + \eta + \zeta - 2)
+\\ \label{bf3kn3}
+N_{3}^{(2)} &=& \del{1}{8} (1 - \xi) (1 - \eta) (1 + \zeta)
+(- \xi - \eta + \zeta - 2)
+\\ \label{bf3kn4}
+N_{4}^{(2)} &=& \del{1}{8} (1 + \xi) (1 - \eta) (1 + \zeta)
+(\xi - \eta + \zeta - 2)
+\\ \label{bf3kn5}
+N_{5}^{(2)} &=& \del{1}{8} (1 + \xi) (1 + \eta) (1 - \zeta)
+(\xi + \eta - \zeta - 2)
+\\ \label{bf3kn6}
+N_{6}^{(2)} &=& \del{1}{8} (1 - \xi) (1 + \eta) (1 - \zeta)
+(- \xi + \eta - \zeta - 2)
+\\ \label{bf3kn7}
+N_{7}^{(2)} &=& \del{1}{8} (1 - \xi) (1 - \eta) (1 - \zeta)
+(- \xi - \eta - \zeta - 2)
+\\ \label{bf3kn8}
+N_{8}^{(2)} &=& \del{1}{8} (1 + \xi) (1 - \eta) (1 - \zeta)
+(\xi - \eta - \zeta - 2)
+\\ \label{bf3kn9}
+N_{9}^{(2)} &=& \del{1}{4} (1 - \xi^2) (1 + \eta) (1 + \zeta)
+\\ \label{bf3kn10}
+N_{10}^{(2)} &=& \del{1}{4} (1 - \xi) (1 - \eta^2) (1 + \zeta)
+\\ \label{bf3kn11}
+N_{11}^{(2)} &=& \del{1}{4} (1 - \xi^2) (1 - \eta) (1 + \zeta)
+\\ \label{bf3kn12}
+N_{12}^{(2)} &=& \del{1}{4} (1 + \xi) (1 - \eta^2) (1 + \zeta)
+\\ \label{bf3kn13}
+N_{13}^{(2)} &=& \del{1}{4} (1 + \xi) (1 + \eta) (1 - \zeta^2)
+\\ \label{bf3kn14}
+N_{14}^{(2)} &=& \del{1}{4} (1 - \xi) (1 + \eta) (1 - \zeta^2)
+\\ \label{bf3kn15}
+N_{15}^{(2)} &=& \del{1}{4} (1 - \xi) (1 - \eta) (1 - \zeta^2)
+\\ \label{bf3kn16}
+N_{16}^{(2)} &=& \del{1}{4} (1 + \xi) (1 - \eta) (1 - \zeta^2)
+\\ \label{bf3kn17}
+N_{17}^{(2)} &=& \del{1}{4} (1 - \xi^2) (1 + \eta) (1 - \zeta)
+\\ \label{bf3kn18}
+N_{18}^{(2)} &=& \del{1}{4} (1 - \xi) (1 - \eta^2) (1 - \zeta)
+\\ \label{bf3kn19}
+N_{19}^{(2)} &=& \del{1}{4} (1 - \xi^2) (1 - \eta) (1 - \zeta)
+\\ \label{bf3kn20}
+N_{20}^{(2)} &=& \del{1}{4} (1 + \xi) (1 - \eta^2) (1 - \zeta)
+\end{eqnarray}

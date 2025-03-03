@@ -1,0 +1,154 @@
+\chapter{Mesh components - nodes, edges, surfaces, elements}
+
+The finite element method is based on a mesh of finite elements
+which are defined with the help of mesh nodes. The finite element
+mesh can be viewed as a hierarchy of nodes which are connected
+by edges. The edges define surfaces and the surfaces define elements.
+Knowledge of interactions among the nodes, edges, surfaces and elements
+is essential and it is described in this chapter. Nodes are represented
+by the class gnode (see \ref{gtopologygnode}) and elements are represented by
+class gelement (see \ref{gtopologygelement}).
+
+
+\section{Mesh formats}
+\subsection{JKTK format}
+
+\begin{itemize}
+\item
+number of nodes (denoted by nn)
+\item
+nn rows follows, each row has the form:
+x coordinate, y coordinate, z coordinate, node property
+\item
+number of elements (denoted by ne), type of elements (see siftop\_elem\_type.h)
+\item
+ne rows follows, each row has the form:
+number of nodes on one element (denoted by nne), nne nodes, element property
+\end{itemize}
+
+\begin{tabular}{llll}
+16      &         &         &
+\\
+0.0e+00 & 0.0e+00 & 0.0e+00 & 0 
+\\
+0.0e+00 & 2.0e+00 & 0.0e+00 & 0 
+\\
+0.0e+00 & 4.0e+00 & 0.0e+00 & 0 
+\\
+0.0e+00 & 6.0e+00 & 0.0e+00 & 0 
+\\
+2.0e+00 & 0.0e+00 & 0.0e+00 & 3 
+\\
+2.0e+00 & 2.0e+00 & 0.0e+00 & 4 
+\\
+2.0e+00 & 4.0e+00 & 0.0e+00 & 4 
+\\
+2.0e+00 & 6.0e+00 & 0.0e+00 & 1 
+\\
+4.0e+00 & 0.0e+00 & 0.0e+00 & 3 
+\\
+4.0e+00 & 2.0e+00 & 0.0e+00 & 4 
+\\
+4.0e+00 & 4.0e+00 & 0.0e+00 & 4 
+\\
+4.0e+00 & 6.0e+00 & 0.0e+00 & 1 
+\\
+6.0e+00 & 0.0e+00 & 0.0e+00 & 2 
+\\
+6.0e+00 & 2.0e+00 & 0.0e+00 & 2 
+\\
+6.0e+00 & 4.0e+00 & 0.0e+00 & 2 
+\\
+6.0e+00 & 6.0e+00 & 0.0e+00 & 2 
+\\
+\end{tabular}
+
+\begin{tabular}{rrrrrr}
+9 &  5 &    &    &    &
+\\
+4 &  6 &  2 &  1 &  5 & 0
+\\
+4 &  7 &  3 &  2 &  6 & 0
+\\
+4 &  8 &  4 &  3 &  7 & 0
+\\
+4 & 10 &  6 &  5 &  9 & 0
+\\
+4 & 11 &  7 &  6 & 10 & 0
+\\
+4 & 12 &  8 &  7 & 11 & 0
+\\
+4 & 14 & 10 &  9 & 13 & 0
+\\
+4 & 15 & 11 & 10 & 14 & 0
+\\
+4 & 16 & 12 & 11 & 15 & 0
+\\
+\end{tabular}
+
+\section{Nodes-elements}
+
+Relationship between nodes and elements is the most important and the most
+used relationship from the studied topic. Elements contain array of
+nodes which define them. The oposite relationship is not explicitly
+defined in the code but it can be built. The most important procedures
+dealing with node-element relationships are:
+
+\begin{itemize}
+\item
+void gelement::give\_nodes (ivector \&nod) - function returns nodes
+of the element stored in the vector nod
+\item
+void gtopology::give\_nodes (long eid,ivector \&nod) - function returns
+nodes of the eid-th element, the nodes are stored in nod
+\end{itemize}
+
+
+\section{Edges-elements}
+
+File ordering.cpp in GEFEL contains functions which assemble array edgenod for
+the edg-th edge of the element. edgenod[i]=j means, the i-th node of the edge
+has the number j, where j is from interval 0-nne (nne is the number of nodes
+on one element).
+
+\begin{itemize}
+\item
+void lintriangle\_edgnod (long *edgenod,long edg) - function works for triangular element
+with linear approximation functions
+\item
+void linquadrilat\_edgnod (long *edgenod,long edg) - function works for quadrilateral
+element with bi-linear approximation functions
+\item
+void quadquadrilat\_edgnod (long *edgenod,long edg) - function works for quadrilateral
+element with bi-quadratic approximation functions
+\end{itemize}
+
+The class gtopology contains function
+void gtopology::give\_edge\_nodes (long eid,long edid,long *nodes)
+which assembles array nodes for the eid-th element and the edid-th edge.
+Array nodes contains node numbers.
+
+
+
+
+\section{Surfaces-elements}
+
+File ordering.cpp in GEFEL contains functions which assemble array surfnod for
+the surf-th surface of the element. surfnod[i]=j means, the i-th node of the surface
+has the number j, where j is from interval 0-nne (nne is the number of nodes
+on one element).
+
+\begin{itemize}
+\item
+void linhexahedral\_surfnod (long *surfnod,long surf) - function works for hexahedral element
+with tri-linear approximation functions
+\item
+void quadhexahedral\_surfnod (long *surfnod,long surf) - function works for hexahedral
+element with tri-quadratic approximation functions
+\end{itemize}
+
+The class gtopology contains function
+void gtopology::give\_surf\_nodes (long eid,long surfid,long *nodes)
+which assembles array nodes for the eid-th element and the surfid-th surface.
+Array nodes contains node numbers.
+

@@ -1,0 +1,28 @@
+\subsubsection{Pedersen model}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+location & /TRFEL/SRC/bazped.cpp\\
+         & /TRFEL/SRC/bazped.h\\
+         & /TRFEL/SRC/pedersen.cpp\\
+         & /TRFEL/SRC/pedersen.h
+\\ \hline
+related files &
+\\ \hline
+notes & 
+\\ \hline
+\end{tabular}
+\end{center}
+
+For the {\it liquid transport} the following expressions are proposed in \cite{pedersen} to describe, 
+in case of uniaxial flow, the dependence of the so called hydraulic conductivity, $K^w/g$ (s), 
+on the moisture content $w$:
+\begin{equation}\label{20}
+\begin{array}{rl} 
+w < w_{cr}, & K^w/g \doteq 0,\\
+w_{cr} \leq w \leq w_{cap}, & K^w/g = A_k {\rm exp} \big(B_kw \big),\\
+w_{cap} < w, & K^w/g = A_k {\rm exp} \big(B_kw_{cap} \big),
+\end{array}
+\end{equation}
+where $A_k,B_k$ are coefficients yet to be determined from experiments.

@@ -1,0 +1,1749 @@
+\chapter{GEFEL data types}
+
+Description of GEFEL enumerate data types is summarized in this section. 
+
+\section{Type {\sf storagetype}}
+\index{type!{\sf storagetype}}
+\label{sectstoragetype}
+Type {\sf storagetype} serves to definition of type of storage of matrices.
+Admissible values of a variable of the {\sf storagetype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt dense\_matrix} & 1 & classical dense matrix storage where all components
+\\
+ & & are stored, suitable only for small problems or debugging,
+\\
+ & & all type of solvers are applicable
+\\ \hline
+{\tt skyline\_matrix} & 2 & only for symmetric matrices, $\mbf{LDL}^T$ factorization
+\\
+ & & is usually used, factorization with pivotting is not possible
+\\
+ & & for this storage, for additional informations about this
+\\
+ & & storage see Section \ref{sectskylinestor}
+\\ \hline
+{\tt double\_skyline} & 3 & suitable for nonsymmetric matrices with symmetric
+\\
+ & & envelope, $\mbf{LU}$ factorization or GMRES iterative method
+\\
+ & & must be used, for additional informations about this
+\\
+ & & storage see Section \ref{sectdoubleskylinestor},
+\\ \hline
+{\tt compressed\_rows} & 10 & suitable for nonsymmetric matrices, very efficient for
+\\
+ & & really sparse matrices, only iterative methods are applicable,
+\\
+ & & no direct method is applicable because of the fill-in,
+\\
+ & & for additional information about this storage see Section \ref{sectcrstor},
+\\ \hline
+{\tt symm\_comp\_rows} & 11 & symmetric compressed rows, similar to the previous
+\\
+ & & case but only for symmetric matrices, for additional
+\\
+ & & informations about this storage see Section \ref{sectscrstor},
+\\ \hline
+{\tt spdirect\_stor} & 140 & storage for sparse direct solver, only for symmetric matrices
+\\ \hline
+\end{tabular}
+\end{center}
+
+\clearpage
+\section{Type {\sf linsolvertype}}
+\index{type!{\sf linsolvertype}}
+\label{sectlinsolvertype}
+Type {\sf linsolvertype} serves to definition of type of solver of linear algebraic systems of equations.
+Admissible values of a variable of the {\sf linsolvertype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt gauss\_elim} & 1 & Gaussian elimination method with pivotting, pivotting is used
+\\
+ & & if there is a zero on the diagonal, pivotting can be used in every
+\\
+ & & step of elimination, this solver can be used only in connection
+\\
+ & & with dense matrix storage
+\\ \hline
+{\tt ldl} & 2 & $\mbf{LDL}^T$ factorization, applicable only for symmetric problems,
+\\
+ & & matrix must be stored as skyline
+\\ \hline
+{\tt lu} & 3 & $\mbf{LU}$ factorization, applicable for all problems, matrix must be
+\\
+ & & stored as dense or in double skyline
+\\ \hline
+{\tt cg} & 20 & conjugate gradient method, applicable only for symmetric positive
+\\
+ & & definite problems
+\\ \hline
+{\tt bicg} & 30 & bi-conjugate gradient method, applicable for all matrices
+\\ \hline
+{\tt spdirect} & 140 & sparse direct solver, applicable only for symmetric positive
+\\
+ & & definite problems, special storage of the matrix must be used
+\\ \hline
+\end{tabular}
+\end{center}
+
+\section{Type {\sf precondtype}}
+\index{type!{\sf precondtype}}
+\label{sectprecontype}
+Type {\sf precondtype} serves to definition of preconditioner of iterative method.
+Admissible values of a variable of the {\sf precondtype} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt noprecond} & 0 & no preconditioner is used
+\\ \hline
+{\tt diagprec} & 1 & diagonal preconditioner is applied (also called Jacobi
+\\
+ & & preconditioner or diagonal scaling)
+\\ \hline
+{\tt ssorprec} & 5 & preconditioner based on the method SSOR (Symmetric
+\\
+ & & Successive OverRelaxation)
+\\ \hline
+{\tt incomdec} & 10 & preconditioner based on incomplete factorization
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+
+
+
+
+\section{Type {\sf meshdescription}}
+\index{type!{\sf meshdescription}}
+\label{sectmeshdescription}
+Type {\sf meshdescription} describes mesh used in domain decomposition methods
+Admissible values of a variable of the {\sf meshdescription} are defined by a list of symbolic constant names (aliases)
+and their numerical representation:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+{\tt all\_nodes} & 1 & global ordering is used
+\\ \hline
+{\tt bound\_nodes} & 2 & coarse ordering is used
+\\ \hline
+{\tt neg\_bound\_nodes} & 3 & negative global ordering is used
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Class {\sf gtopology}}
+\index{class!{\sf gtopology}}
+
+Name {\sf gtopology} is an abbreviation of General TOPOLOGY. Class {\sf gtopology} contains
+all necessary data about topology which are independent on type of solved
+problem. In other words, it contains common data to all problems solvable
+by the SIFEL system.
+
+Class  contains basic attributes (Sect. \ref{gtopologybatt}),
+array of instances of the class {\sf gnode} (Sect. \ref{gtopologygnode})
+and array of instances of the class {\sf gelement} (Sect. \ref{gtopologygelement}).
+
+\section{Basic attributes}
+\label{gtopologybatt}
+The class {\sf gtopology} contains following important attributes:
+\begin{itemize}
+\item{nn - number of nodes,}
+\item{ne - number of finite elements,}
+\item{nln - number of layered nodes; this is important for layered problems where
+structured nodes along the thickness are used.}
+\end{itemize}
+Meanings of mentioned attributes are clear.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\sf gnode}}
+\index{class!{\sf gnode}}
+\label{gtopologygnode}
+Name {\sf gnode} is an abbreviation of General NODE. The class {\sf gnode} contains important
+informations about nodes. All informations are read from the input file.
+\subsection{Basic attributes}
+\begin{itemize}
+\item{{\sf ndofn} - number of degrees of freedom of node, (number of unknowns defined on node),}
+\item{{\sf cn} - array of code numbers,}
+\item{{\sf x,y,z} - coordinates of node (all three coordinates are used in all problems without regard to
+problem type).}
+\item{{\sf ai} - auxiliary indicator,}
+\item{{\sf av} - auxiliary variable,}
+\end{itemize}
+If there are {\sf nn} nodes in the solved problem, {\sf nn} instances (objects) of the class {\sf gnode} are created.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\sf gelement}}
+\index{class!{\sf gelement}}
+\label{gtopologygelement}
+Name {\sf gelement} is an abbreviation of General ELEMENT. The class {\sf gelement} contains important
+informations about elements. Informations are read from the input file or they are instantiated
+implicitly.
+\subsection{Basic attributes}
+\begin{itemize}
+\item{{\sf nne} - number of nodes on one element,}
+\item{{\sf ndofe} - number of degrees of freedom of element (number of unknowns defined on element),}
+\item{{\sf nmult} - number of Lagrange multipliers on element (important only in layered problems, otherwise
+nmult is prescribed to 0),}
+\item{{\sf nodes} - array of node numbers,}
+\item{{\sf cne} - indicator of code numbers on element (degrees of freedom are implicitly defined on nodes,
+then cne=0, but DOFs can be defined also on elements, then cne=1),}
+\item{{\sf cn} - array of code numbers (if DOFs are defined on elements instead of nodes, this array contains
+code numbers of DOFs),}
+\item{{\sf auxinf} - auxiliary variable}
+\item{{\sf get} - type of element (triangle, quadrilateral, etc.}
+\end{itemize}
+If there are {\sf ne} elements in the solved problem, {\sf ne} instances (objects) of the class {\sf gelement} are created.
+
+\begin{center}
+\begin{tabular}{lll}
+0 & noelem & not defined
+\\
+1 & linbar & one-dimensional element with 2 nodes
+\\
+2 & quadbar & one-dimensional element with 3 nodes
+\\
+21 & lintriag & triangular element with 3 nodes
+\\
+22 & quadtriag & triangular element with 6 nodes
+\\
+25 & linquad & quadrilateral element with 4 nodes
+\\
+26 & quadquad & quadrilateral element with 8 nodes
+\\
+41 & lintetra & tetrahedral element with 4 nodes
+\\
+42 & quadtetra & tetrahedral element with 10 nodes
+\\
+45 & linhexa & hexahedral elements with 8 nodes
+\\
+46 & quadhexa & hexahedral element with 20 nodes
+\\
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\sf lgnode}}
+\index{class!{\sf lgnode}}
+\label{gtopologylgnode}
+Name {\sf lgnode} is an abbreviation of Layered General NODE. The class {\sf lgnode} is used only in layered problems.
+It is assumed that one reference finite element mesh is used for all layers. If the number of layers is not constant
+on all finite elements, mesh belonging to appropriate layer is obtained from the reference mesh by removing
+elements. The reference mesh is copied to each layer and therefore nodes of the mesh are copied several times.
+{\sf lgnode} represents all nodes located on the line crossing the thickness.
+\subsection{Basic attributes}
+\begin{itemize}
+\item{{\sf nl} - number of layers,}
+\item{{\sf nmult} - number of Lagrange multipliers,}
+\item{{\sf ndofn} - number of degrees of freedom of one node,}
+\item{{\sf nodes} - array of node numbers,}
+\item{{\sf cn} - array of code numbers.}
+\end{itemize}
+If there are {\sf nln} layered nodes in the solved problem, {\sf nln} instances (objects) of the class {\sf lgnode} are created.
+The number of nodes {\sf nn} is greater than number of layered nodes {\sf nln} (they are equal only for one-level problem
+where no objects of the class {\sf lgnode} are created) and besides {\sf nln} objects of the class {\sf lgnode} {\sf nn} objects of
+the class {\sf gnode} are created.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Class {\sf gmatrix}}
+\index{class!{\sf gmatrix}}
+
+Name {\sf gmatrix} is an abbreviation of General MATRIX. This class assures interface between
+any part of the SIFEL code and numerical methods collected in the GEFEL.
+
+With respect to the attribute {\sf ts} which is a {\sf storagetype} appropriate
+type of matrix storage is created. Classes dealing with storage are mentioned in Sections
+\ref{sectclassdensemat}-\ref{sectclasssymcomprow}.
+
+\section{Basic attributes}
+\begin{itemize}
+\item{{\sf ts} - type of storage, see GEFEL type in Section \ref{sectstoragetype},}
+\item{{\sf tlinsol} - type of solver of system of linear algebraic equations, see GEFEL type in Section \ref{sectlinsolvertype},}
+\item{{\sf tprec} - type of preconditioner, see GEFEL type in Section \ref{sectprecontype}.}
+\end{itemize}
+
+\section{Class {\sf densemat}}
+\index{class!{\sf densemat}}
+\label{sectclassdensemat}
+
+\section{Class {\sf skyline}}
+\index{class!{\sf skyline}}
+\label{sectclassskyline}
+
+\section{Class {\sf dskyline}}
+\index{class!{\sf dskyline}}
+\label{sectclassdskyline}
+
+\section{Class {\sf comprow}}
+\index{class!{\sf comprow}}
+\label{sectclasscomprow}
+
+\section{Class {\sf symcomprow}}
+\index{class!{\sf symcomprow}}
+\label{sectclasssymcomprow}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Other classes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\sf slesolv}}
+\index{class!{\sf slesolv}}
+Class {\sf slesolv} contains all necessary informations about solver of
+system of linear algebraic equations.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & meaning and remarks
+\\ \hline \hline
+{\sf tlinsol} & {\sf linsolvertype} & type of solver, see Section \ref{sectlinsolvertype}
+\\ \hline
+{\sf tprec} & {\sf precondtype} & type of preconditioner (only for iterative methods),
+\\
+ & & see Section \ref{sectprecontype}
+\\ \hline
+{\sf zero} & {\sf double} &  computer zero, expressions are compared to this
+\\
+ & & value to avoid e.g. division by zero
+\\ \hline
+{\sf nicg} & {\sf long} & number of required iterations in conjugate
+\\
+ & & gradient method
+\\ \hline
+{\sf errcg} & {\sf double} & required error, that is required norm of the
+\\
+ & & residual vector
+\\ \hline
+{\sf anicg} & {\sf long} & number of used iterations
+\\ \hline
+{\sf aerrcg} & {\sf double} & attained error, that is attained norm of residual vector
+\\ \hline
+{\sf ssoromega} & {\sf double} & parameter of SSOR preconditioning
+\\ \hline
+{\sf indegamma} & {\sf double} & parameter of incomplete factorization
+\\ \hline
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Class {\sf timecontr}}
+\index{class!{\sf timecontr}}
+Class {\sf timecontr} controles time in time dependent problems. Attributes of the class are summarized
+in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\sf time} & {\sf double} & actual time
+\\ \hline
+{\sf dt} & {\sf double} & actual time increment
+\\ \hline
+{\sf start\_time} & {\sf double} & starting time
+\\ \hline
+{\sf end\_time} & {\sf double} & end time
+\\ \hline
+{\sf timefun} & {\sf gfunct} & function describing time increments
+\\ \hline
+{\sf nit} & {\sf long} & number of important times
+\\ \hline
+{\sf *imptime} & {\sf double} & array of important times
+\\ \hline
+{\sf apit} & {\sf long} & actual position in imptime array
+\\ \hline
+\end{tabular}
+\end{center}
+
+Time interval is defined by the beginning time which is represented by the attribute {\sf start\_time}
+and the end time which is represented by attribute {\sf end\_time}. Time step (increment) is defined
+by function {\sf timefun} of type {\sf gfunct}. Generalized data type {\sf gfunct} enables application
+of any standard mathematical function. The most common function is constant function. Exponential
+increase of time steps is used in problems of creep of concrete structures etc.
+
+Member function {\sf newtime} of the class {\sf timecontr} is called at every instance of time. The class {\sf timecontr}
+contains actual time which is represented by the attribute {\sf time}. Actual time is substituted into
+instance {\sf timefun} of the class {\sf gfunct}. Instance {\sf timefun} returns new time increment (the length
+of the time step). The member function {\sf newtime} add new time increment to actual time. Then the member function
+returns new actual time and new time increment.
+
+So called important times are defined for convenience. Important time must not be skipped and solved problem
+must be evaluated at this times. If the member function {\sf newtime} computes time increment which leads to new
+time bigger than important time, important time is used and time increment is modified. Important times are used
+in cases of suddenly acting force etc.
+
+\section {Class {\sf hdbcontr}}
+The class stores the setup of backup procedure for particular SIFEL modules (so called backup controller). 
+The backup procedure allows for storage of all necessary data from computer memory to file in prescribed 
+times during a calculation process. The backup is usefull in many cases from power or network failure to 
+moderate changes in setup of computation process. In the case of changes in setup, the modifications should 
+be moderate and they have to respect certain rules. The following lists describes what can or must not be 
+changed in retorage input file, which data are rewriten by stored ones and what is checked during 
+restorage process.
+\\
+
+\noindent {\bf What CAN be changed in the input file used for restorage:}
+\begin{itemize}
+\item material parameters,
+\item new materials can be added,
+\item material types of elements (but the values of eqother arrays read from backup file should
+      be reordered with help of setup in {\sf hdbcontr})
+\item intensity of load or load cases (MEFEL)
+\item prescribed fluxes (TRFEL)
+\item output setup (outdriver section)
+\end{itemize}
+
+\noindent {\bf What MUST NOT be changed in the input file used for restorage:}
+\begin{itemize}
+\item start time and important times in time controller,
+\item number of nodes and number of DOFs on nodes,
+\item number of elements and their types,
+\item Dirichlet boundary conditions (i.e. supports and prescribed displacements in MEFEL and prescribed unknowns 
+      in TRFEL).
+\item number of load cases (MEFEL) or number of transported media (TRFEL)
+\end{itemize}
+
+
+\noindent {\bf Data that are rewritten after restorage:}
+\begin{itemize}
+\item {\sf timecontr} data - actual {\sf time}, actual backward time step {\sf bdt}, actual 
+      forward time step {\sf fdt},  backup of forward time step {\sf bfdt}, actual important time 
+      {\sf apit} and flag for important time {\sf iiit}
+\item solver data - attained time of solver {\sf time}, attained time increment of solver {\sf dt},
+      attained number of steps {\sf ni}, total number of degrees of freedom {\sf n}, 
+      left hand side vector {\sf r}, increment of left hand side vector {\sf dr}, vector of the right 
+      hand side from previous step {\sf fp}
+\item data of integration points (MEFEL) - stress array, strain array, array of internal variables ({\sf eqother} array) 
+\item data of integration points (TRFEL) - gardients, fluxes and internal variables ({\sf eqother} array)
+\item non-mechanical quantities at integration points in MEFEL (temperature, moisture)
+\end{itemize}
+
+\noindent {\bf Data that are checked up during restorage:}
+\begin{itemize}
+\item identical number of integration points
+\item identical number of load cases (MEFEL), identical number of transported media (TRFEL)
+\item identical number of strain components at integration points (MEFEL {\sf ncompstr}), 
+      identical number of gradient components at integration points (TRFEL {\sf ncompgrad})
+\end{itemize}
+
+Attributes of {\sf hdbcontr} class are summarized in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\sf  hdbtype}  & {\sf hdbackuptype} &   type of backup on harddisk
+\\ \hline
+{\sf hdbfmtr}   & {\sf hdbackupfmttype} &  format of backup file for restoring (text/binary)
+\\ \hline
+{\sf hdbfmts}   & {\sf hdbackupfmttype} &  format of backup file for saving (text/binary)
+\\ \hline
+{\sf rmold}    & {\sf answertype} &  flag for removing old previous backup files\\
+             &                  & (rmold=1 - i.e. only one backup file will be hold)
+\\ \hline
+{\sf rmold\_id}      & {\sf long} &  id of previous backup files 
+\\ \hline
+{\sf prec}     & {\sf long} &  precision of real numbers in output files
+\\ \hline
+{\sf hdbnamer}  & {\sf char} &  backup filename for restoring
+\\ \hline
+{\sf hdbnames}  & {\sf char} &  backup filename for saving
+\\ \hline
+{\sf selelems}  & {\sf sel} &  selelemr
+\\ \hline
+{\sf selother\_s} & {\sf sel*} &  selection of other components for saving
+\\ \hline
+{\sf selother\_r} & {\sf sel*} &  selection of other components for restoring
+\\ \hline
+{\sf selother\_id} & {\sf long**} &  array of indeces of starting positions\\
+              &              &  for restoring of other array
+\\ \hline
+\end{tabular}
+\end{center}
+
+Type of backup procedures performed by program are controlled by {\sf hdbtype} attribute
+whose values are defined by enumeration {\sf hdbackuptype} (see {\sf galias.h}) which is described
+in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+list of identifiers & integer value & description and remarks
+\\ \hline \hline
+{\sf nohdb}       & {\sf 0} & no backup is performed
+\\ \hline
+{\sf hdbs\_single}   & {\sf 1} & data are stored to the single backup file
+\\ \hline
+{\sf hdbs\_multiple}  & {\sf 2} & data are stored to the multiple files\\
+                 &         & according to stored quantities
+\\ \hline
+{\sf hdbr\_single}   & {\sf 3} & data are recovered from the single backup file
+\\ \hline
+{\sf hdbr\_multiple}  & {\sf 4} & data are recovered from the multiple backup files\\
+                 &         & with stored particular quantities
+\\ \hline
+{\sf hdbrs\_single}   & {\sf 5} & both of above procedures 1 and 2 are performed
+\\ \hline
+{\sf hdbrs\_multiple} & {\sf 6} & both of above procedures 3 and 4 are performed
+\\ \hline
+{\sf hdbr\_nonloc}   & {\sf 7} & recovery of surrounding integration point\\
+                 &        & used for non-local material models
+\\ \hline
+{\sf hdbs\_nonloc}   & {\sf 8} & storage of surrounding integration point\\
+                 &        & used for non-local material models
+\\ \hline
+{\sf hdbrs\_nonloc}  & {\sf 9} & both of above procedures 7 and 8 are performed
+\\ \hline
+\end{tabular}
+\end{center}
+
+The class {\sf hdbcont} has the following member functions\\ 
+
+{\sf
+  \indent \hspace{20mm} long restore\_stat(void);\\
+  \indent \hspace{20mm} long save\_stat(void);\\
+}
+
+that determine whether the storage, recovery or both should be performed.
+Main procedures controlling storage or recovery in MEFEL are defined in the 
+{\sf backupsol.cpp}\\
+
+{\sf
+  \indent \hspace{20mm}  void solver\_save (..)\\
+  \indent \hspace{20mm}  void solver\_restore (..)\\
+}
+
+They are called in the solvers depending on the problem solved and the appropriate 
+{\sf hdbcont} setup. There are also member functions in classes {\sf intpoints}, ({\sf intpoints.cpp}) 
+which perform storage or recovery of quantities at one integration point.
+
+Similarly, there are corresponding procedures in TRFEL  defined in the {\sf backupsolt.cpp}\\
+
+{\sf 
+  \indent \hspace{20mm}  void solvert\_save (..)\\
+  \indent \hspace{20mm}  void solvert\_restore (..)\\
+}
+
+and member functions in classes {\sf intpointst}, ({\sf intpointst.cpp}) 
+which perform storage or recovery of quantities at one integration point.
+
+\section{Class {\sf tablefunct}}
+\index{class!{\sf tablefunct}}
+Class {\sf tablefunct} defines function given by a table of values. It means, the function is defined in 
+discrete points only and several interpolation techniques can be used. It is also possible to calculate 
+first derivative at the particular intervals. It is used in classes {\sf gfunct}, {\sf loadcaset} and in 
+some material models. Attributes of the class are summarized in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\sf itype} & {\sf interpoltype} & type of used interpolation on intervals
+\\ \hline
+{\sf asize} & {\sf long} & number of points with defined function values, \\
+          &            & it represents the size of arrays {\sf x} and {\sf y}
+\\ \hline
+{\sf x}    & {\sf double*} &   array of independent variable values \\
+          &                &  (usually denoted x)
+\\ \hline
+{\sf y}    & {\sf double*} &   array of function values\\
+          &                &  (dependent variable, usually denoted y)
+\\ \hline
+\end{tabular}
+\end{center}
+Type of interpolation on intervals is given by {\sf itype} attribute whose values are defined by 
+enumeration {\sf interpoltype} (see {\sf tablefunc.h}) which is described in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+list of identifiers & integer value & description and remarks
+\\ \hline \hline
+{\sf piecewiselin}    & {\sf 1} & piecewise linear approximation
+\\ \hline
+{\sf piecewiseconst}   & {\sf 2} & piecewise constant approximation
+\\ \hline
+{\sf lagrange}       & {\sf 3} & Lagrange polynomial approximation
+\\ \hline
+{\sf piecewiselin2}   & {\sf 4}  &
+\\ \hline
+{\sf dirac2}        & {\sf 5}  &
+\\ \hline
+\end{tabular}
+\end{center}
+
+The class {\sf gfunct} has several member functions for function evaluation\\
+
+{\sf
+  \indent \hspace{20mm} double getval(double t);\\
+  \indent \hspace{20mm} double getval2(double t, double \&k);\\
+  \indent \hspace{20mm} double getval3(double t, double \&k);\\
+  \indent \hspace{20mm} double getderiv (double t);\\
+}
+
+where {\sf getval(t)} returns the approximated function value for given value of independent 
+variable {\sf t}. Function {\sf getval2(t, k)} returns the function value for given value of the independent 
+variable {\sf t} and derivative of approximation function in argument {\sf k} (it is used in the case 
+of earth pressures). On the other hand, function {\sf getval3(t, k)} returns value of 
+independent variable for the given dependent value {\sf t} and derivative of inverse approximation 
+function (it is inverse procedure to {\sf getval2(t, k)}). Function {\sf getderiv(t)} returns the value 
+of approximation function derivative at {\sf t}.
+
+
+
+\section{Class {\sf gfunct}}
+\index{class!{\sf gfunct}}
+Class {\sf gfunct} defines mathematical function of one or more variables used in the code for 
+various purposes. It can be defined by the table of values, constant value or by the mathematical 
+expression, which can be specified for several intervals. The mathematical expression is defined 
+in the input file by the string with usual C/C++ format. This string is read and then is parsed 
+by binary tree parser. This parser allows also for derivatives or integrals of the given expression.
+
+Attributes of the class are summarized in the following table.
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute & data type & description and remarks
+\\ \hline \hline
+{\sf tfunc} & {\sf generalfunct} & type of function (constant, table, parser, ...)
+\\ \hline
+{\sf neqs} & {\sf long} & number of expressions used for function evaluation
+\\ \hline
+{\sf ngf} & {\sf long} & number of gfunct objects for \\
+         &            & function type {\sf tfunc = gfunct\_set}
+\\ \hline
+{\sf f} & {\sf double} & constant value returned by function\\
+       &               & for function type {\sf tfunc = stat}
+\\ \hline
+{\sf func} & {\sf char**} & array of strings with expressions for parser\\
+       &               & dimension of the array is given by {\sf neqs}
+\\ \hline
+{\sf eq} & {\sf Equation **} & array of parsed expressions from strings \\
+        &                   & given by {\sf func}
+\\ \hline
+{\sf var} & {\sf variable ***} & twodimensional array of pointers to variables\\
+         &                    & detected in parsed strings\\
+         &                    & {\sf var[i][j]} returns pointer to {\sf j}-th variable from {\sf i}-th interval
+\\ \hline
+{\sf limval} & {\sf double *}   & limit values for particular intervals
+\\ \hline
+{\sf tabf} & {\sf tablefunct *}  & pointer to {\sf tablefunct} object for\\
+         &                     & function type {\sf tfunc = tab} (all values are real)
+\\ \hline
+{\sf itabf} & {\sf itablefunct *}   & pointer to {\sf itablefunct} object for\\
+         &                     & function type {\sf tfunc = tab} \\
+         &                     & (x values are real numbers while y values are integers)
+\\ \hline
+{\sf gfs} & {\sf gfunct *}      & array of general functions for\\
+         &                     & function type {\sf tfunc = gfunct\_set} \\
+         &                     & dimension of the array is given by {\sf ngf}
+\\ \hline
+\end{tabular}
+\end{center}
+
+Type of {\sf gfunct} is given by the {\sf tfunc} attribute whose values are defined by 
+enumeration {\sf generalfunct} (see {\sf galias.h}) which is described in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+list of identifiers & integer value & description and remarks
+\\ \hline \hline
+{\sf stat}    & {\sf 0} & constant function type
+\\ \hline
+{\sf pars}    & {\sf 1} & function is parsed form a string
+\\ \hline
+{\sf tab}     &  {\sf 2} & function is given by table values\\
+             &          & with various interpolations for intervals
+\\ \hline
+{\sf pars\_set} & {\sf 3}  & set of parsed strings given on intervals
+\\ \hline
+{\sf multpv}   & {\sf 10} & constant value multiplied by \\
+             &          & one common function
+\\ \hline
+{\sf itab}     & {\sf 20} & table of integer values for intervals
+\\ \hline
+{\sf gfunct\_set} & {\sf 30} & set of general functions for particular intervals
+\\ \hline
+\end{tabular}
+\end{center}
+
+The class {\sf gfunct} has several member functions for function evaluation\\
+
+{\sf
+  \indent \hspace{20mm} double getval(double t);\\
+  \indent \hspace{20mm} double getval(double t, double t0);\\
+  \indent \hspace{20mm} long   getval\_long (double t);\\
+  \indent \hspace{20mm} double getderiv (double t);\\
+}
+
+where {\sf getval(t)} returns the function value for given value of variable {\sf t},
+{\sf getval(t, t0)} returns the function value for given values of the principle variable {\sf t}
+and auxiliary variable {\sf t0} (it is used in the case of earth pressures), {\sf getval\_long(t)}
+returns an integer value for given value of variable {\sf t} (it is used for time controlled DOFs) and
+{\sf getderiv(t)} returns the value of function derivative at {\sf t}.
+
+
+\section {Class {\sf sel}} \label{sel}
+The class is used in {\sf outdriverm} and {\sf outdrivert} classes (MEFEL, TRFEL) and it contains the 
+selection of variety items such as load cases, time steps, nodes, elements, particular quantities 
+defined at nodes or elements, etc. Depending on the selected items or quantities, 
+integer indeces or real numbers are used for the selection. Attributes of the class are summarized 
+in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+attribute   & data type &     description and remarks
+\\ \hline \hline
+{\sf st}     & {\sf seltype} & type of selection (no, all, list, range, ...)
+\\ \hline
+{\sf n}     & {\sf long} &   represents number of list items or number of ranges\\
+            &           &   or {\sf n} = 1 for other values of {\sf st}
+\\ \hline
+{\sf id1}    & {\sf long*} &  array with the initial indices of ranges\\
+            &             &  or indeces of list
+\\ \hline
+{\sf ncomp}   & {\sf long*} &  array with lengthes of ranges
+\\ \hline
+{\sf rid1}   & {\sf double*} &  array with initial values of real ranges,\\
+            &              &   values of real lists or real period
+\\ \hline
+{\sf rid2}   & {\sf double*} &  array with end values of real ranges
+\\ \hline
+{\sf err}    & {\sf double} &  required error of real lists \\
+            &              &  or real period - searched items may vary  \\
+            &              &  by this {\sf err}.
+\\ \hline
+{\sf initime} & {\sf double} &  initial time for selection of real period
+\\ \hline
+{\sf fintime} & {\sf double} &  end time for selection of real period
+\\ \hline
+{\sf r}     & {\sf double} &  real period
+\\ \hline
+\end{tabular}
+\end{center}
+
+Type of {\sf sel} is given by the {\sf st} attribute whose values are defined by 
+enumeration {\sf seltype} (see {\sf galias.h}) which is described in the following table.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+list of identifiers & integer value & description and remarks
+\\ \hline \hline
+{\sf sel\_no}       &  0 &  nothing is selected
+\\ \hline
+{\sf sel\_all}      &  1 &  all values/indeces are selected
+\\ \hline
+{\sf sel\_range}     &  2 &  selection by ranges of indeces
+\\ \hline
+{\sf sel\_list}      &  3 &  selection by list of individual indeces
+\\ \hline
+{\sf sel\_period}     &  4 &  selection by constant period \\
+                  &    &  (each n-th index is selected)          
+\\ \hline
+{\sf sel\_realrange}   &  5 &  selection by range of real values
+\\ \hline
+{\sf sel\_reallist}    &  6 &  selection by list of real values
+\\ \hline
+{\sf sel\_mtx}       &  7 &   selection of all components of a tensorial\\
+                  &    &   quantity for GiD
+\\ \hline
+{\sf sel\_range\_mtx}  &  8 &   selection of all components of a tensorial quantity\\
+                  &    &   for GiD by range of indeces, the quantity \\
+                  &    &   is stored in larger array (e.g. {\sf eqother})
+\\ \hline
+{\sf sel\_range\_vec}  &  9 &   selection of a vector quantity for GiD\\
+                  &    &   by range of indeces - the quantity \\
+                  &    &   is stored inside larger array (e.g. {\sf eqother})
+\\ \hline
+{\sf sel\_realperiod}  &  10 &  option used for selection of time steps with \\
+                  &     &  real period {\sf r}
+\\ \hline
+{\sf sel\_impvalues}   &  11 &  option used for selection of time steps \\
+                  &      &  according to important times defined in \\
+                  &      &  time controller (class {\sf timecontr})
+\\ \hline
+\end{tabular}
+\end{center}
+
+The class {\sf sel} has also attribute {\sf n} which represents the number of 
+selected ranges or items depending on the type of selection ({\sf st} attribute).
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+{\tt st} = 0           & {\tt n} = 0
+\\
+{\tt st} = 1           & {\tt n} = 1
+\\ 
+{\tt st} = 2           & {\tt n} = number of selected ranges
+\\
+{\tt st} = 3           & {\tt n} = number of list items
+\\
+{\tt st} = 4           & {\tt n} = 1
+\\
+{\tt st} = 5           & {\tt n} = number of selected real ranges
+\\
+{\tt st} = 6           & {\tt n} = number of real items in the list
+\\
+{\tt st} = 7           & {\tt n} = 1
+\\
+{\tt st} = 8           & {\tt n} = 1
+\\
+{\tt st} = 9           & {\tt n} = 1
+\\
+{\tt st} = 10          & {\tt n} = number is calculated from the time \\
+                       & interval length and given period
+\\
+{\tt st} = 11          & {\tt n} = 1
+\\
+\hline
+\end{tabular}
+\end{center}
+
+The class {\sf sel} has four basic member functions for the determination whether the
+specified index {\sf id} or real value {\sf rid} are present in the selection.
+The index of matched range or item in list is passed via argument {\sf ir}.\\
+
+{\sf
+  \indent \hspace{20mm} long presence\_id(double rid);\\
+  \indent \hspace{20mm} long presence\_id(long id);\\
+  \indent \hspace{20mm} long presence\_id(double id, long \&ir);\\
+  \indent \hspace{20mm} long presence\_id(long id, long \&ir);\\
+}
+
+There are also two alternatives of the above member functions that are used in connection
+of time step selection (time steps can be selected either by the time step id or
+directly by the time value)\\
+
+{\sf
+  \indent \hspace{20mm} long presence\_id(long id, double rid);\\
+  \indent \hspace{20mm} long presence\_id(long id, double rid, timecontr \&tc);\\
+}
+
+Additionally, there are some other variants of the {\sf presence\_id()} member functions
+that are used for the internal purposes (see {\sf selection.cpp} for their description). 
+
+\subsection {Conjugated selection} \label{consel}
+The class {\sf sel} was designed for the selection of output data and there is often 
+required the output of different quantities for given selection of elements 
+or nodes. The typical case represents output of selected internal variables stored 
+in the {\sf eqother} array on integration points of elements. If the problem domain 
+is heterogeneous and different material models are used then the order of internal 
+variables is not the same for all integration points and consequently, the selection of 
+required internal variables differs on particular elements. This case can be solved by 
+using of conjugated selections where the main selection is connected with required 
+elements/nodes and conjugated selection is connected with the required internal 
+variables. The number of conjugated selections is given by the number of items
+in the main selection i.e., attribute {\sf } of main selection is the number of 
+conjugated selections. Presence of the required element/node with the 
+index {\sf id} and required quantity with the index {\sf idc} in the main and 
+conjugated selections is checked by the following function\\
+
+{\sf
+  \indent \hspace{20mm} long presence\_id(sel *consel, long id, long idc);\\
+}
+
+where {\sf consel} is the array of conjugated selections connected with the instance 
+of the main selection whose member function {\sf presence\_id()} is called.
+
+\subsection {Input record for one selection} \label{irecsel}
+In the input file, the record for the {\sf sel} class has the format decribed in 
+Tab.~\ref{tabsel}. The first colmun contains input values for particular types of selection 
+(see {\sf st} attribute). The second column contains rest of input record. For each selection 
+type, two alternatives of input record are specified - without and with keywords. Each row 
+of table contains the input record itself and below the this record, the corresponding C 
+{\sf xfscanf()} function format is specified.
+
+\begin{table}[!p]
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+\hline
+Attribute {\sf st} & Rest of input record\\
+\hline
+\hline
+
+0             &  \\
+{\sf \%m}     &  \\ 
+\cline{1-2}
+{\sf sel\_no} &  \\
+{\sf \%m}     &  \\ 
+
+\hline
+\hline
+
+1              &  \\
+{\sf \%m}      &  \\
+\cline{1-2}
+{\sf sel\_all} &  \\
+{\sf \%m}      &  \\
+
+\hline
+\hline
+
+2                & {\sf n} ({\sf id1} {\sf ncomp})$\times${\sf n}   \\
+{\sf \%m}        &  {\sf \%ld} ({\sf \%ld \%ld})$\times${\sf n} \\
+\cline{1-2}
+{\sf sel\_range} & {\sf numranges} {\sf n} ({\sf id1} {\sf ncomp})$\times${\sf n}   \\
+{\sf \%m}        & {\sf \%k \%ld} ({\sf \%ld \%ld})$\times${\sf n}  \\
+
+\hline
+\hline
+
+3               &  {\sf n} ({\sf id1})$\times${\sf n}  \\
+{\sf \%m}       &  {\sf \%ld} ({\sf \%ld})$\times${\sf n}      \\
+\cline{1-2}
+{\sf sel\_list} &  {\sf numlist\_items } {\sf n} ({\sf id1})$\times${\sf n}  \\
+{\sf \%m}       &  {\sf \%k \%ld} ({\sf \%ld})$\times${\sf n}      \\
+
+\hline
+\hline
+
+4                 &  {\sf id1}   \\
+{\sf \%m}         &  {\sf \%ld} \\
+\cline{1-2}
+{\sf sel\_period} &  {\sf id1}   \\
+{\sf \%m}         &  {\sf \%ld} \\
+
+\hline
+\hline
+
+5                    & {\sf n} ({\sf rid1} {\sf rid2})$\times${\sf n}  \\
+{\sf \%m}            & {\sf \%ld} ({\sf \%lf \%lf})$\times${\sf n}      \\
+\cline{1-2}
+{\sf sel\_realrange} & {\sf numranges} {\sf n} ({\sf rid1} {\sf rid2})$\times${\sf n}  \\
+{\sf \%m}            & {\sf \%k \%ld} ({\sf \%lf \%lf})$\times${\sf n}      \\
+
+\hline
+\hline
+
+6                   & {\sf n} ({\sf rid1})$\times${\sf n} {\sf err} \\
+{\sf \%m}           & {\sf \%ld} ({\sf \%lf})$\times${\sf n} {\sf \%lf}  \\
+\cline{1-2}
+{\sf sel\_reallist} & {\sf numlist\_items } {\sf n} ({\sf rid1})$\times${\sf n} {\sf err} \\
+{\sf \%m}           & {\sf \%k \%ld} ({\sf \%lf})$\times${\sf n} {\sf \%lf}  \\
+
+\hline
+\hline
+
+7              & \\
+{\sf \%m}      & \\
+\cline{1-2}
+{\sf sel\_mtx} & \\
+{\sf \%m}      & \\
+
+\hline
+\hline
+
+8                   & {\sf id1} {\sf ncomp}  \\
+{\sf \%m}           & {\sf \%ld \%ld} \\
+\cline{1-2}
+{\sf sel\_rangemtx} & {\sf id1} {\sf ncomp}\\
+{\sf \%m}           & {\sf \%ld \%ld}\\
+
+\hline
+\hline
+
+9                           &  {\sf id1}  {\sf ncomp} \\
+{\sf \%m}                   &  {\sf \%ld \%ld}     \\
+\cline{1-2}
+{\sf sel\_rangevec}         &  {\sf id1} {\sf ncomp}  \\
+{\sf \%m}                   &  {\sf \%ld \%ld}     \\
+
+\hline
+\hline
+
+10                    & {\sf initime fintime r err}      \\
+{\sf \%m}             & {\sf \%lf \%lf \%lf \%lf} \\
+\cline{1-2}
+{\sf sel\_realperiod} & {\sf ini\_time} {\sf initime} {\sf fin\_time} {\sf fintime} {\sf period} {\sf r} {\sf err} {\sf err}      \\
+{\sf \%m}             & {\sf \%k \%lf \%k \%lf \%k \%lf \%k \%lf} \\
+
+\hline
+\hline
+
+11                   & \\
+{\sf \%m}            & \\
+\cline{1-2}
+{\sf sel\_impvalues} & \\
+{\sf \%m}            & \\
+
+\hline
+\hline
+\end{tabular}
+\caption{Input record for {\sf sel}}
+\label{tabsel}
+\end{center}
+\end{table}
+
+\subsection{Input record for conjugated selections}
+The input record of conjugated selections contains input record of the main selection
+{\sf mainsel} according to section~\ref{irecsel} followed by input records of conjugated
+selections {\sf consel$_1$}, {\sf consel$_2$}, $\ldots$, {\sf consel$_n$} where $n$ is
+given by the value specified for attribute {\sf n} of {\sf mainsel}. Input records of 
+particular conjugated selections {\sf consel$_i$} have the same format as the main selection
+{\sf mainsel}. Formally, the format can be written as follows \\
+
+\indent \hspace{20mm} {\sf mainsel} ({\sf consel})$\times${\sf mainsel.n}\\
+
+\subsection {Examples of input record for basic selection types} \label{basicsel_ex}
+This section describes basic selections used for selection of list of integer identifiers or 
+indeces (ids), e.g. nodes, elements, load cases, strain components, time steps, etc.
+
+
+
+\subsubsection{Definition of empty list}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+0 & \# type of selection = no selection or empty list
+\\ \hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_no & \# type of selection = no selection or empty list
+\\ \hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Definition of list of all ids}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+1 & \# type of selection = all ids are selected
+\\ \hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_all & \# type of selection = all ids are selected
+\\ \hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Definition of id ranges}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+2   & \# type of selection = integer ranges \\
+2   & \# two ranges will be specified       \\
+    & \# first range <1, 5>                 \\
+1   & \# initial id - range 1.              \\
+5   & \# number of selected ids - range 1.  \\
+    & \# second range <23, 24>              \\
+23  & \# initial id - range 2.              \\
+2   & \# number of selected ids - range 2.  \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_range    & \# type of selection = integer ranges \\
+num\_ranges 2 & \# two ranges will be specified       \\
+              & \# first range <1,5>                  \\
+1             & \# initial id - range 1.              \\
+5             & \# number of selected ids - range 1.  \\
+              & \# second range <23, 24>              \\
+23            & \# initial id - range 2.              \\
+2             & \# number of selected ids - range 2.  \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Definition of list of individual ids}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+3          & \# type of selection = integer list \\
+4          & \# number of selected ids           \\
+8 15 17 11 & \# list of selected ids             \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_list        & \# type of selection = integer list \\
+numlist\_items 4 & \# number of selected ids           \\
+8 15 17 11       & \# list of selected ids             \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsection{Examples of input record for selections of periodic indeces and real values} \label{timesel_ex}
+This section describes examples of input records of for periodic selection of indeces 
+and selection of real values. They are used only in the cases of time step selection.
+
+\subsubsection{Integer periodic selection type}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+4 & \# type of selection = integer periodic \\
+5 & \# period                               \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_period & \# type of selection = integer periodic \\
+5          & \# period                               \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Selection of real ranges}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+5    & \# type of selection = real ranges \\
+2    & \# number of ranges                \\
+     & \# range 1. = <1.0, 5.0>           \\
+1.0  & \# lower limit of range 1.       \\
+5.0  & \# upper limit of range 1.       \\
+     & \# range 2. = <50.0, 65.2>         \\
+50.0 & \# lower limit of range 2.       \\
+65.2 & \# upper limit of range 2.           \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_realrange  & \# type of selection = real ranges \\
+numranges 2     & \# number of ranges                \\
+                & \# range 1. = <1.0, 5.0>           \\
+1.0             & \# lower limit of range 1.       \\
+5.0             & \# upper     limit of range 1.       \\
+                & \# range 2. = <50.0, 65.2>         \\
+50.0            & \# lower limit of range 2.       \\
+65.2            & \# upper limit of range 2.           \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Selection of real list}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+6            & \# type of selection = list of real values \\ 
+3            & \# number of selected values               \\
+5.8 7.5 12.4 & \# list of selected real values            \\
+1.0e-3       & \# required error of real lists;           \\
+             & \# selected time steps may be different    \\
+             & \# from the above ones about 1.0e-3        \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+sel\_reallist    & \# type of selection = list of real values \\ 
+numlist\_items 3 & \# number of selected values               \\
+5.8 7.5 12.4     & \# list of selected real values            \\
+1.0e-3           & \# required error of selected items;       \\
+                 & \# selected time steps may be different    \\
+                 & \# from the above ones about 1.0e-3        \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Periodic selection from real range}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+        & \# time steps 3.0, 4.0 and 5.0 will be selected \\
+10      & \# type of selection = real periodic selection  \\  
+3.0     & \# lower limit of range                         \\
+5.0     & \# upper limit of range                         \\
+1.0     & \# period                                       \\
+1.0e-2  & \# required error of selected items             \\
+        & \# selected time steps may be different         \\
+        & \# from the above ones about 1.0e-2             \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+                & \# time steps 3.0, 4.0 and 5.0 will be selected \\
+sel\_realperiod & \# type of selection = real periodic selection  \\  
+ini\_time   3.0 & \# lower limit of range                         \\
+fin\_time   5.0 & \# upper limit of range                         \\
+period      1.0 & \# period                                       \\
+err      1.0e-2 & \# required error of selected items             \\
+                & \# selected time steps may be different         \\
+                & \# from the above ones about 1.0e-2             \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Selection of all important times defined in {\sf timecontr}}
+Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+   & \# selects important time steps defined in time controler \\
+11 & \# type of selection = sel\_impvalues                     \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+               & \# selects important time steps defined in time controler \\
+sel\_impvalues & \# type of selection = selection of important values      \\
+\hline
+\end{tabular}\\
+\end{center}
+
+\subsection{Examples of input record of selections used for GiD} \label{gidsel_ex}
+This section describes examples of input records used for the selections of 
+quantity components that will be written to GiD post-processor file in the tensorial 
+or vector formats.
+
+
+
+\subsubsection{Selection of tensorial quantity stored as vector}
+\noindent Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+   & \# select all component of the given quantity \\
+   & \# write them in the GiD tensorial format     \\
+7  & \# type of selection = sel\_mtx               \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+         & \# select all component of the given quantity \\
+         & \# write them in the GiD tensorial format     \\
+sel\_mtx  & \# type of selection = sel\_mtx               \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Selection of tensorial quantity stored as vector in larger array}
+\noindent Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+   & \# select n component of the given quantity \\
+   & \# write them in the GiD tensorial format   \\
+8  & \# type of selection = sel\_range\_mtx      \\
+3  & \# initial id of large array                \\
+4  & \# number of quantity components            \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+                & \# select n component of the given quantity         \\
+                & \# write them in the GiD tensorial format           \\
+sel\_range\_mtx & \# type of selection = sel\_range\_mtx              \\
+3               & \# initial id of the first component in large array \\
+4               & \# number of quantity components                    \\
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+\subsubsection{Selection of vector quantity stored in larger array}
+\noindent Example without keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+   & \# select n component of the given quantity \\
+   & \# write them in the GiD vector format      \\
+9  & \# type of selection = sel\_range\_vec      \\
+3  & \# initial id of large array                \\
+3  & \# number of vector components              \\
+\hline
+\end{tabular}\\
+\end{center}
+Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+                & \# select n component of the given quantity         \\
+                & \# write them in the GiD tensorial format           \\
+sel\_range\_vec & \# type of selection = sel\_mtx                     \\
+3               & \# initial id of the first component in large array \\
+3               & \# number of vector components                      \\
+\hline
+\end{tabular}\\
+\end{center}
+
+\subsection {Example of conjugated selection for plastic strains on elements} \label{consel_ex}
+In this example, the output of plastic strain components $\eps^p_x$ and $\eps^p_y$ will 
+be specified for integration points of elements 1-25 and 36-40 .
+
+\vspace{3mm}
+\noindent Example without keywords
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+     & \# SELECTION OF REQUIRED ELEMENTS                    \\
+2    & \# type of selection = integer ranges                \\
+2    & \# two ranges will be specified                      \\
+     & \# first range $<$1, 25$>$                           \\
+1    & \# initial id - range 1.                             \\
+25   & \# number of selected ids - range 1.                 \\
+     & \# second range $<$36, 40$>$                         \\
+36   & \# initial id - range 2.                             \\
+5    & \# number of selected ids - range 2.                 \\
+     &                                                      \\
+     & \# SELECTION OF REQUIRED PLASTIC STRAIN COMPONENTS   \\
+     &                                                      \\
+3    & \# type of conjugated selection for range 1.         \\
+2    & \# number of selected pl. strain components          \\
+1 2  & \# indeces of eqother array corresponding to         \\
+     & \# required pl. strain components eps\^p\_x and eps\^p\_y\\      
+     &                                                      \\
+3    & \# type of conjugated selection for range 2.         \\
+2    & \# number of selected pl. strain components          \\
+1 2  & \# indeces of eqother array corresponding to         \\
+     & \# required pl. strain components eps\^p\_x and eps\^p\_y\\      
+\hline
+\end{tabular}\\
+\end{center}
+
+\noindent Example with keywords
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+                 & \# SELECTION OF REQUIRED ELEMENTS                    \\
+sel\_range       & \# type of selection = integer ranges                \\
+num\_ranges 2    & \# two ranges will be specified                      \\
+                 & \# first range $<$1, 25$>$                           \\
+1                & \# initial id - range 1.                             \\
+25               & \# number of selected ids - range 1.                 \\
+                 & \# second range $<$36, 40$>$                         \\
+36               & \# initial id - range 2.                             \\
+5                & \# number of selected ids - range 2.                 \\
+                 &                                                      \\
+                 & \# SELECTION OF REQUIRED PLASTIC STRAIN COMPONENTS   \\
+                 &                                                      \\
+sel\_list        & \# type of conjugated selection for range 1.         \\
+numlist\_items 2 & \# number of selected pl. strain components          \\
+1 2              & \# indeces of eqother array corresponding to         \\
+                 & \# required pl. strain components eps\^p\_x and eps\^p\_y\\      
+                 &                                                      \\
+sel\_list        & \# type of conjugated selection for range 2.         \\
+numlist\_items 2 & \# number of selected pl. strain components          \\
+1 2              & \# indeces of eqother array corresponding to         \\
+                 & \# required pl. strain components eps\^p\_x and eps\^p\_y\\      
+\hline
+\end{tabular}\\
+\end{center}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter {Class {\sf matrix, vector, ivector} and algebraic operations}
+These classes are used for the element level matrix or vector computations. That means the full contents
+of the matrices and vectors is stored in the memory. No zero compression is performed. 
+\begin {itemize}
+\item Class {\sf matrix} defines matrix with real number components.
+\item Class {\sf vector} defines vector with real number components.
+\item Class {\sf ivector} defines vector with integer number components.
+\end{itemize}
+Access for each component is solved by the overloaded operator {\sf []} or {\sf ()}. {\sf a[i][j]} or {\sf a(i,j)} means 
+the componet of matrix {\sf a} which is on the position (i,j) of the matrix {\sf a}. Similarly, {\tt v[i]} or {\tt v(i)} 
+means the component of the vector {\sf v} which is on the i-th position of the vector v. Range checking of the
+indeces can be turned on by the defining corresponding macros in the {\sf matrix.h}, the {\sf vector.h}
+or the {\sf ivector.h} files.
+Note that in case of {\sf []} operator of the {\sf matrix} class only the first index could be checked. For more details see
+source files or the online documentation of the given class.
+\section {Defined algebraic operations}
+This section describes implemented algebraic operations. These operations was implemented as
+usual functions not member functions. Some functions use pointers to the double array as parameters instead of the classes
+{\sf matrix, vector, ivector}. The reason was the compatibilty because some pieces of program are created by the existing code.
+For parameters and detailed description of the functions see online generated documentation or source files.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+function name  & math operation & description of matrix operation
+\\ \hline \hline
+{\sf addm} & ${\mbf A + \mbf B}$ & adds two matrices
+\\ \hline
+{\sf subm} & ${\mbf A - \mbf B}$ & substracts two matrices
+\\ \hline
+{\sf tensprd} & ${\mbf u \otimes \mbf v}$ & performs tensor product of vectors u and v
+\\ \hline
+{\sf mulvm} & ${\mbf u \otimes \mbf v}$ & performs tensor product of vectors u and v
+\\ \hline
+{\sf vxv} & ${\mbf u \otimes \mbf v}$ & performs tensor product of vectors u and v
+\\ \hline
+{\sf mxm} & ${\mbf A \mbf B}$ & multiplies two matrices
+\\ \hline
+{\sf mtxm} & ${\mbf A^T \mbf B}$ & multiplies one matrix with transposed one from the left
+\\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+function & math & description \\
+name     & operation & of the matrix operation
+\\ \hline \hline
+{\sf mxmt} & ${\mbf A \mbf B^T}$ & multiplies one matrix with transposed one from the right
+\\ \hline
+{\sf cmulm} & $c{\mbf A}$ & multiplies matrix with constant
+\\ \hline
+{\sf tranm} & ${\mbf A^T}$ & transposes matrix
+\\ \hline
+{\sf vxm} & ${\mbf v \mbf A}$ & multiplies matrix with vector from the left
+\\ \hline
+{\sf mxv} & ${\mbf A \mbf v}$ & multiplies matrix with vector from the right
+\\ \hline
+{\sf vxmt} & ${\mbf v \mbf A^T}$ & multiplies transposed matrix with vector from the left
+\\ \hline
+{\sf mtxv} & ${\mbf A^T \mbf v}$ & multiplies transposed matrix with vector from the right
+\\ \hline
+{\sf gause} &  & performs Gauss elimination of a matrix
+\\ \hline
+{\sf invm} & ${\mbf A^{-1}}$ & computes inverse matrix
+\\ \hline
+{\sf detm} & $|{\mbf A}|$ & computes determinant of the matrix
+\\ \hline
+{\sf bdbjac} & $\mbf B^T \mbf {D B}j$ & computes one of the typical product in the FEM computation
+\\ \hline
+{\sf nnjac} & $\mbf N^T \mbf N j$ & computes one of the typical product in the FEM computation
+\\ \hline
+\end{tabular}
+\end{center}
+
+Folowing functions use pointer to the array of {\sf double} as parameters instead of {\sf matrix} class.
+
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+function & math & description \\
+name     & operation & of the matrix operation
+\\ \hline \hline
+{\sf mm} & ${\mbf A \mbf B}$ & multiplies two matrices
+\\ \hline
+{\sf mtm} & ${\mbf A^T \mbf B}$ & multiplies one matrix with transposed one from the left
+\\ \hline
+{\sf mmt} & ${\mbf A \mbf B^T}$ & multiplies one matrix with transposed one from the right
+\\ \hline
+{\sf mv} & ${\mbf A \mbf v}$ & multiplies matrix with vector from the right
+\\ \hline
+{\sf mtv} & ${\mbf A^T \mbf v}$ & multiplies transposed matrix with vector from the right
+\\ \hline
+{\sf mtmccr} & ${\mbf A^T \mbf B}$ & multiplies one matrix with transposed one from the left\\
+ & & matrix are stored in the columns, result is stored in the rows
+\\ \hline
+{\sf mvc} & ${\mbf A^T \mbf v}$ & multiplies  matrix with vector from the right\\
+& & matrix is stored in the columns
+\\ \hline
+{\sf mtvc} & ${\mbf A^T \mbf v}$ & multiplies transposed matrix with vector from the right\\
+& & matrix is stored in the columns
+\\ \hline
+{\sf bdbj} & $\mbf B^T \mbf {D B}j$ & computes one of the typical product in the FEM computation
+\\ \hline
+{\sf nnj} & $\mbf N^T \mbf N j$ & computes one of the typical product in the FEM computation
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+These functions are used for algebraic operations with the {\sf vector} and {\sf ivector} classes.
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+function name  & math operation & description of vector operation
+\\ \hline \hline
+{\sf addv} & ${\mbf u + \mbf v}$ & adds two vectors
+\\ \hline
+{\sf addmultv} & ${\mbf u + c \mbf v}$ & adds two vectors, one is multiplied by a scalar
+\\ \hline
+{\sf subv} & ${\mbf u - \mbf v}$ & substracts two vectors
+\\ \hline
+{\sf crprd} & ${\mbf u \times \mbf v}$ & computes cross product of the two vectors
+\\ \hline
+{\sf scprd} & ${\mbf u \cdot \mbf v}$ & computes scalar product of the two vectors
+\\ \hline
+{\sf cmulv} & $c \mbf u $ & multiplies vector with constant value
+\\ \hline
+{\sf normv} & $|\mbf u |$ & computes size of vector
+\\ \hline
+{\sf cosav} & $\frac{\mbf u \cdot \mbf v}{|\mbf u||\mbf v|}$ & computes cosine of the angle of the two vectors
+\\ \hline
+\end{tabular}
+\end{center}
+
+
+\chapter {Iotools and stacktrace modules}
+These auxiliary modules are not directly connected with FEM calculations but they were
+created for the input and output and error/debugging support of the SIFEL package. The Iotools module
+contains replacement of the standard fscanf function by {\sf xfscanf} function which involves some important 
+extensions and improvements. There is also standard funtion for printing of error messages and warnings which
+allows for unified reporting error messages. The stacktrace module is the only system/compiler dependent 
+module in the SIFEL package. It contains support for printing call tree (trace of stack) at runtime including
+line numbers and function names. Undefining of the special macro {\sf TRACE\_SOURCE\_FILES} in the {\sf systrace.h} 
+turns off this support providing the most portable code with minimum dependency on the used system/compiler. 
+
+\section {Iotools module}
+This module consists of the following files:
+{\sf iotools.h, iotools.cpp, xfile.h, kwdset.h, kwdset.cpp}.
+The module {\sf iotools.cpp} contains new fucntion extended {\sf xfscanf} widely used in all SIFEL
+parts. The fucntion replaces standard C {\sf fscanf} function for data reading from the text
+file. Similarly, there is {\sf XFILE} data structure which replaces standard C {\sf FILE} structure.
+The main differences between the standard functions and extended ones are summarized in the following paragraphs. 
+\begin{itemize}
+\item Handling of row and column numbers of the actual poistion in the text file. Row and column 
+      numbers are stored in the {\sf XFILE} structure in the attributes {\sf row} and {\sf col} and they may
+      be accessed directly.
+\item Checking whether the read value corresponds to the specified format in the format string. If an discrepancy
+      is revealed than the warning or error is reported.
+\item Introduction of the new conversion types:
+      \begin {itemize}
+      \item {\sf \textquotedbl \%m\textquotedbl}- the conversion handles enumeration type. It requires two pointers
+       in the xfscanf paramter list. The first pointer refers to the {\sf kwdset} object which
+      holds the pairs of integer values and corresponding strings for the given {\sf enum} type.
+      These objects has to be prepared for each used enum type which should be read by the xfscanf function.
+      The class {\sf kwdset} contains two attributes. One is array {\sf set} of {\sf enumstr} type and 
+      the second is the size of the array {\sf set}. Each object of {\sf enumstr} type should contain a
+      pair of {\sf alias} string for the given integer {\sf id} which represents the integer value of 
+      one item of the given {\sf enum} type. Generally, {\sf alias} can differ from the definition of 
+      the given enum type but it is a good practice to set them the same.
+      If the matching failure occures the error message is cast and the list of acceptable enum values
+      with the appropriate keywords ({\sf alias} strings) are printed. 
+      
+      \item {\sf \textquotedbl\%a\textquotedbl} - the conversion handles reading of string terminated with the new 
+       line character. It reads string including whitespaces until the newline chracter is reached. If the 
+       last non-space character on the line is {\sf @} then it is replaced by the {\sf \textbackslash n} 
+       in the stored string and scanning of the next line is started. Thus the {\sf @} character at the end of 
+       lines allows for scanning a string from multiple lines in the file.
+       An argument of {\sf char*} type is expected and it has to have sufficient memory allocated to hold
+       whole scanned  string including trailing \textbackslash 0. Several modifications are possible due to
+       fine tuning of the conversion behaviour.
+         \begin{itemize}
+         \item  The format string {\sf \textquotedbl \%a\textquotedbl} skips the initial whitespaces  like 
+                {\sf \textvisiblespace}, {\sf \textbackslash t}, {\sf \textbackslash n}, 
+                {\sf \textbackslash r} and {\sf \textbackslash v} 
+                and starts the scanning at the first nonwhitespace character.
+         \item  The format string {\sf \textquotedbl\%\textvisiblespace a\textquotedbl} skips {\sf \textbackslash n} and 
+                {\sf \textbackslash r} BUT NOT {\sf \textvisiblespace}, 
+                {\sf \textbackslash t} and {\sf \textbackslash v} 
+                and than starts scanning. In this case, the scanned string can contain initial spaces or tabelators.
+         \item  Format string {\sf \textquotedbl\%\textvisiblespace \#a\textquotedbl} skips {\sf \textbackslash n} and 
+                {\sf \textbackslash r} BUT NOT {\sf \textvisiblespace}, 
+                {\sf \textbackslash t} and {\sf \textbackslash v} and than starts scanning. 
+                No more than {\sf \#} characters is read (terminating {\sf \textbackslash 0} is not counted) and the scanned string can 
+                contain initial spaces or tabelators.
+         \end{itemize}
+     
+       \item {\sf \textquotedbl\%k\textquotedbl} - the conversion handles reading of keywords. The keywords 
+        are strings passed as arguments of the xfscanf function which ar scanned for in the input file depending 
+        on the keyowrd handling flag {\sf kwdmode} in the given {\sf XFILE}. Argument should be string with required 
+        keyword, no conversion is performed. The conversion which follows after the {\sf \textquotedbl\%k\textquotedbl} 
+        should perform assignment of keyword value to the argument which follows argument with keyword string.
+        The keyword can be set optional by specifying {\sf \textquotedbl\%+k\textquotedbl}. In such a case, if the
+        keyword string is not located in the file the following conversion for the keyword value is skipped.
+        \end{itemize}
+\item Handling of keywords by the specifying keyword handling flag {\sf kwdmode} in the given {\sf XFILE} structure. The 
+      initial value is set to {\sf ignore} so that keywords are forbidden in the given input file. All keyword handling modes 
+      are given by the alias {\sf kwd\_handling} (see {\sf gaias.h}). Description of all used modes follows:
+      \begin{itemize}
+      \item {\sf ignore} - keywords specified in calls of {\sf xfscanf} function by the conversion {\sf \textquotedbl\%k\textquotedbl} are not read from the 
+                          input file and thus the conversions {\sf \textquotedbl\%k\textquotedbl} are ignored.
+                          This mode is default and it is used for the reading of the input files in MEFEL, TRFEL, METR 
+                          and their parallel versions in the case that no command line option -kwd is specified or -kwd=0.
+      \item {\sf sequent\_mode} - keywords are processed sequentially from the given input file according to format strings
+                                of particular calls of {\sf xfscanf}. No characters except of blanks can be skipped. If the
+                                string with keyword cannot be located than the error message is printed. 
+                                If the command line option -kwd=1-4 is specified, this mode is used for the reading some 
+                                parts of the input files in MEFEL, TRFEL, METR and their parallel versions.
+      \item {\sf line\_mode} - the keywords are located on the actual line of the input file so that arbitrary text from
+                             the line beginning till the keyword occurence can be skipped. If the keyword cannot be located
+                             on the actual line the error message is printed.
+      \end{itemize}
+      Additionally, there are two modes for handling of keyword reading in file content organized in sections. The
+      sections in the input file have to be delimited by the pairs of keywords for the section beginning and section end.
+      The function {\sf xfdetect\_sect} has to be called for the detection of all keywords in the input file. Than it is 
+      possible to set the actual processed section by the call of function {\sf xf\_setsec}. This function sets the 
+      {\sf XFILE} pointer after the last character of the keyword for the given section beginning. Resetting of the 
+      section pointer to the beginning can be done by the call of {\sf xf\_resetsec} function. After the detection 
+      of all sections in the given input file and setup of the current section, the {\sf xfscanf} can detect keywords 
+      using these modes
+      \begin{itemize}
+      \item {\sf sect\_mode\_seq} - the keyword searching starts at the actual position in the given section and arbitrary 
+                                 text can be skipped until the keyword is located or the section end is encountered.
+      \item {\sf sect\_mode\_full} - the keyword searching always starts at the section beginning and arbitrary 
+                                 text can be skipped until the keyword is located or the section end is encountered.
+      \end{itemize}
+      The above two modes are used in the MECHPREP and TRANSPREP especially. 
+
+      Regardless the keyword handling mode, the required value connected with the keyword is read sequentially after the 
+      localization of the given keyword. For example in the call
+      \begin{center}
+        {\sf xfscanf(in, \textquotedbl\%k\%e\textquotedbl, \textquotedbl xcoord\textquotedbl, \&x);}
+      \end{center}
+      the string {\sf \textquotedbl xcoord\textquotedbl} is located depending on the keyword mode specified for the 
+      input file {\sf in} and than the value of {\sf x} coordinate is scanned from the character following the last 
+      character of the located keyword. 
+
+      There is also possible to control case sensitivity of the keyword scanning 
+      by the flag parameter {\sf ignorecase} of the {\sf XFILE} structure. If the parameter is set to 0 than the 
+      scanning is case sensitive. For the case of insensitive scanning, the flag has to be set to 1. The default value 
+      used in {\sf xfopen} function is 0 i.e. case sensitive scanning.
+
+\end {itemize}
+
+\section {Stacktrace module}
+This module contains very usefull support for the first investigations about runtime errors. It consists 
+of the following files: {\sf stacktrace.h, stacktrace.cpp}, {\sf libstrace.h}, {\sf libtrace.cpp}, {\sf systrace.h}. 
+From the user point of view, the most important file is {\sf stacktrace.cpp} which contains interface functions 
+for printing of call tree at runtime including line numbers and function names. These functions need debug 
+symbols generated by compilers that are stored in the executable file of the given code. On the other hand, 
+the format of debug symbols is strongly compiler/system dependent and using of the stacktrace leads to 
+less portablity of the source code. In case of problems with portability on the Linux systems, there is a 
+special macro {\sf TRACE\_SOURCE\_FILES} in the {\sf systrace.h} which controls the usage of the compiler/system 
+dependent parts of the stacktrace module. Undefining of {\sf TRACE\_SOURCE\_FILES} turns off the advanced call 
+tree support and it provides the most portable code with minimum dependency on the used system/compiler and basic 
+functionality of the stack tracing.
+
+The target operation system (OS) is detected in the {\sf systrace.h} with respect to compiler predefined OS macros.
+Actually, the OS Windows and Linux are supported but there are some additional libraries or utilities that  
+have to be installed depending on the target OS and used compiler.
+
+The stacktrace functions are used especially in {\sf print\_err(..)} and {\sf print\_warning(..)} functions which 
+are defined in the {\sf iotools.cpp} but they can be free used on all places where the runtime call tree 
+could be usefull. The call tree from the actual source line can be invoked by the call of function
+
+\begin{center}
+{\sf void stack\_trace(FILE *out, long level)},
+\end{center}
+
+where {\sf out} is the pointer to an output text file and {\sf level} is the integer number which specifies
+the number of initial branches of the call tree which will be omitted at the output. Reasonable value of 
+the {\sf level} argument is 2 because for less values, the useless levels of call tree caused by the internal 
+stacktrace function calls will be included at the output.
+
+\subsection {Using stacktrace module on Linux systems}
+On Linux systems, the stacktrace module is based on {\sf libbfd.a} library which is regularly used in {\sf gdb} 
+debugger. The functions from the {\sf bfd}  are widely used in {\sf libtrace.cpp} which contains the Linux support
+functions for stacktrace module. In Linux distributions, the {\sf bfd} library is usually contained in the developer 
+version of package {\sf binutils}. If the package is not available the {\sf TRACE\_SOURCE\_FILES} in the {\sf systrace.h} 
+has to be undefined. Additionally, the standard system library {\sf libdl.a} has to be linked and all debug symbols 
+should be added by the linker into the resulting executable/library file ({\sf -rdynamic} option on {\sf gcc} compiler).
+Should be noted that on Linux systems, the name of the executable file has to be set before the first call 
+of {\sf stack\_trace(..)} function. It is accomplished by the call of function
+
+\begin{center}
+{\sf set\_prgname(const char *fname)},
+\end{center}
+where {\sf fname} is a string with the executable filename. Most of the SIFEL programs invokes the function 
+at the startup so the users do not need to care about.
+
+\subsection {Using stacktrace module on Windows systems}
+In contradistinction to Linux, the Windows OS does not need installation of additional libraries but there 
+are some utilities which should be installed for the full functionality on some compilers.
+The module was tested with Microsoft Visual C++ 2008 Express Edition (MSVC), Open Watcom C++ 1.9 (OWC) and 
+Borland C++ Builder 2009 (BCB) compilers and the following setup of compilers has to be used for full stacktrace:
+\begin {description}
+\item [MSVC] - the switch {\sf /clr} cannot be used (Common Language Runtime support has to be switched off).
+                   No additional steps are necessary. MS native debug format {\sf PDB} is used by default and
+                   it is processed by the dbgHelp function without problems.
+
+\item[OWC] - the debug format {\sf CodeView 4} with ONLY LINE DEBUG SYMBOLS has to be used and stored in the {\sf exe} 
+                  file (do not use separate symbol file). The {\sf rebase.exe} utility from the old Windows SDK has to 
+                  be used in order to strip the debug symbols out of the {\sf exe} file and store them 
+                  into {\sf .dbg} file. The settings has to be performed both in target C++ compiler 
+                  switches and target linker switches. Use {\sf rebase.exe -b 0x400000 -x . prog\_name.exe}. 
+                  The address 0x400000 is a memory segment where the {\sf exe} file is stored by default. This 
+                  procedure removes debug symbols from the {\sf exe} file and it causes that the program cannot 
+                  be debugged in the Watcom debugger. Should be also noted that the procedure has to be repeated 
+                  after each recompilation of the target {\sf exe} file. 
+
+\item [BCB] - the debug format {\sf CodeView 4} has to be used and stored in the {\sf tds} file (default storage).
+                  than the utility {\sf tds2dbg.exe} from Bjarne Juul Pasgaard has to be used in order to convert the debug 
+                  symbols from the {\sf tds} file and store them into {\sf .dbg} file. This procedure changes the setup of debug 
+                  symbols in the {\sf exe} file and it causes that the program cannot be debugged in the C++Builder debugger. 
+                  Should be also noted that the procedure has to be repeated after each recompilation of the target {\sf exe} file. 
+\end {description}

@@ -1,0 +1,190 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Description of TRFEL Philosophy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Strategy of nonstationary problems}
+
+tento odstavec opravit??!!
+
+Nonlinear static problems are described by (\ref{eqnnonlinstat}). Dependence of stiffness matrix on actual
+configuration represented by vector of displacements $\mbf{d}$ is the main difficulty. System of nonlinear
+algebraic equations (\ref{eqnnonlinstat}) is solved by the arc-length method or by the Newton-Raphson method.
+Increments of displacements and loads are computed from the attained state which is in equilibrium. New
+vectors of displacements and loads define new state which is generally not in equilibrium. Therefore vector
+of residuals is assembled and corrections of mentioned vectors are computed. The last step is repeated until
+equilibrium state is obtained.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Integration Points}
+\index{integration points}
+
+Integration points play significant role in the code. They contain information about used material models,
+actual and previous values of unknowns, important material parameters etc.
+
+
+There are the following arrays at every integration point
+\begin{itemize}
+\item{{\sf tm} - contains type of material or materials,}
+\item{{\sf idm} - contains identification number of material or materials,}
+\item{{\sf av} - contains actual values of unknowns,}
+\item{{\sf pv} - contains values of unknowns from previous tim step,}
+\item{{\sf fluxes} - contains flux components,}
+\item{{\sf grad} - contains gradients components,}
+\item{{\sf other} - contains all other parameters, which are not in the equilibrium during the iteration,}
+\end{itemize}
+\index{array!other}\index{array!eqother}\index{array!stress}\index{array!strain}\index{array!nonloc}
+
+tento odstavec opravit??!!
+
+The array {\sf other} contains all necessary material parameters. Elastic models do not use it. Plastic
+models require to store plastic strains, consistency parameter and optionally hardening parameters.
+Damage models require to store damage parameter etc. Stored parameters in the array {\sf other} are
+defined by used material model. The material model should describe an order of parameters in the
+array {\sf other}.
+
+The array {\sf eqother} contains the same parameters as the array {\sf other}. The array {\sf other}
+is changed in each iteration and contains values of material parameters which can be unequilibriated.
+On the other hand, the array {\sf eqother} contains values of material parameters which are
+equilibriated and this array is changed only when the new global equilibrium is attained.
+Components of the array {\sf eqother} are changed by the function {\sf void mechmat::updateipval (void)}
+which is called by the solver (arc-length, Newton-Raphson method etc.).
+
+The situation is more complicated in the case of combination of several material models. Since it is
+not clear the maximum number of combined material models, the arrays {\sf other} and {\sf eqother}
+are not multiplied. The arrays are allocated longer. The number of components of the arrays is
+equal to the sum of number of material parameters of combined models. The number of components
+of the arrays can be obtained by the function {\sf long mechmat::givencompother (long ipp,long im)}.
+The {\it ipp} denotes the number of integration point and {\it im} stands for the number of
+material model used at the integration point (it is index in the array {\sf tm}).
+The defualt value of {\it im} is 0.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Combination of Material Models}
+
+The code contains many material models in the following areas:
+\begin{itemize}
+\item{elasticity}
+\item{plasticity}
+\item{damage}
+\item{viscosity}
+\item{microplane models}
+\end{itemize}
+
+In order to keep the code general in the area of material modelling, the code enables many combinations
+of implemented material models. For this purpose, artificial material models are introduced. They are called
+artificial because they do not contain any material parameters. Their main and only purpose is that they
+call appropriate functions of combined models.
+
+The array {\sf tm} of the class {\sf intpoints} play important role in the case of combination of several
+material models. The main material model is located at the first position. This model controls whole
+computation. It means, that it calls appropriate methods of classes, stores and restores required data etc.
+The artificial material models are always located at the first position of the array {\sf tm}.
+
+The type elastic material model is always located at the last position of the array {\sf tm}. The only exception
+is the case with temperature load which requires a model of thermal dilatancy. The type of the thermal dilatancy
+is located at the last position of the array {\sf tm} and the type of elastic model is at the last but one position.
+The type of elastic material can be obtained by the function {\sf long intpoints::gemid(void)}. It returns
+the index of the elastic model in the array {\sf tm}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Nonlinear nonstationary computations}
+
+Nonlocal computations are used for various problems which suffer by difficulties during the classical
+local approximation. The typical example is description of damage which has to be localized in a narrow
+band.
+
+The application of material models based on nonlocal approximation is clearly more complicated than
+the classical material models. For better understanding, the order of method calling is described in this section.
+
+Solver of nonlinear algebraic equations (arc-length, Newton-Raphson) calls function
+\newline {\sf internal\_forces (lcid,fi);} from the file {\sf globmat.cpp}.
+\newline With respect to the nonlocal model, the function
+\newline {\sf nonloc\_internal\_forces (lcid,intfor);} from the file {\sf globmat.cpp}
+\newline is called. This function calls the function
+\newline {\sf local\_values(lcid, i, 0, 0);}
+\newline with respect to the type of finite element. The finite element calls
+\newline {\sf Mm$\rightarrow$computenlstresses (ipp);} from the file {\sf mechmat.cpp}
+\newline in order to obtain correct stresses. With respect to the used material model, the function
+\newline {\sf nlstresses (ipp);} or {\sf nonloc\_nlstresses (ipp,im,ido);}
+\newline is called. Then the code is going back to the function
+\newline {\sf nonloc\_internal\_forces (long lcid,double *intfor)} from the file {\sf globmat.cpp}
+\newline where the averaging is performed. Then the function
+\newline {\sf nonloc\_internal\_forces (lcid, i, 0, 0, ifor);}
+\newline is called with respect to the used element. This function calls
+\newline {\sf Mm$\rightarrow$compnonloc\_nlstresses (ipp);} from the file {\sf mechmat.cpp}
+\newline With respect to the type of material model, the function
+\newline {\sf nonloc\_nlstresses (ipp,im,ido);}
+\newline is called. After its execution, the stresses are known and nodal forces
+are computed at the element level. The resulting vector of nodal forces is obtained
+after execution
+\newline {\sf nonloc\_internal\_forces (long lcid,double *intfor)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quantity sources}
+
+Source of studied quantity is one term in transport equation.
+
+Source of quantity is defined in object {\it lc} of the class {\sf loadcaset}
+which represents load case. The source is described by the class {\sf sourcet}.
+
+Source can be defined at nodes as well as at elements. List of nodes where source
+of quantity is defined is stored in an array denoted {\it lnqs} which is located in
+objects {\it lc}. List of elements with defined source is stored in an array denoted
+{\it leqs} which is in located in objects {\it lc}. Contributions from source terms
+are computed on elements and therefore elements with sources have to be denoted.
+Function {\sf loadcaset::elemsource ()} searches for elements with sources.
+It deals only with sources defined at nodes because the situation is clear in case of
+sources defined at element (list of such elements is directly available, the list
+is denoted {\it leqs}). 
+
+ The class {\sf loadcaset} contains array {\it lenqs} where
+list of numbers of nodes with sources are stored for each element. {\it lenqs[eid][nid]}
+contains number of row in array {\it lnqs} for
+
+
+If {\it lenqs} returns value -1, no source is defined at the node.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problems with Discontinuities}
+
+Transport problems with discontinuities prescribed in space can be solved
+by problem type discont\_nonlin\_nonstat\_problem=62. Discontinuity prescribed
+in space can be found e.g. at material interfaces. It is assumed that
+discontinuity leads on element edges in two dimensional problems or on
+element surfaces in three dimensional elements. Therefore, approximated
+functions (such as temperature, humidity, etc.) are smooth on elements
+but there are jumps at interface nodes and of course along interface edges or surfaces.
+More precisely, there are jumps in nodal values.
+
+Additional informations have to be read in the case of transport problems
+with discontinuitites. There must be a list of elements influenced by
+discontinuity. Elements adjacent to discontinuity from one side must
+be mentioned in the list. For each element, there must be number of
+nodes with discontinuity (with jumps) on particular element. There must
+also be a list of node numbers for each element. These informations
+are read before the classical element reading. The part
+containing these informations is located after node reading
+and before the classical element reading.
+
+When the previously mentioned data are read, variable discont located
+at the class elementt is changed from its default value -1 to some
+nonnegative value. The variable describes number of element influenced
+by discontinuity. This number is generally different from element number
+because it is assigned only to elements influenced by the jumps. Elements
+not influenced by the jumps have the variable discont equal to -1.
+This value is assigned in the constructor.
+
+In contrast to the classical computation, nodal values of elements influenced
+by discontinuity are recalculated with the help of appropriate material model.
+Function nodalvalues in file globmatt.cpp contains case
+discont\_nonlin\_nonstat\_problem, where function discont\_val is used.
+Final value transformation is located in function     
+Tm->values\_transformation in the file transmat.cpp
+

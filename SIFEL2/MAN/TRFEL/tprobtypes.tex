@@ -1,0 +1,743 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Type of transport problems}
+\label{typeofproblems}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Stationary problems}
+\label{secstationary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Differential equation}
+
+Let's consider the differential equation (Laplace's equation) describing stationary heat or moisture transfer as 
+\begin{eqnarray}
+{\rm div} \big(k\ {\rm grad} u(\tenss{x},t) \big) = 0 \qquad \tenss{x} 
+\in \Omega,\nonumber
+\end{eqnarray}
+with following boundary conditions
+\begin{eqnarray}
+u(\tenss{x},t) = \overline{u}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_u \nonumber
+\end{eqnarray}
+and
+\begin{eqnarray}
+q(\tenss{x},t) = \overline{q}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_q, \nonumber
+\end{eqnarray}
+where $q(x,t) = k (\partial  u(x,t) / \partial n)$.
+In case of heat transfer, $k$ is thermal conductivity and in case of moisture transfer,
+$k$ is diffusivity.
+
+Applying {\it Galerkin`s method} in Eqs. above we obtain
+\begin{eqnarray}
+\int_{\Omega}\Big(k\ {\rm grad} u\Big) w {\rm d} \Omega + 
+\int_{\Gamma_q}\Big(k\ \frac{\partial u}{\partial \vec{n}} - \overline{q}\Big)w {\rm d} \Gamma = 0.
+\end{eqnarray}
+Converting the first integral via {\it Gauss theorem} yields:
+\begin{eqnarray}\label{sfem}
+\int_{\Omega}\Big\{ k\ {\rm grad} u \ {\rm grad} w \Big\} {\rm d}\Omega
++ \int_{\Gamma_u} k\ \frac{\partial u}{\partial \vec{n}} w {\rm d}\Gamma - \int_{\Gamma_q} 
+\overline{q} w {\rm d}\Gamma = 0,
+\end{eqnarray}
+where $w$ is weight function. In finite element method the weight function $w = \delta u$ is 
+usually  variational of searching function.
+From the first boundary condition it is evident that $\delta u = 0$ on $\Gamma_u$ and 
+\begin{eqnarray}
+\int_{\Gamma_u} k\ \frac{{\rm d} u}{{\rm d} n} \delta u {\rm d}\Gamma = 0
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical solution}
+
+On the finite element  the function $u$ is approximated as:
+\begin{eqnarray}\label{saprox_u}
+u = \tenss{Nr},
+\end{eqnarray}
+where $\tenss{N}$ is a matrix of shape  functions (according to type of used elements) 
+and $\tenss{r}$ is a column matrix of nodal values of function $u$.
+
+Using approximation (\ref{saprox_u}) and in Eq. (\ref{sfem}), 
+we arrive at a set of the first order differential equations
+\begin{eqnarray}\label{sfemmatr}
+\tenss{Kr}  = \overline{\tenss{q}}
+\end{eqnarray}
+where
+\begin{eqnarray}\label{skint}
+\tenss{K} &=& \int_{\Omega}  \Big(\frac{\partial \tenss{N}^T}{\partial x}k\frac{\partial \tenss{N}}{\partial x} 
++ \frac{\partial \tenss{N}^T}{\partial y}k\frac{\partial \tenss{N}}{\partial y} + 
+\frac{\partial \tenss{N}^T}{\partial z}k\frac{\partial \tenss{N}}{\partial z}\Big){\rm d}\Omega,\nonumber\\
+\tenss{K} &=& \int_{\Omega}  \Big(\tenss{B}^T k \tenss{B}\Big){\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\overline{\tenss{q}} = \int_{\Gamma_2} \tenss{N}^T  \overline{q}{\rm d}\Gamma,
+\end{eqnarray}
+Matrix $\tenss{K}$ is the conductivity matrix.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Non-stationary problems}
+\label{secnonstationary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Differential equation}
+
+Let's consider the diffusivity differential equation (parabolical equation) describing heat or moisture transfer as 
+\begin{eqnarray}
+{\rm div} \big(k\ {\rm grad} u(\tenss{x},t) \big) -  c\ \frac{\partial  u(\tenss{x},t)}{\partial t} = 0 \qquad \tenss{x} 
+\in \Omega,\nonumber
+\end{eqnarray}
+with initial condition
+\begin{eqnarray}
+u(\tenss{x},t = 0) = u_0(\tenss{x}), \qquad \tenss{x} \in \Omega \nonumber
+\end{eqnarray}
+and with following boundary conditions
+\begin{eqnarray}
+u(\tenss{x},t) = \overline{u}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_u \nonumber
+\end{eqnarray}
+and
+\begin{eqnarray}
+q(\tenss{x},t) = \overline{q}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_q, \nonumber
+\end{eqnarray}
+where $q(x,t) = k (\partial  u(x,t) / \partial n)$.
+In case of heat transfer, $k$ is thermal conductivity and $c = \rho  C$, where $\rho$ is density and $C$ is specific heat.
+In case of moisture transfer, $k$ is diffusivity and $c = \rho$, where $\rho$ is density.
+
+Applying {\it Galerkin`s method} in Eqs. above we obtain
+\begin{eqnarray}
+\int_{\Omega}\Big(k\ {\rm grad} u - c\ \frac{\partial u}{\partial t}\Big) w {\rm d} \Omega + 
+\int_{\Gamma_q}\Big(k\ \frac{\partial u}{\partial \vec{n}} - \overline{q}\Big)w {\rm d} \Gamma = 0.
+\end{eqnarray}
+Converting the first integral via {\it Gauss theorem} yields:
+\begin{eqnarray}\label{nfem}
+\int_{\Omega}\Big\{ k\ {\rm grad} u \ {\rm grad} w - c\  \frac{\partial u}{\partial t} w \Big\} {\rm d}\Omega
++ \int_{\Gamma_u} k\ \frac{\partial u}{\partial \vec{n}} w {\rm d}\Gamma - \int_{\Gamma_q} 
+\overline{q} w {\rm d}\Gamma = 0,
+\end{eqnarray}
+where $w$ is weight function. In finite element method the weight function $w = \delta u$ is 
+usually  variational of searching function.
+From the first boundary condition it is evident that $\delta u = 0$ on $\Gamma_u$ and 
+\begin{eqnarray}
+\int_{\Gamma_u} k\ \frac{{\rm d} u}{{\rm d} n} \delta u {\rm d}\Gamma = 0
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Numerical solution}
+
+On the finite element  the function $u$ is approximated as:
+\begin{eqnarray}\label{naprox_u}
+u = \tenss{Nr},
+\end{eqnarray}
+where $\tenss{N}$ is a matrix of shape  functions (according to type of used elements) 
+and $\tenss{r}$ is a column matrix of nodal values of function $u$.
+
+Using approximation (\ref{naprox_u}) and in Eq. (\ref{nfem}), 
+we arrive at a set of the first order differential equations
+\begin{eqnarray}\label{nfemmatr}
+\tenss{Kr} + \tenss{C} \frac{{\rm d}\tenss{r}}{{\rm d}t} = \overline{\tenss{q}}
+\end{eqnarray}
+where
+\begin{eqnarray}\label{nkint}
+\tenss{K} &=& \int_{\Omega} \Big(\frac{\partial \tenss{N}^T}{\partial x}k \frac{\partial \tenss{N}}{\partial x} 
++ \frac{\partial \tenss{N}^T}{\partial y}k \frac{\partial \tenss{N}}{\partial y} + 
+\frac{\partial \tenss{N}^T}{\partial z}k \frac{\partial \tenss{N}}{\partial z}\Big){\rm d}\Omega,\nonumber\\
+\tenss{K} &=& \int_{\Omega}  \Big(\tenss{B}^T k \tenss{B}\Big){\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\tenss{C} = \int_{\Omega} \tenss{N}^T c\ \tenss{N} {\rm d}\Omega,
+\end{eqnarray}
+\begin{eqnarray}
+\overline{\tenss{q}} = \int_{\Gamma_2} \tenss{N}^T  \overline{q}{\rm d}\Gamma,
+\end{eqnarray}
+Matrix $\tenss{K}$ is the conductivity matrix, $\tenss{C}$ is the temperature or moisture 
+capacity matrix, respectively. $\tenss{\overline{q}}$ is a vector of prescribed fluxes on the boundary. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time discretization}
+
+Let's consider time interval $\Delta t = t_i- t_{i-1}$ and assume we know solution 
+$\tenss{r}_{i-1}$ at a time instant $t_{i-1}$. We admit a linear approximation for vector 
+\begin{eqnarray}\label{timeint}
+\tenss{r}(t) = \tau \tenss{r}_i + (1-\tau)\tenss{r}_{i-1},
+\end{eqnarray}
+where $\tau = (t - t_{i-1})/\Delta t$. The same approximation is used for 
+vector $\overline{\tenss{q}}$. 
+\begin{eqnarray}\label{timeder}
+\frac{{\rm d} \tenss{r}}{{\rm d}t} =  \frac{1}{\Delta t}(\tenss{r}_i-\tenss{r}_{i-1})
+\end{eqnarray}
+Applying Eqs. (\ref{timeint}) and (\ref{timeder}) to Eq. (\ref{nfemmatr}) we obtain the following 
+system of linear equations for unknown vector $\tenss{r}_i$ written in the matrix form
+\begin{eqnarray}\label{qq}
+\Big[\tenss{K}\tau + \frac{\tenss{C}}{\Delta t} \Big] \tenss{r}_i = \overline{\tenss{q}}_{i-1}(1-\tau) + \overline{\tenss{q}}_i\tau + 
+\Big[\frac{\tenss{C}}{\Delta t} - \tenss{K}(1-\tau) \Big] \tenss{r}_{i-1}.
+\end{eqnarray}
+The quantities appearing on the right-hand side of Eq. (\ref{qq}) are suppose to be known.
+It is necessary to choose $\tau$ from the interval $1/2 \le \tau \le 1$ to ensure numerical 
+stability of the procedure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Initial conditions}
+
+An initial condition is set in time $t = 0$:
+
+\begin{eqnarray}
+u(\tenss{x},t = 0) = u_0(\tenss{x}), \qquad \tenss{x} \in \Omega. \nonumber
+\end{eqnarray}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Boundary conditions}
+
+There are generally three types of boundary conditions:
+
+{\bf Dirichlet's type:}
+
+- prescribed value on the boundary
+
+\begin{eqnarray}
+u(\tenss{x},t) = \overline{u}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_u. \nonumber
+\end{eqnarray}
+
+{\bf Neumann's type:}
+
+- prescribed fluxes on the boundary
+
+\begin{eqnarray}
+q(\tenss{x},t) = \overline{q}(\tenss{x},t), \qquad \tenss{x} \in \Gamma_{q_1}. \nonumber
+\end{eqnarray}
+
+{\bf Cauchy's type (mixed):}
+
+- transfer on the boundary
+
+\begin{eqnarray}
+q(\tenss{x},t) = \beta_u\big({u}(\tenss{x},t) - {u}_\infty(\tenss{x},t)\big), \qquad \tenss{x} \in \Gamma_{q_2}, \nonumber
+\end{eqnarray}
+where $\beta_u$ is transfer coefficient on the boundary and ${u}_\infty(\tenss{x},t)$ is an ambient value.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Source terms}
+
+A source of medium $u$ can be defined as:
+
+\begin{eqnarray}
+{\rm div} \big(k\ {\rm grad} u(\tenss{x},t) \big) -  c\ \frac{\partial  u(\tenss{x},t)}{\partial t} + I_u(\tenss{x},t) = 0 \qquad \tenss{x} 
+\in \Omega,\nonumber
+\end{eqnarray}
+
+As an example we present an equation of heat transfer in simple form
+\begin{eqnarray}\label{hydr1}
+\big( \rho C \big)_{\rm eff} \frac{\partial T}{\partial t} = {\rm div}\Big( \chi_{\rm eff} {\rm grad} T\Big) + I(x,y,z,t),
+\end{eqnarray}
+where $( \rho C \big)_{\rm eff}$ is effective heat capacity, $\chi_{\rm eff}$ is effective heat conductivity and 
+$I$ [W/m$^3$] is the volume heat source. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{JK}
+
+Transport process of one medium will be shown on example of heat transport. The governing function represents
+temperature, $T$. The flow of the heat is described by flux of heat denoted by $\mbf{q}$. Relation between
+temperature and the flux is given by the Fourier law
+\begin{equation}
+q_i = - \sum_{j=1}^{3} d_{ij} \ppd{T}{x_j}\ ,
+\end{equation}
+where $d_{ij}$ stands for conductivity coefficients. Usually, the off-diagonal components of $d_{ij}$ are equal
+to zero. The flux in the direction of a normal vector has the form
+\begin{equation}
+q_n = \sum_{i=1}^{3} q_i n_i = - \sum_{i=1}^{3} \sum_{j=1}^{3} n_i d_{ij} \ppd{T}{x_j}\ .
+\end{equation}
+
+Let $\Omega$ is a 3D domain
+and the boundary of the domain $\Omega$ is denoted by $\Gamma$. The boundary is a union of 3 parts
+$\Gamma_p$, $\Gamma_f$ and $\Gamma_t$. For all internal points of the domain $\Omega$, the governing
+equation has the form
+\begin{equation}\label{eqgoveqn}
+\sum_{i=1}^{3} \ppd{}{x_i} \left(\sum_{j=1}^{3} d_{ij} \ppd{T}{x_{j}}\right) + z = \rho c \ppd{T}{t}\ ,
+\end{equation}
+where $z$ denotes the source of heat per unit volume, $\rho$ stands for the density and $c$ expresses the capacity.
+Boundary conditions are
+\begin{eqnarray}
+\forall \mbf{x} \in \Gamma_p &:& T(\mbf{x},t) = g(\mbf{x},t)\ ,
+\\
+\forall \mbf{x} \in \Gamma_f &:& q_n(\mbf{x},t) = h(\mbf{x},t)\ ,
+\\
+\forall \mbf{x} \in \Gamma_t &:& q_n(\mbf{x},t) = c_t (T(\mbf{x},t) - T_{ext}(\mbf{x},t))
+\end{eqnarray}
+and initial condition
+\begin{equation}
+T(\mbf{x},0) = e(\mbf{x})\ .
+\end{equation}
+The problem has non-homogeneous boundary conditions and will be transformed into problem with homogeneous
+conditions. The function $T$ is split into two functions
+\begin{equation}\label{eqhomboundcond}
+T(\mbf{x},t) = \tilde{T}(\mbf{x},t) + \hat{T}(\mbf{x},t)
+\end{equation}
+which satisfy the following conditions
+\begin{eqnarray}
+\forall \mbf{x} \in \Gamma_p : \tilde{T}(\mbf{x},t) &=& 0\ ,
+\\
+\hat{T}(\mbf{x},t) &=& g(\mbf{x},t)\ ,
+\\
+\hat{T}(\mbf{x},0) &=& e(\mbf{x})\ .
+\end{eqnarray}
+Application of the Galerkin method on (\ref{eqgoveqn}) and substitution of (\ref{eqhomboundcond}) leads to expression
+\begin{eqnarray}\label{eqgalmethbe}
+\int_{\Omega} \phi \sum_{i=1}^{3} \ppd{}{x_i} \left(\sum_{j=1}^{3} d_{ij}
+\left(\ppd{\tilde{T}}{x_{j}} + \ppd{\hat{T}}{x_{j}}\right)\right) {\ \rm d}\Omega
++ \int_{\Omega} \phi z {\ \rm d}\Omega =
+\int_{\Omega} \phi \rho c \left(\ppd{\tilde{T}}{t} + \ppd{\hat{T}}{t}\right) {\ \rm d}\Omega
+\end{eqnarray}
+The first term of (\ref{eqgalmethbe}) can be modified
+\begin{eqnarray}
+&& \int_{\Omega} \phi \sum_{i=1}^{3} \ppd{}{x_i} \left(\sum_{j=1}^{3} d_{ij} \ppd{(\tilde{T}+\hat{T})}{x_{j}}\right) {\ \rm d}\Omega =
+\\
+&&
+\int_{\Gamma} \sum_{i=1}^{3} \phi n_i \left(\sum_{j=1}^{3} d_{ij} \ppd{(\tilde{T}+\hat{T})}{x_{j}}\right) {\ \rm d}\Gamma -
+\int_{\Omega} \sum_{i=1}^{3} \sum_{j=1}^{3} \ppd{\phi}{x_{i}} d_{ij} \ppd{(\tilde{T}+\hat{T})}{x_{j}} {\ \rm d}\Omega =
+\\
+&&
+\int_{\Gamma_f} - \phi h {\ \rm d}\Gamma_f -
+\int_{\Gamma_t} - \phi c_t (\tilde{T} + \hat{T} - T_{ext}) {\ \rm d}\Gamma_t -
+\int_{\Omega} \sum_{i=1}^{3} \sum_{j=1}^{3} \ppd{\phi}{x_{i}} d_{ij} \ppd{(\tilde{T}+\hat{T})}{x_{j}} {\ \rm d}\Omega\ \ \ \ \ 
+\end{eqnarray}
+The continuous functions from the previous relations are discretized by the finite element method in the following form
+\begin{eqnarray}
+\tilde{T} &=& \mbf{N} \mbf{d}
+\\
+\hat{T} &=& \mbf{N}^{[u]} \mbf{u}
+\\
+\phi &=& \mbf{N}^{[\phi]} \mbf{\phi}
+\\
+h &=& \mbf{N}^{[h]} \mbf{h}
+\\
+z &=& \mbf{N}^{[z]} \mbf{z}
+\\
+T_{ext} &=& \mbf{N}^{[e]} \mbf{e}
+\\
+{\rm grad}\ \tilde{T} &=& \mbf{B} \mbf{d}
+\\
+{\rm grad}\ \hat{T} &=& \mbf{B}^{[u]} \mbf{u}
+\\
+{\rm grad}\ \phi &=& \mbf{B}^{[\phi]} \mbf{\phi}
+\end{eqnarray}
+After substitution of the previous approximation to the Equation (\ref{eqgalmethbe}), the following equation is obtained
+\begin{eqnarray}
+&& \int_{\Omega} \left(
+- \mbf{\phi}^T (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B} \mbf{d} 
+- \mbf{\phi}^T (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B}^{[u]} \mbf{u}
++ \mbf{\phi}^T (\mbf{N}^{[\phi]})^T \mbf{N}^{[z]} \mbf{z} -
+\right. \\
+&& \left. - \mbf{\phi}^T (\mbf{N}^{[phi]})^T \rho c \mbf{N} \dot{\mbf{d}}
+- \mbf{\phi}^T (\mbf{N}^{[\phi]})^T \rho c \mbf{N}^{[u]} \dot{\mbf{u}}
+\right) {\ \rm d}\Omega -
+\int_{\Gamma_f} \mbf{\phi}^T (\mbf{N}^{[\phi]})^T \mbf{N}^{[h]} \mbf{h} {\ \rm d}\Gamma_f +
+\\
+&& \int_{\Gamma_t} \left(
+- \mbf{\phi}^T (\mbf{N}^{[\phi]})^T c_t \mbf{N} \mbf{d}
+- \mbf{\phi}^T (\mbf{N}^{[\phi]})^T c_t \mbf{N}^{[u]} \mbf{u}
++ \mbf{\phi}^T (\mbf{N}^{[\phi]})^T c_t \mbf{N}^{[e]} \mbf{e}
+\right) {\ \rm d}\Gamma_t = \mbf{0}\ .\ \ \ 
+\end{eqnarray}
+Vector $\mbf{\phi}$ can be factored out and the form is obtained
+\begin{eqnarray}
+&& \mbf{\phi}^T \left(\int_{\Omega} \left(
+- (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B} \mbf{d} 
+- (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B}^{[u]} \mbf{u}
++ (\mbf{N}^{[\phi]})^T \mbf{N}^{[z]} \mbf{z} -
+\right.\right. \\ && \left.\left. 
+- (\mbf{N}^{[phi]})^T \rho c \mbf{N} \dot{\mbf{d}}
+- (\mbf{N}^{[\phi]})^T \rho c \mbf{N}^{[u]} \dot{\mbf{u}}
+\right) {\ \rm d}\Omega -
+\int_{\Gamma_f} (\mbf{N}^{[\phi]})^T \mbf{N}^{[h]} \mbf{h} {\ \rm d}\Gamma_f +
+\right. \\ && \left. 
++ \int_{\Gamma_t} \left(
+- (\mbf{N}^{[\phi]})^T c_t \mbf{N} \mbf{d}
+- (\mbf{N}^{[\phi]})^T c_t \mbf{N}^{[u]} \mbf{u}
++ (\mbf{N}^{[\phi]})^T c_t \mbf{N}^{[e]} \mbf{e}
+\right) {\ \rm d}\Gamma_t \right) = \mbf{0}\ .\ \ \ 
+\end{eqnarray}
+
+Usual notation has the form
+\begin{eqnarray}\label{eqcondmat}
+\mbf{K}^{[T]} &=& \int_{\Omega} (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B}{\ \rm d}\Omega
+\\
+\mbf{K}^{[u]} &=& \int_{\Omega} (\mbf{B}^{[\phi]})^T \mbf{D} \mbf{B}^{[u]}{\ \rm d}\Omega
+\\
+\mbf{K}^{[Tt]} &=& \int_{\Gamma_t} (\mbf{N}^{[\phi]})^T c_t \mbf{N}{\ \rm d}\Gamma
+\\
+\mbf{K}^{[ut} &=& \int_{\Gamma_t} (\mbf{N}^{[\phi]})^T c_t \mbf{N}^{[u]}{\ \rm d}\Gamma
+\\
+\mbf{C} &=& \int_{\Omega} (\mbf{N}^{[\phi]})^T c \mbf{N} {\ \rm d}\Omega
+\\
+\mbf{C}^{[u]} &=& \int_{\Omega} (\mbf{N}^{[\phi]})^T c \mbf{N}^{[u]} {\ \rm d}\Omega
+\\
+\mbf{M} &=& \int_{\Omega} (\mbf{N}^{[\phi]})^T \mbf{N}^{[z]} {\ \rm d}\Omega
+\\
+\mbf{f}^{[f]} &=& \int_{\Gamma_f} (\mbf{N}^{[\phi]})^T  \mbf{N}^{[h]} {\ \rm d}\Gamma\ \mbf{h}
+\\
+\mbf{f}^{[t]} &=& \int_{\Gamma_t} (\mbf{N}^{[\phi]})^T  c_t \mbf{N}^{[e]} {\ \rm d}\Gamma\ \mbf{e}
+\\ \label{eqsourcevector}
+\mbf{f}^{[z]} &=& \mbf{M} \mbf{z}
+\end{eqnarray}
+
+The balance equation with the previous notation has the form
+\begin{eqnarray}
+\left(\mbf{K}^{[T]}+\mbf{K}^{[Tt]}\right) \mbf{d} + \mbf{C} \dot{\mbf{d}} = 
+\mbf{f}^{[z]} - \left(\mbf{K}^{[u]}+\mbf{K}^{[ut]}\right) \mbf{u} -
+\mbf{C}^{[u]} \dot{\mbf{u}} - \mbf{f}^{[f]} + \mbf{f}^{[t]}\ .
+\end{eqnarray}
+Approximation functions for continuous functions are usually identical, therefore the following
+relationship is valid
+\begin{eqnarray}
+\mbf{N} = \mbf{N}^{[u]} = \mbf{N}^{[\phi]} = \mbf{N}^{[z]} = \mbf{N}^{[f]} = \mbf{N}^{[t]}\ .
+\end{eqnarray}
+The notation (\ref{eqcondmat}-\ref{eqsourcevector}) can be simplified to the form
+\begin{eqnarray}\label{eqcondmatred}
+\mbf{K}^{[T]} &=& \int_{\Omega} (\mbf{B}^T \mbf{D} \mbf{B}{\ \rm d}\Omega
+\\
+\mbf{K}^{[\Gamma]} &=& \int_{\Gamma_t} (\mbf{N}^T c_t \mbf{N}{\ \rm d}\Gamma
+\\
+\mbf{C} &=& \int_{\Omega} (\mbf{N}^T c \mbf{N} {\ \rm d}\Omega
+\\
+\mbf{M} &=& \int_{\Omega} (\mbf{N}^T \mbf{N} {\ \rm d}\Omega
+\\
+\mbf{f}^{[f]} &=& \int_{\Gamma_f} (\mbf{N}^T  \mbf{N} {\ \rm d}\Gamma\ \mbf{h}
+\\
+\mbf{f}^{[t]} &=& \int_{\Gamma_t} (\mbf{N}^T  c_t \mbf{N} {\ \rm d}\Gamma\ \mbf{e}
+\\ \label{eqsourcevectorred}
+\mbf{f}^{[z]} &=& \mbf{M} \mbf{z}
+\end{eqnarray}
+
+The balance equation with the previous notation (\ref{eqcondmatred}-\ref{eqsourcevectorred}) has the form
+\begin{eqnarray}\label{eqbalanceeq}
+\left(\mbf{K}^{[T]}+\mbf{K}^{[\Gamma]}\right) \mbf{d} + \mbf{C} \dot{\mbf{d}} = 
+\mbf{f}^{[z]} - \left(\mbf{K}+\mbf{K}^{[\Gamma]}\right) \mbf{u} -
+\mbf{C} \dot{\mbf{u}} - \mbf{f}^{[f]} + \mbf{f}^{[t]}\ .
+\end{eqnarray}
+
+\section{Solution of balance equations}
+
+The balance equation (\ref{eqbalanceeq}) can be written in more concise form
+\begin{eqnarray}\label{eqbalanceeqconcise}
+\mbf{K} \mbf{d} + \mbf{C} \dot{\mbf{d}} = \mbf{f}\ ,
+\end{eqnarray}
+where additional notation is used
+\begin{eqnarray}
+\mbf{K} &=& \mbf{K}^{[T]}+\mbf{K}^{[\Gamma]}
+\\
+\mbf{f} &=& \mbf{f}^{[z]} - \left(\mbf{K}+\mbf{K}^{[\Gamma]}\right) \mbf{u} -
+\mbf{C} \dot{\mbf{u}} - \mbf{f}^{[f]} + \mbf{f}^{[t]}\ .
+\end{eqnarray}
+Equation (\ref{eqbalanceeqconcise}) is system of ordinary differential equations
+and approximation in time has the form
+\begin{eqnarray}\label{eqtimeapprox}
+\dot{\mbf{d}} &=& \mbf{v}
+\\
+\mbf{d}_{n+1} &=& \mbf{d}_n + \Delta t \mbf{v}_{n+\alpha}
+\\
+\mbf{v}_{n+\alpha} &=& (1-\alpha) \mbf{v}_n + \alpha \mbf{v}_{n+1}\ ,
+\end{eqnarray}
+where subscripts denote the time step. Equation (\ref{eqbalanceeqconcise}) at time step $n+1$ can be written in the form
+\begin{eqnarray}\label{eqbalancen1}
+\mbf{K} \mbf{d}_{n+1} + \mbf{C} \mbf{d}_{n+1} = \mbf{f}_{n+1}\ .
+\end{eqnarray}
+If time approximation (\ref{eqtimeapprox}) is taken into account, the Equation (\ref{eqbalancen1}) can be rewritten to the form
+\begin{eqnarray}\label{eqsyslinequations}
+\left(\mbf{C} + \alpha \Delta \mbf{K}\right) \mbf{v}_{n+1} = \mbf{f}_{n+1} - \mbf{K} \mbf{d}_n - (1-\alpha)\Delta\mbf{K} \mbf{v}_n\ .
+\end{eqnarray}
+The predictor-corrector method can be used, where the predictor has the form
+\begin{eqnarray}\label{eqpredictor}
+\tilde{\mbf{d}}_{n+1} = \mbf{d}_n + (1-\alpha)\Delta \mbf{v}_n
+\end{eqnarray}
+and the corrector has the form
+\begin{eqnarray}\label{eqcorrector}
+\mbf{d}_{n+1} = \tilde{\mbf{d}}_{n+1} + \alpha\Delta \mbf{v}_{n+1}\ .
+\end{eqnarray}
+With the help of predictor and corrector, Equation (\ref{eqsyslinequations}) has the form
+\begin{eqnarray}\label{eqsyslinequations2}
+\left(\mbf{C} + \alpha \Delta \mbf{K}\right) \mbf{v}_{n+1} = \mbf{f}_{n+1} - \mbf{K} \tilde{\mbf{d}}_{n+1}\ .
+\end{eqnarray}
+
+Equation (\ref{eqsyslinequations2}) works with time derivatives of the nodal values $\mbf{v}_{n+1}$.
+This approach is called $v$-version and it may lead to a problem sometimes. Therefore additional approach,
+called $d$-version, was introduced. Time derivatives of nodal values are expressed from Equation (\ref{eqcorrector})
+in the form
+\begin{eqnarray}\label{eqnodderiv}
+\mbf{v}_{n+1} = \del{1}{\alpha\Delta t} (\mbf{d}_{n+1} - \tilde{\mbf{d}}_{n+1})
+\end{eqnarray}
+which is reasonable for $\alpha>0$ and $\Delta t>0$. Substitution of expression (\ref{eqnodderiv}) to the balance equation
+leads to the form
+\begin{eqnarray}\label{eqsyslinequations3}
+\left(\del{1}{\alpha\Delta t} \mbf{C} + \mbf{K}\right) \mbf{d}_{n+1} = \mbf{f}_{n+1} + \del{1}{\alpha\Delta t} \mbf{C} \tilde{\mbf{d}}_{n+1}\ .
+\end{eqnarray}
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coupled problems}
+
+Let a general coupled problem be described by a set of $m$ variables $v^{[j]}(x_i,t)$
+which depend on spatial coordinates and time. The variables can be collected in the vector
+\begin{eqnarray}
+\mbf{v}(\mbf{x},t) = \left(\begin{array}{c}
+v^{[1]}(\mbf{x},t)
+\\
+v^{[2]}(\mbf{x},t)
+\\
+\vdots
+\\
+v^{[m]}(\mbf{x},t)
+\end{array}\right)
+\end{eqnarray}
+The flux of the $j$-th variable has the form
+\begin{eqnarray}
+\mbf{q}^{[j]}(\mbf{x},t) &=& \mbf{q}^{[j]}(v^{[k]}(\mbf{x},t))
+\\
+q^{[j]}_i(x_k,t) &=& q^{[j]}_i(v^{[r]}(x_k,t))
+\end{eqnarray}
+The flux vector $\mbf{q}^{[j]}(\mbf{x},t)$ contains $d$ components, where $d$ is the geometrical dimension
+of the problem. Vectors $\mbf{q}^{[j]}(\mbf{x},t)$ can be collected in a new larger vector
+\begin{eqnarray}
+\mbf{q}(\mbf{x},t) = \left(\begin{array}{c}
+\mbf{q}^{[1]}(\mbf{x},t)
+\\
+\mbf{q}^{[2]}(\mbf{x},t)
+\\
+\vdots
+\\
+\mbf{q}^{[m]}(\mbf{x},t)
+\end{array}\right)
+\end{eqnarray}
+which contains $d.m$ components.
+Flux in the direction defined by an unit vector $\mbf{n}$ (unit means that size of the vector is equal
+to one, in mathematical language, norm of the vector is equal to one) is denoted by $\mbf{q}_n$ and
+can be expressed in the form
+\begin{eqnarray}\label{eqnormalfluxdef}
+\mbf{q}^{[j]}_n(\mbf{x},t) &=& q^{[j]}_n(x_k,t) \mbf{n}
+\end{eqnarray}
+where
+\begin{eqnarray}
+q^{[j]}_n(x_k,t) &=& \sum_{i=1}^{i=d} q^{[j]}_i(v^{[r]}(x_k,t)) n_i
+\end{eqnarray}
+Gradients of the variables can be written in the form
+\begin{eqnarray}
+\mbf{g}^{[j]} &=& {\rm grad}\ v^{[j]}(\mbf{x},t)
+\\
+g^{[j]}_i &=& \ppd{v^{[j]}(x_k,t)}{x_i}
+\end{eqnarray}
+The gradients can be also collected in a new larger vector
+\begin{eqnarray}
+\mbf{g}(\mbf{x},t) = \left(\begin{array}{c}
+\mbf{g}^{[1]}(\mbf{x},t)
+\\
+\mbf{g}^{[2]}(\mbf{x},t)
+\\
+\vdots
+\\
+\mbf{g}^{[m]}(\mbf{x},t)
+\end{array}\right)
+\end{eqnarray}
+which contains $d.m$ components.
+
+In the linear case, the fluxes has a special form
+\begin{eqnarray}\label{eqlinfluxv}
+\mbf{q}^{[j]}(\mbf{x},t) &=& - \sum_{k=1}^{k=m} \mbf{D}^{[jk]} \mbf{g}^{[k]}
+\\ \label{eqlinfluxt}
+q^{[j]}_i(x_k,t) &=& - \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} \ppd{v^{[k]}(x_s,t)}{x_r}
+\end{eqnarray}
+The constitutive relationships (\ref{eqlinfluxv}) can be written in the compact vector form
+\begin{eqnarray}
+\mbf{q}(\mbf{x},t) &=& - \mbf{D} \mbf{g}
+\end{eqnarray}
+where
+\begin{eqnarray}
+\mbf{D} = \left(\begin{array}{cccc}
+\mbf{D}^{[11]} & \mbf{D}^{[12]} & \ldots & \mbf{D}^{[1m]}
+\\
+\mbf{D}^{[21]} & \mbf{D}^{[22]} &        & \mbf{D}^{[2m]}
+\\
+\vdots      &             & \ddots & \vdots
+\\
+\mbf{D}^{[m1]} & \mbf{D}^{[m2]} & \ldots & \mbf{D}^{[mm]}
+\end{array}\right)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{D}^{[j]} = \left(\begin{array}{cccc}
+\mbf{D}^{[j1]} & \mbf{D}^{[j2]} & \ldots & \mbf{D}^{[jm]}
+\end{array}\right)
+\end{eqnarray}
+Combining (\ref{eqnormalfluxdef}), (\ref{eqlinfluxv}) and (\ref{eqlinfluxt}),
+flux in the direction defined by an unit vector $\mbf{n}$ can be rewritten
+\begin{eqnarray}\label{eqnormalfluxv}
+\mbf{q}^{[j]}_n(\mbf{x},t) &=& q^{[j]}_n(x_k,t) \mbf{n} = - \mbf{n} \sum_{k=1}^{k=m} \mbf{n}^T \mbf{D}^{[jk]} \mbf{g}^{[k]} =
+- \mbf{n} \mbf{n}^T \mbf{D}^{[j]} \mbf{g}
+\\ \label{eqnormalfluxt}
+q^{[j]}_n(x_k,t) &=& - \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} \ppd{v^{[k]}(x_s,t)}{x_r} n_i
+\end{eqnarray}
+
+
+
+Balance equation for the $j$-th variable has the form
+\begin{eqnarray}
+\ppd{h^{[j]}}{t} + {\rm div}\ \mbf{q}^{[j]} &=& s^{[j]}
+\\
+\ppd{h^{[j]}}{t} + \sum_{i=1}^{i=d}\ppd{q^{[j]}}{x_i} &=& s^{[j]}
+\end{eqnarray}
+where $s^{[j]}$ denotes the source of the $j$-th quantity and $h^{[j]}$
+denotes the density of the $j$-th quantity.
+
+The balance equations 
+\begin{eqnarray}
+\sum_{i=1}^{i=d} c^{[ji]} \ppd{v^{[i]}}{t} - \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} \dpd{v^{[k]}(x_s,t)}{x_r}{x_i} &=& s^{[j]}
+\\
+\sum_{i=1}^{i=d} c^{[ji]} \ppd{v^{[i]}}{t} - \sum_{k=1}^{k=m} D^{[jk]}_{ir} \Delta v^{[k]}(x_s,t) &=& s^{[j]}
+\end{eqnarray}
+The balance equations are accompanied by initial and boundary conditions. The initial conditions have the form
+\begin{eqnarray}
+v^{[k]}(x_i,0) = v^{[k]}_0(x_i)
+\end{eqnarray}
+The whole boundary of the domain $\Omega$ is split into three disjoint parts for each variable.
+The split for the $j$-th variable contains $\Gamma^{[j]}_D$, where Dirichlet conditions (function
+values) are prescribed, $\Gamma^{[j]}_N$, where Neumann conditions (fluxes) are prescribed and 
+$\Gamma^{[j]}_C$, where Newton-Cauchy conditions (transmission conditions) are prescribed.
+\begin{eqnarray}\label{eqboundarydecomp}
+\Gamma^{[j]}_D \cup \Gamma^{[j]}_N \cup \Gamma^{[j]}_C = \Gamma
+\end{eqnarray}
+Boundary conditions
+\begin{eqnarray}\label{eqdirichletbc}
+\forall \mbf{x} \in \Gamma^{[j]}_D &:& v^{[j]}(\mbf{x},t) = g^{[j]}(\mbf{x},t)\ ,
+\\ \label{eqneumannbc}
+\forall \mbf{x} \in \Gamma^{[j]}_N &:& q^{[j]}_n(\mbf{x},t) = h^{[j]}(\mbf{x},t)\ ,
+\\ \label{eqnewtonbc}
+\forall \mbf{x} \in \Gamma^{[j]}_C &:& q^{[j]}_n(\mbf{x},t) = \sum_{i=1}^{i=m} \kappa^{[ji]} (v^{[i]}(\mbf{x},t) - v^{[i]}_{ext}(\mbf{x},t))
+\end{eqnarray}
+
+\begin{eqnarray}
+\mbf{v}_{ext}(\mbf{x},t) = \left(\begin{array}{c}
+v^{[1]}_{ext}(\mbf{x},t)
+\\
+v^{[2]}_{ext}(\mbf{x},t)
+\\
+\vdots
+\\
+v^{[m]}_{ext}(\mbf{x},t)
+\end{array}\right)
+\end{eqnarray}
+\begin{eqnarray}
+\mbf{\kappa}^{[j]} = \left(\begin{array}{cccc}
+\mbf{\kappa}^{[j1]} & \mbf{\kappa}^{[j2]} & \ldots & \mbf{\kappa}^{[jm]}
+\end{array}\right)
+\end{eqnarray}
+\begin{eqnarray}
+\forall \mbf{x} \in \Gamma^{[j]}_C &:& q^{[j]}_n(\mbf{x},t) = \mbf{\kappa}^{[j]} (\mbf{v}(\mbf{x},t) - \mbf{v}_{ext}(\mbf{x},t))
+\end{eqnarray}
+
+
+Functions $v^{[j]}(\mbf{x},t)$ could be split 
+\begin{eqnarray}
+v^{[j]}(\mbf{x},t) = u^{[j]}(\mbf{x},t) + w^{[j]}(\mbf{x})
+\end{eqnarray}
+where
+\begin{eqnarray}
+\forall \mbf{x} \in \Gamma^{[j]}_D &:& w^{[j]}(\mbf{x},t) = g^{[j]}(\mbf{x},t)\ ,
+\\
+\forall \mbf{x} \in \Gamma^{[j]}_D &:& u^{[j]}_n(\mbf{x},t) = 0\ ,
+\\
+                                   &:& w^{[j]}_n(\mbf{x},0) = v^{[k]}_0(x_i)\ ,
+\end{eqnarray}
+
+
+Galerkin method
+\begin{eqnarray}\label{eqgalerkinstart}
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} \ppd{}{x_i} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\\ \nonumber
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} c^{[ji]} \ppd{(u^{[i]}+w^{[i]})}{t} {\rm d}\Omega - 
+\int_{\Omega} \phi^{[j]} s^{[j]} {\rm d}\Omega
+\end{eqnarray}
+The term on the left side can be modified with the help of Green theorem
+\begin{eqnarray}
+-\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} \ppd{}{x_i} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\\ \nonumber
+-\int_{\Gamma} \phi^{[j]} \sum_{i=1}^{i=d} n_i \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir}
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Gamma +
+\\ \nonumber
+\int_{\Omega} \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} \ppd{\phi^{[j]}}{x_i} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\end{eqnarray}
+Taking into account relationships (\ref{eqnormalfluxt}), (\ref{eqnormalfluxdef}) and (\ref{eqboundarydecomp}),
+the boundary integral in the previous equation can be modified which result in the form
+\begin{eqnarray}
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} \ppd{}{x_i} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\\ \nonumber
+\int_{\Gamma^{[j]}_N} \phi^{[j]} \sum_{i=1}^{i=d} n_i q^{[j]}_i {\rm d}\Gamma^{[j]}_N +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \sum_{i=1}^{i=d} n_i q^{[j]}_i {\rm d}\Gamma^{[j]}_C +
+\\ \nonumber
+\int_{\Omega} \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} \ppd{\phi^{[j]}}{x_i} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\end{eqnarray}
+Substitution of the boundary conditions (\ref{eqneumannbc}) and (\ref{eqnewtonbc}) to the previous equation leads
+to the form
+\begin{eqnarray}\label{eqgreenresult}
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} \ppd{}{x_i} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega =
+\\ \nonumber
+\int_{\Gamma^{[j]}_N} \phi^{[j]} h^{[j]} {\rm d}\Gamma^{[j]}_N +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \sum_{i=1}^{i=m} \kappa^{[ji]} (u^{[i]}+w^{[i]}-v^{[i]}_{ext}) {\rm d}\Gamma^{[j]}_C +
+\\ \nonumber
+\int_{\Omega} \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} \ppd{\phi^{[j]}}{x_i} D^{[jk]}_{ir} 
+\ppd{(u^{[i]}+w^{[i]}(x_s,t))}{x_r} {\rm d}\Omega
+\end{eqnarray}
+The term on left side of equation (\ref{eqgalerkinstart}) can be replaced by the terms in equation (\ref{eqgreenresult}).
+After some manipulations the final form can be written
+\begin{eqnarray}
+\int_{\Gamma^{[j]}_N} \phi^{[j]} h^{[j]} {\rm d}\Gamma^{[j]}_N +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \sum_{i=1}^{i=m} \kappa^{[ji]} w^{[i]} {\rm d}\Gamma^{[j]}_C +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \sum_{i=1}^{i=m} \kappa^{[ji]} v^{[i]}_{ext} {\rm d}\Gamma^{[j]}_C +
+\\ \nonumber
+\int_{\Omega} \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} \ppd{\phi^{[j]}}{x_i} D^{[jk]}_{ir} 
+\ppd{w^{[i]}(x_s,t)}{x_r} {\rm d}\Omega +
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} c^{[ji]} \ppd{w^{[i]}}{t} {\rm d}\Omega - 
+\int_{\Omega} \phi^{[j]} s^{[j]} {\rm d}\Omega = 
+\\ \nonumber
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \sum_{i=1}^{i=m} \kappa^{[ji]} u^{[i]} {\rm d}\Gamma^{[j]}_C +
+\int_{\Omega} \sum_{i=1}^{i=d} \sum_{k=1}^{k=m} \sum_{r=1}^{r=d} \ppd{\phi^{[j]}}{x_i} D^{[jk]}_{ir} 
+\ppd{u^{[i]}}{x_r} {\rm d}\Omega +
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} c^{[ji]} \ppd{u^{[i]}}{t} {\rm d}\Omega - 
+\end{eqnarray}
+
+After some manipulations the final form can be written
+\begin{eqnarray}
+\int_{\Gamma^{[j]}_N} \phi^{[j]} h^{[j]} {\rm d}\Gamma^{[j]}_N +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \mbf{\kappa}^{[j]} \mbf{w} {\rm d}\Gamma^{[j]}_C +
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \mbf{\kappa}^{[j]} \mbf{v}_{ext} {\rm d}\Gamma^{[j]}_C +
+\\ \nonumber
+\int_{\Omega} \left(\mbf{B}^{[\phi]}\right)^T \mbf{D}^{[j]} \mbf{B}^{[w]} {\rm d}\Omega +
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} c^{[ji]} \ppd{w^{[i]}}{t} {\rm d}\Omega - 
+\int_{\Omega} \phi^{[j]} s^{[j]} {\rm d}\Omega = 
+\\ \nonumber
+\int_{\Gamma^{[j]}_C} \phi^{[j]} \mbf{\kappa}^{[j]} \mbf{u} {\rm d}\Gamma^{[j]}_C +
+\int_{\Omega} \left(\mbf{B}^{[\phi]}\right)^T  \mbf{D}^{[j]} \mbf{B}^{[u]} {\rm d}\Omega +
+\int_{\Omega} \phi^{[j]} \sum_{i=1}^{i=d} c^{[ji]} \ppd{u^{[i]}}{t} {\rm d}\Omega - 
+\end{eqnarray}
+
+
+%\begin{eqnarray}
+
+%\end{eqnarray}
+
